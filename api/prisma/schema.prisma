@@ -1,0 +1,512 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// =====================================================================
+// ÉNUMÉRATIONS
+// =====================================================================
+
+// Rôles internes (CMS 1 Administration/Régie + CMS 2 Rédaction).
+// Ne concerne jamais un lecteur grand public — voir modèle Reader.
+enum StaffRole {
+  ADMIN // CMS 1 — accès complet, gestion des comptes
+  REGIE // CMS 1 — gestion des campagnes publicitaires et de la facturation
+  REDACTEUR // CMS 2 — rédige et soumet des articles
+  CHEF_SERVICE // CMS 2 — valide les articles de son service (Politique/Régions, Économie/Société, Culture...)
+  REDACTEUR_EN_CHEF // CMS 2 — validation finale, publication
+  SECRETAIRE_GENERAL // CMS 2 — supervision transverse de la rédaction
+}
+
+// Les 10 rubriques éditoriales + rubriques de service sont des lignes
+// du modèle Rubrique (pas un enum) pour rester configurables sans
+// redéploiement. RubriqueType distingue les deux familles.
+enum RubriqueType {
+  EDITORIALE // Politique, Refondation, Économie, Vie chère, Société, Régions, Diaspora, Culture, Sport, Vérité ou Intox
+  SERVICE // Photos légendées, Vidéos, Audio/Podcasts, Archives/Kiosque numérique
+}
+
+// Format de traitement d'un contenu — détermine le gabarit de saisie
+// dans le CMS 2 Rédaction et l'emplacement d'affichage grand public.
+enum Format {
+  FLASH // Info ultra-courte, façon story, vérifiée mais rapide
+  EDITION // Article structuré, contenu de référence du jour
+  DECRYPTAGE // Analyse approfondie, graphiques/chronologie
+  LIVE // Couverture en direct, mises à jour successives
+  VIDEO_COURTE // Résumé visuel < 90s, format vertical
+  AUDIO // Journal parlé / version audio d'un sujet
+  VERITE_OU_INTOX // Fact-check, prioritairement publié en Flash
+}
+
+// Cycle de validation éditoriale : Rédacteur → Chef de service →
+// Rédacteur en chef / Secrétaire général → Publié.
+enum StatutArticle {
+  BROUILLON // En cours de rédaction
+  EN_RELECTURE // Soumis, en attente de validation par le chef de service
+  VALIDE // Validé, prêt à publier (peut être programmé)
+  PUBLIE // Visible du grand public
+  DEPUBLIE // Retiré de la diffusion (sans être supprimé)
+}
+
+// Accès grand public à un article.
+enum Paywall {
+  LIBRE // Accessible sans abonnement ni paiement
+  PAYANT // Paywall souple : abonnement OU paiement à l'article
+}
+
+enum TypeMedia {
+  PHOTO
+  VIDEO
+  AUDIO
+  PDF // ex : PDF d'une édition papier (kiosque)
+}
+
+// Verdict d'un fact-check « Vérité ou Intox ».
+enum VerdictFactCheck {
+  VRAI
+  FAUX
+  TROMPEUR // Vrai en partie, présenté hors contexte, etc.
+  NON_VERIFIABLE
+}
+
+enum FilNotification {
+  QUOTIDIEN // Actualité du jour, rythme modéré
+  FLASH // Alerte immédiate — format Flash ou Vérité ou Intox urgent
+}
+
+enum TypeAbonnement {
+  MENSUEL
+  ANNUEL
+}
+
+enum StatutAbonnement {
+  ACTIF
+  EXPIRE
+  ANNULE
+  IMPAYE
+}
+
+enum TypeTransaction {
+  ABONNEMENT
+  PAIEMENT_ARTICLE
+}
+
+enum MoyenPaiement {
+  ORANGE_MONEY
+  MTN_MOMO
+  MOOV_MONEY
+  CARTE_BANCAIRE
+}
+
+enum StatutTransaction {
+  EN_ATTENTE
+  REUSSI
+  ECHEC
+  REMBOURSE
+}
+
+enum FormatPub {
+  NATIVE_CARTE // Format publicitaire natif inspiré des cartes d'article
+  BANNIERE
+  TICKER_SPONSOR // Sponsoring du ticker Vie chère ou d'une rubrique
+}
+
+enum StatutCampagne {
+  BROUILLON
+  EN_ATTENTE_VALIDATION
+  ACTIVE
+  EN_PAUSE
+  TERMINEE
+}
+
+enum StatutFacture {
+  EMISE
+  PAYEE
+  EN_RETARD
+  ANNULEE
+}
+
+// =====================================================================
+// STAFF — CMS 1 (Administration/Régie) & CMS 2 (Rédaction)
+// =====================================================================
+
+model Staff {
+  id             String    @id @default(uuid())
+  nom            String
+  prenom         String
+  email          String    @unique
+  motDePasseHash String
+  telephone      String?
+  photo          String?
+  role           StaffRole
+  service        String? // ex : "Politique & Régions", "Économie & Société", "Culture", "Commercial & Marketing"
+  isActive       Boolean   @default(true)
+  pushToken      String? // token Expo Push — PWA rédaction
+
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  lastActiveAt DateTime?
+
+  // Relations — production éditoriale
+  articlesRediges     Article[]       @relation("ArticleAuteur")
+  articlesValides     Article[]       @relation("ArticleValidateur")
+  liveUpdates         LiveUpdate[]
+  checklistsVerifiees ChecklistItem[] @relation("ChecklistVerifiePar")
+  factChecksRealises  FactCheck[]
+
+  // Relations — régie publicitaire
+  campagnesGerees CampagnePub[] @relation("CampagneGerantPar")
+
+  @@map("staff")
+}
+
+// =====================================================================
+// LECTEURS — grand public (site + app)
+// =====================================================================
+
+model Reader {
+  id             String  @id @default(uuid())
+  nom            String?
+  prenom         String?
+  email          String? @unique
+  telephone      String? @unique
+  motDePasseHash String?
+  googleId       String? @unique
+  facebookId     String? @unique
+  photo          String?
+  region         String? // pour ciblage régie + Régions/Diaspora
+  pushToken      String? // token Expo Push — app grand public
+  notifQuotidien Boolean @default(true)
+  notifFlash     Boolean @default(true)
+  isActive       Boolean @default(true)
+
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  lastActiveAt DateTime?
+
+  abonnements  Abonnement[]
+  transactions Transaction[]
+  vues         ArticleVue[]
+
+  @@map("readers")
+}
+
+// =====================================================================
+// RUBRIQUES
+// =====================================================================
+
+model Rubrique {
+  id             String       @id @default(uuid())
+  slug           String       @unique
+  nom            String
+  type           RubriqueType @default(EDITORIALE)
+  angleEditorial String? // ex : "Vie institutionnelle, gouvernement, partis, Assemblée nationale"
+  ordre          Int          @default(0)
+  couleur        String? // pour badges/tabs de la maquette
+  actif          Boolean      @default(true)
+
+  articles            Article[]     @relation("ArticleRubriquePrincipale")
+  articlesSecondaires Article[]     @relation("ArticleRubriqueSecondaire")
+  campagnes           CampagnePub[] @relation("CampagneCiblageRubrique")
+
+  @@map("rubriques")
+}
+
+// =====================================================================
+// ARTICLES & CONTENU
+// =====================================================================
+
+model Article {
+  id          String        @id @default(uuid())
+  slug        String        @unique
+  titre       String
+  chapo       String? // accroche / résumé court (dek)
+  contenuHtml String? // corps de l'article, HTML produit par l'éditeur riche du CMS 2
+  tags        String[] // mots-clés libres — recherche + SEO
+  format      Format        @default(EDITION)
+  statut      StatutArticle @default(BROUILLON)
+  paywall     Paywall       @default(LIBRE)
+
+  rubrique             Rubrique   @relation("ArticleRubriquePrincipale", fields: [rubriqueId], references: [id])
+  rubriqueId           String
+  rubriquesSecondaires Rubrique[] @relation("ArticleRubriqueSecondaire") // ex : une brève Sport aussi taguée Diaspora
+
+  auteur      Staff   @relation("ArticleAuteur", fields: [auteurId], references: [id])
+  auteurId    String
+  validePar   Staff?  @relation("ArticleValidateur", fields: [valideParId], references: [id])
+  valideParId String?
+
+  imageUneUrl    String? // visuel principal (carte d'article + Une)
+  dureeEcouteSec Int? // durée de la version audio, si générée
+
+  vuesTotal             Int       @default(0) // compteur agrégé, rafraîchi en continu
+  datePublicationPrevue DateTime? // publication programmée (statut VALIDE en attente de bascule)
+  publieLe              DateTime?
+  depublieLe            DateTime?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  medias        Media[]
+  liveUpdates   LiveUpdate[]
+  factCheck     FactCheck?
+  checklist     ChecklistItem[]
+  vues          ArticleVue[]
+  notifications Notification[]
+
+  @@index([rubriqueId, statut, publieLe])
+  @@index([format, statut])
+  @@index([datePublicationPrevue])
+  @@map("articles")
+}
+
+model Media {
+  id       String    @id @default(uuid())
+  type     TypeMedia
+  url      String
+  legende  String?
+  credit   String? // photographe/source — "valorise le travail des photographes de la rédaction"
+  dureeSec Int? // vidéo/audio
+  ordre    Int       @default(0)
+
+  article   Article? @relation(fields: [articleId], references: [id])
+  articleId String?
+
+  createdAt DateTime @default(now())
+
+  @@map("medias")
+}
+
+// Mise à jour d'un article au format LIVE (badge "DIRECT").
+model LiveUpdate {
+  id         String   @id @default(uuid())
+  contenu    String
+  horodatage DateTime @default(now())
+
+  article   Article @relation(fields: [articleId], references: [id])
+  articleId String
+
+  auteur   Staff  @relation(fields: [auteurId], references: [id])
+  auteurId String
+
+  @@map("live_updates")
+}
+
+// Détail fact-check pour un article de format VERITE_OU_INTOX (1-1).
+model FactCheck {
+  id            String           @id @default(uuid())
+  verdict       VerdictFactCheck
+  rumeurOrigine String? // description de la rumeur/vidéo virale identifiée
+  sourceRumeur  String? // réseau social / lien d'origine
+  preuves       String? // éléments de preuve, sources citées
+
+  article   Article @relation(fields: [articleId], references: [id])
+  articleId String  @unique
+
+  realisePar   Staff  @relation(fields: [realiseParId], references: [id])
+  realiseParId String
+
+  createdAt DateTime @default(now())
+
+  @@map("fact_checks")
+}
+
+// Checklist de vérification avant publication (obligatoire pour
+// Flash et Vérité ou Intox, cf. cahier des charges §2.2).
+model ChecklistItem {
+  id        String    @id @default(uuid())
+  libelle   String // ex : "Source primaire identifiée", "Deuxième source recoupée"
+  verifie   Boolean   @default(false)
+  verifieLe DateTime?
+
+  article   Article @relation(fields: [articleId], references: [id])
+  articleId String
+
+  verifiePar   Staff?  @relation("ChecklistVerifiePar", fields: [verifieParId], references: [id])
+  verifieParId String?
+
+  @@map("checklist_items")
+}
+
+// =====================================================================
+// KIOSQUE / ARCHIVES — édition papier numérisée
+// =====================================================================
+
+model Edition {
+  id            String   @id @default(uuid())
+  numero        Int      @unique // ex : 7970
+  dateParution  DateTime
+  pdfUrl        String
+  couvertureUrl String?
+  prix          Int      @default(300) // FCFA
+
+  createdAt DateTime @default(now())
+
+  @@map("editions")
+}
+
+// =====================================================================
+// TICKER VIE CHÈRE
+// =====================================================================
+
+model PrixVieChere {
+  id           String   @id @default(uuid())
+  produit      String // riz, huile, essence, transport...
+  unite        String // kg, litre, trajet...
+  prix         Float
+  variationPct Float? // évolution vs relevé précédent, pour flèche hausse/baisse du ticker
+  dateReleve   DateTime @default(now())
+
+  @@index([produit, dateReleve])
+  @@map("prix_vie_chere")
+}
+
+// =====================================================================
+// STATISTIQUES DE LECTURE (temps réel, visible côté rédaction)
+// =====================================================================
+
+// Journal d'événements de lecture — alimente le compteur Article.vuesTotal
+// et les statistiques temps réel du CMS 2 Rédaction.
+model ArticleVue {
+  id        String  @id @default(uuid())
+  article   Article @relation(fields: [articleId], references: [id])
+  articleId String
+
+  reader   Reader? @relation(fields: [readerId], references: [id])
+  readerId String? // null si lecteur anonyme
+
+  source    String? // web, app, notification, partage...
+  region    String?
+  createdAt DateTime @default(now())
+
+  @@index([articleId, createdAt])
+  @@map("article_vues")
+}
+
+// =====================================================================
+// NOTIFICATIONS
+// =====================================================================
+
+model Notification {
+  id      String          @id @default(uuid())
+  titre   String
+  contenu String?
+  fil     FilNotification
+
+  article   Article? @relation(fields: [articleId], references: [id])
+  articleId String?
+
+  envoyeLe  DateTime?
+  createdAt DateTime  @default(now())
+
+  @@map("notifications")
+}
+
+// =====================================================================
+// ABONNEMENTS & PAIEMENTS (lecteurs)
+// =====================================================================
+
+model Abonnement {
+  id       String @id @default(uuid())
+  reader   Reader @relation(fields: [readerId], references: [id])
+  readerId String
+
+  type               TypeAbonnement
+  statut             StatutAbonnement @default(ACTIF)
+  prix               Int // FCFA
+  dateDebut          DateTime         @default(now())
+  dateFin            DateTime
+  renouvellementAuto Boolean          @default(true)
+
+  transactions Transaction[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("abonnements")
+}
+
+model Transaction {
+  id       String @id @default(uuid())
+  reader   Reader @relation(fields: [readerId], references: [id])
+  readerId String
+
+  type             TypeTransaction
+  montant          Int // FCFA
+  moyenPaiement    MoyenPaiement
+  statut           StatutTransaction @default(EN_ATTENTE)
+  referenceExterne String? // référence opérateur mobile money / PSP carte
+
+  abonnement   Abonnement? @relation(fields: [abonnementId], references: [id])
+  abonnementId String?
+
+  articleId String? // paiement à l'article — pas de relation stricte pour ne pas bloquer la suppression d'un article payé
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([readerId, statut])
+  @@map("transactions")
+}
+
+// =====================================================================
+// RÉGIE PUBLICITAIRE (CMS 1)
+// =====================================================================
+
+model Annonceur {
+  id        String   @id @default(uuid())
+  nom       String
+  contact   String?
+  email     String?
+  telephone String?
+  createdAt DateTime @default(now())
+
+  campagnes CampagnePub[]
+
+  @@map("annonceurs")
+}
+
+model CampagnePub {
+  id        String         @id @default(uuid())
+  nom       String
+  formatPub FormatPub
+  statut    StatutCampagne @default(BROUILLON)
+
+  annonceur   Annonceur @relation(fields: [annonceurId], references: [id])
+  annonceurId String
+
+  rubriquesCiblees Rubrique[] @relation("CampagneCiblageRubrique")
+  regionsCiblees   String[] // ciblage géographique (ex : "Abidjan", "Bouaké", "Diaspora France")
+
+  dateDebut   DateTime
+  dateFin     DateTime
+  budget      Int // FCFA
+  impressions Int      @default(0)
+  clics       Int      @default(0)
+
+  gerePar   Staff?  @relation("CampagneGerantPar", fields: [gereParId], references: [id])
+  gereParId String?
+
+  factures FactureCampagne[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("campagnes_pub")
+}
+
+model FactureCampagne {
+  id         String      @id @default(uuid())
+  campagne   CampagnePub @relation(fields: [campagneId], references: [id])
+  campagneId String
+
+  montant      Int // FCFA
+  statut       StatutFacture @default(EMISE)
+  dateEmission DateTime      @default(now())
+  dateEcheance DateTime
+
+  @@map("factures_campagnes")
+}

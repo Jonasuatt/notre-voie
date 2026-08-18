@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  background: theme('colors.cream');
+  color: theme('colors.ink');
+}
+
+@keyframes pulse-live {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .25; }
+}
+.dot-live {
+  animation: pulse-live 1.4s infinite;
+}
+
+.prose-article :is(p) {
+  margin-bottom: 1.1em;
+  line-height: 1.75;
+}
