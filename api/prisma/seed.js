@@ -512,6 +512,256 @@ async function seedArticlesBatch2() {
   console.log(`✔ ${crees} article(s) du second lot créé(s) (${articles.length - crees} déjà existant(s)).`);
 }
 
+// Troisième lot — contenu réel des n°7961 à 7964 (31 juillet-5 août 2026),
+// les 4 derniers numéros de l'archive PDF fournie. Complète l'historique
+// vers l'amont (avant le n°7965 déjà seedé). Même principe d'attribution
+// et d'idempotence que les lots précédents.
+async function seedArticlesBatch3() {
+  const rubrique = async (nom) => prisma.rubrique.findUniqueOrThrow({ where: { slug: slugify(nom) } });
+  const staff = async (email) => prisma.staff.findUniqueOrThrow({ where: { email } });
+
+  const [politique, economie, societe, regions, culture, sport] = await Promise.all(
+    ['Politique', 'Économie', 'Société', 'Régions', 'Culture', 'Sport'].map(rubrique)
+  );
+  const [redacteurEnChef, secretaireGeneral, chefPolitique, chefCulture, redacteurSport, regie] = await Promise.all([
+    staff('redacteur-en-chef@notrevoienews.com'),
+    staff('secretaire-general@notrevoienews.com'),
+    staff('chef-politique@notrevoienews.com'),
+    staff('chef-culture@notrevoienews.com'),
+    staff('redacteur@notrevoienews.com'),
+    staff('regie@notrevoienews.com'),
+  ]);
+
+  const h = (heures) => new Date(Date.now() - heures * 3600 * 1000);
+
+  const articles = [
+    // --- n°7961 (31 juillet-2 août) — heures ~285-310h ---
+    {
+      slug: 'cote-ivoire-demene-sortir-guepier-blanchiment-capitaux',
+      titre: 'Blanchiment de capitaux et financement du terrorisme : la Côte d\'Ivoire se démène pour sortir du guêpier',
+      chapo: "Maintenue sur la liste grise du GAFI lors de la plénière de juin 2026 à Paris, la Côte d'Ivoire mise sur le nouveau Pôle pénal économique et financier pour convaincre d'ici la plénière d'octobre.",
+      contenuHtml: `<p>La Côte d'Ivoire figure toujours sur la liste grise du Groupe d'action financière (GAFI) et sur la liste noire de l'Union européenne en matière de blanchiment de capitaux et de financement du terrorisme. Des rumeurs avaient annoncé sa sortie prématurée, mais elle a bel et bien été maintenue lors de la session de juin 2026 à Paris — seules l'Algérie et la Namibie en sont sorties à cette occasion.</p>
+<p>Une mission cruciale d'évaluateurs du GAFI est attendue en Côte d'Ivoire en septembre 2026, pour vérifier sur le terrain l'application concrète des réformes. Les autorités espèrent une décision de retrait officiel dès la plénière d'octobre 2026, si cette visite confirme les progrès. L'installation fin juillet du Pôle pénal économique et financier dans son nouveau siège de Cocody 2 Plateaux se veut une vitrine institutionnelle.</p>
+<p>Mais des procès concernent jusque-là essentiellement de « petits calibres » : l'absence de personnalités politiques ou de hauts fonctionnaires parmi les poursuites interroge sur la réalité de la volonté de lutte contre le blanchiment au sommet de l'État.</p>`,
+      tags: ['GAFI', 'blanchiment de capitaux', 'justice'],
+      format: 'DECRYPTAGE', rubrique: politique, auteur: redacteurEnChef, heures: 300,
+    },
+    {
+      slug: 'bedie-le-sphinx-de-daoukro-il-y-a-trois-ans',
+      titre: 'Commémoration du décès de l\'ancien président ivoirien : Bédié, le Sphinx de Daoukro, il y a trois ans',
+      chapo: "Des messes ont été célébrées à Pépressou, son village natal, et à la paroisse Saint-Jean de Cocody, en présence de nombreux cadres du PDCI-RDA.",
+      contenuHtml: `<p>Cela fait trois ans que l'ancien président ivoirien Aimé Henri Konan Bédié, surnommé le « Sphinx de Daoukro », s'est éteint, le 1er août 2023. Des messes ont été célébrées en sa mémoire, l'une dans son village natal de Pépressou, dans la sous-préfecture de Daoukro, l'autre à la paroisse catholique Saint-Jean de Cocody.</p>
+<p>Le secrétaire exécutif du PDCI-RDA, Calice Yapo Yapo, l'ancien secrétaire exécutif Maurice Kacou Guikahué et plusieurs autres figures du parti se sont rendus à Pépressou pour ce moment de recueillement aux côtés de la veuve, Henriette Konan Bédié.</p>
+<p>Économiste, diplomate et président de la République de 1993 à 1999, Henri Konan Bédié aura mené une vie riche : ambassadeur à 26 ans, ministre de l'Économie et des Finances, président de l'Assemblée nationale, avant d'accéder à la magistrature suprême à la mort de Félix Houphouët-Boigny puis de lancer, en 2015, l'« Appel de Daoukro » en faveur d'Alassane Ouattara.</p>`,
+      tags: ['PDCI-RDA', 'Henri Konan Bédié', 'commémoration'],
+      format: 'EDITION', rubrique: politique, auteur: chefPolitique, heures: 290,
+    },
+    {
+      slug: 'assemblee-nationale-deputes-95-pourcent-electeurs-non-choisis',
+      titre: 'Boycott des élections, dispersion des voix, abstention : l\'Assemblée nationale et ces députés que 95 % des électeurs n\'ont pas choisis',
+      chapo: "Avec un taux de participation national de 35,04 % aux législatives du 27 décembre 2025, plusieurs députés doivent leur siège à moins d'un électeur inscrit sur vingt.",
+      contenuHtml: `<p>Sur 8 597 092 électeurs inscrits, seuls 3 012 094 se sont déplacés aux législatives du 27 décembre 2025, soit un taux de participation national de 35,04 %. Une abstention massive à laquelle le boycott appelé par le PPA-CI de Laurent Gbagbo n'est pas étranger, combinée à une multiplication des candidatures indépendantes.</p>
+<p>À Gagnoa (circonscription 069), quinze candidats se sont affrontés pour un seul siège : le vainqueur, l'indépendant Moussa Konaté, l'a emporté avec 18,72 % des suffrages exprimés — soit à peine 4 % du corps électoral total de 46 572 inscrits. À Kossou, le journaliste Léandre Kouakou Kouhouré Koffi a été élu avec seulement 5,3 % du corps électoral.</p>
+<p>Sur le plan strictement juridique, ces élus disposent de la plénitude de leurs prérogatives : le droit électoral ivoirien, comme la plupart des systèmes à scrutin majoritaire à un tour, ne connaît pas de seuil minimal de participation. Mais la légitimité politique ne se limite pas à la légalité, et la question de la représentativité réelle des élus reste entière.</p>`,
+      tags: ['Assemblée nationale', 'législatives', 'abstention'],
+      format: 'DECRYPTAGE', rubrique: politique, auteur: chefPolitique, heures: 225,
+    },
+    {
+      slug: 'cherte-carburant-loyer-vivres-transport-pouvoir-achat-souffrance',
+      titre: 'Cherté du carburant, du loyer, des vivres, du transport, de l\'électricité : le pouvoir d\'achat en souffrance',
+      chapo: "Entre loyers impayables, « pas-de-porte » redoutés et panier de la ménagère qui se vide chaque jour, le quotidien devient difficilement soutenable pour les ménages les plus vulnérables.",
+      contenuHtml: `<p>Pour un logement de deux pièces, il faut débourser par mois 150 000 FCFA pour être généreux, sinon dans certains quartiers c'est au-delà de 250 000 FCFA. Le salaire étant maigre, le travailleur n'a pas la capacité de souscrire à un projet immobilier pour s'offrir une maison — il est condamné à louer jusqu'au soir de sa vie.</p>
+<p>Dans le secteur de l'immobilier commercial, le phénomène redouté des « pas-de-porte » — des millions à débourser, non remboursables, sans rapport avec la caution — prend la forme d'une escroquerie bien huilée contre laquelle le gouvernement manque de volonté, freinant l'entrepreneuriat qu'il prétend par ailleurs encourager.</p>
+<p>Le prix minimum du maïs braisé, pourtant semé et récolté en Côte d'Ivoire, est de 200 FCFA. Le riz local est plus cher que le riz importé. « Le panier de la ménagère est un désert. Le coût du transport ruine », résume l'article, qui rappelle que le kilogramme de viande a doublé pour atteindre 3 500 à 4 000 FCFA depuis 2011.</p>`,
+      tags: ['vie chère', 'pouvoir d\'achat', 'loyer'],
+      format: 'DECRYPTAGE', rubrique: politique, auteur: chefPolitique, heures: 215,
+    },
+    // --- Économie ---
+    {
+      slug: 'vrai-tresor-afrique-pas-sous-la-terre-eco-2027',
+      titre: 'ECO 2027 : le vrai trésor de l\'Afrique n\'est pas sous la terre',
+      chapo: "Dans sa rubrique « Au cœur de l'économie », l'économiste et banquier Guillaume Liby dépasse le mythe d'une monnaie garantie par l'or : la solidité monétaire naît d'économies productives, pas de coffres pleins.",
+      contenuHtml: `<p>« Nos pays disposent d'importantes réserves d'or, nous pouvons donc créer une monnaie nationale souveraine » : cet argument, qui revient avec insistance à l'approche de l'entrée en vigueur de l'ECO en 2027, repose sur une confusion entre richesse minière d'un pays et fondements d'une monnaie moderne, explique Guillaume Liby.</p>
+<p>Depuis la suspension par Richard Nixon, en 1971, de la convertibilité du dollar en or, aucune grande monnaie internationale n'est plus adossée au métal précieux. « Au XIXe siècle, la richesse faisait la monnaie par l'or ; au XXIe siècle, la richesse fait la monnaie par la production », résume l'économiste, citant l'exemple de Singapour, sans mine d'or mais à la monnaie parmi les plus solides d'Asie.</p>
+<p>« La véritable question est : sommes-nous capables de construire une économie suffisamment forte pour donner naturellement de la valeur à notre monnaie ? », interroge-t-il, plaidant pour une souveraineté monétaire qui « commence dans les champs modernisés, les usines, les ports, les universités » plutôt que dans les coffres d'une banque centrale.</p>`,
+      tags: ['ECO 2027', 'monnaie', 'économie'],
+      format: 'DECRYPTAGE', rubrique: economie, auteur: secretaireGeneral, heures: 295,
+    },
+    {
+      slug: 'accord-cote-ivoire-botswana-or-africain-richesse-durable',
+      titre: 'Accord Côte d\'Ivoire-Botswana : le pari de l\'or africain transformé en richesse durable',
+      chapo: "Premier accord de coopération minière entre les deux pays, signé à Gaborone, avec le Botswana comme modèle de gestion responsable des ressources naturelles.",
+      contenuHtml: `<p>La Côte d'Ivoire et le Botswana ont signé leur premier accord de coopération dans les secteurs des mines et de l'énergie, un partenariat qui marque une nouvelle orientation : passer de la simple exploitation des ressources naturelles à la création d'une industrie minière intégrée et génératrice de valeur.</p>
+<p>Le choix du Botswana comme partenaire n'est pas un hasard : grâce au diamant, ce pays a réussi à construire une chaîne de valeur complète, de l'exploration à la commercialisation, en utilisant les revenus miniers pour soutenir son développement. Pour la Côte d'Ivoire, dont les découvertes aurifères de Koné, Tanda-Iguela et Doropo renforcent l'attractivité, l'objectif est de s'inspirer de cette expérience.</p>
+<p>« La véritable réussite d'un secteur extractif ne se mesure pas uniquement au volume des découvertes, mais à sa capacité à générer une dynamique économique endogène », a résumé Mamadou Sangafowa-Coulibaly, ministre des Mines, du Pétrole et de l'Énergie.</p>`,
+      tags: ['Botswana', 'mines', 'coopération'],
+      format: 'EDITION', rubrique: economie, auteur: secretaireGeneral, heures: 270,
+    },
+    {
+      slug: 'abondance-petroliere-ne-profite-pas-aux-ivoiriens',
+      titre: 'Énième hausse des prix du carburant : l\'abondance pétrolière qui ne profite pas aux Ivoiriens',
+      chapo: "Malgré les gisements Baleine et Calao, la Côte d'Ivoire reste exposée aux prix internationaux : le consortium d'exploitation associe ENI (47 %), Vitol (30 %) et PETROCI (23 %) seulement.",
+      contenuHtml: `<p>Le litre de super sans plomb est passé de 820 à 905 FCFA en trois mois à peine, tandis que le gasoil a grimpé de 655 à 725 FCFA. À chaque hausse, la même explication officielle revient : la conjoncture internationale. Mais cette justification mérite d'être interrogée à la lumière d'un paradoxe — la Côte d'Ivoire produit désormais son propre pétrole, et pourtant ses citoyens paient leur carburant de plus en plus cher.</p>
+<p>Dans le montage du gisement Baleine, présenté comme une découverte de classe mondiale, la participation ivoirienne demeure minoritaire : le groupe italien ENI y détient environ 47 %, le négociant Vitol 30 %, et PETROCI, le bras pétrolier de l'État, environ 23 % seulement.</p>
+<p>Second paradoxe : la Société ivoirienne de raffinage ne serait pas configurée pour traiter de manière optimale le brut extrait de Baleine, qui continue de s'approvisionner sur le marché international. La Côte d'Ivoire produit donc du pétrole brut, mais reste exposée aux prix internationaux des produits raffinés qu'elle consomme.</p>`,
+      tags: ['pétrole', 'Baleine', 'carburant'],
+      format: 'DECRYPTAGE', rubrique: economie, auteur: secretaireGeneral, heures: 210,
+    },
+    // --- Société ---
+    {
+      slug: '13e-prix-national-excellence-80-laureats-primes',
+      titre: '13e édition du Prix national d\'Excellence : 80 lauréats primés',
+      chapo: "Chaque lauréat, sur 3977 candidatures enregistrées, a reçu des mains du président Alassane Ouattara un trophée, un diplôme et une récompense de 10 millions FCFA.",
+      contenuHtml: `<p>Quatre-vingts lauréats sur les 3 977 candidatures enregistrées ont été primés au palais de la présidence de la République, lors de la cérémonie de la 13e édition du Prix national d'Excellence présidée par le chef de l'État. Ces lauréats se répartissent en 45 personnes physiques et 35 personnes morales, dont 11 administrations publiques et 13 entreprises privées.</p>
+<p>Dans le domaine de l'Éducation nationale, Ismaël Ivan Kien a été distingué comme meilleur élève au CEPE, Kouakou Guy Stéphane Dongo au BEPC et Bi Tra Aymard Yvan Gouli au baccalauréat. Dans le domaine de la Communication, Marie-Laure N'Goran a été distinguée pour le développement des médias.</p>
+<p>Ces 80 lauréats seront les invités spéciaux du président de la République lors des festivités du 66e anniversaire de l'indépendance, prévues sur le boulevard de la Solidarité, à Yopougon.</p>`,
+      tags: ['prix national d\'excellence', 'distinction'],
+      format: 'EDITION', rubrique: societe, auteur: secretaireGeneral, heures: 245,
+    },
+    {
+      slug: 'bin-sin-bin-mourir-un-luxe-en-cote-ivoire',
+      titre: 'Bin Sin Bin : mourir, un luxe en Côte d\'Ivoire',
+      chapo: "Formol facturé en double, cercueil facturé au prix d'un modèle XXL, « organisation obsèques » facturée pour un service jamais rendu : le calvaire tarifaire des familles endeuillées, sans aucune grille de contrôle de l'État.",
+      contenuHtml: `<p>Combien vaut un mort en Côte d'Ivoire ? Question absurde ? Pas pour les pompes funèbres, qui, elles, ont déjà la réponse chiffrée, gonflée et facturée sans honte. Le jour de la levée du corps, la facture tombe : formol facturé en double sans explication, cercueil en simple bois blanc facturé au prix d'un modèle XXL, manutention déclinée en quatre lignes pour un seul et même geste.</p>
+<p>Ce ne sont pas des erreurs de facturation. C'est une méthode, tolérée dans le silence complice des cliniques qui empochent leur commission sur chaque corps enlevé, et dans le silence assourdissant de l'État, qui ne fixe aucune grille tarifaire, n'exerce aucun contrôle.</p>
+<p>« Un pays qui laisse mourir sa population deux fois — une fois dans la maladie, une fois dans la facture — n'a plus rien d'un État protecteur », dénonce la chronique, qui appelle le ministère du Commerce et celui de la Santé à ouvrir les dossiers et fixer une grille tarifaire.</p>`,
+      tags: ['pompes funèbres', 'chronique', 'consommation'],
+      format: 'DECRYPTAGE', rubrique: societe, auteur: regie, heures: 218,
+    },
+    {
+      slug: 'ecole-catholique-ecrase-moyennes-nationales-examens-2026',
+      titre: 'Résultats des examens à grand tirage 2025-2026 : l\'école catholique écrase les moyennes nationales',
+      chapo: "98,18 % de réussite au CEPE contre 85,76 % au niveau national, 88,74 % au BEPC contre 52,17 % : l'Éducation catholique confirme son leadership avec 521 établissements et 143 096 élèves.",
+      contenuHtml: `<p>L'école catholique en Côte d'Ivoire confirme une fois de plus son rang de référence. Au Certificat d'études primaires élémentaires, l'Éducation catholique enregistre un taux historique de réussite de 98,18 %, contre 85,76 % au niveau national. Au BEPC, l'écart atteint plus de 36 points (88,74 % contre 52,17 %), et au Baccalauréat, plus de 27 points (67,89 % contre 40,60 %).</p>
+<p>« Ces écarts, parmi les plus élevés observés dans le pays, traduisent l'efficacité de notre accompagnement des élèves jusqu'au terme du cycle secondaire », s'est félicité le père Félicien Guessé, secrétaire exécutif national de l'Éducation catholique (SENEC).</p>
+<p>L'institution s'appuie sur un vaste réseau de 521 établissements accueillant 143 096 élèves, encadrés par 4 956 enseignants et personnels administratifs, avec des ratios jugés favorables : 29 élèves par enseignant au préscolaire, 40 au primaire et 27 au secondaire.</p>`,
+      tags: ['éducation catholique', 'examens', 'résultats scolaires'],
+      format: 'EDITION', rubrique: societe, auteur: secretaireGeneral, heures: 208,
+    },
+    // --- Culture ---
+    {
+      slug: 'finale-awoulaba-reines-afrique-sonia-nguessan-moronou',
+      titre: 'Finale Awoulaba Reines d\'Afrique : Sonia N\'Guessan du Moronou sur le trône',
+      chapo: "La candidate du Moronou, 43 ans et mère de 6 enfants, a battu Nakan Traoré de six points (188 contre 182 sur 220), dans une soirée glamour au palais de la Culture de Treichville.",
+      contenuHtml: `<p>Mlle Malan Sonia Nadège épouse N'Guessan, de la région du Moronou, détient le trône du concours Awoulaba Reines d'Afrique. Elle a battu Mlle Nakan Traoré, première Saraman, de six points seulement — 188 contre 182 sur 220 — au terme d'une bataille rude dans la salle François Bernard Lougah du palais de la Culture d'Abidjan-Treichville.</p>
+<p>Son âge, 43 ans, ses six enfants et la conservation de son physique sont, à l'en croire, les atouts qui ont milité en sa faveur. La nouvelle beauté ivoirienne place son mandat sous l'autonomisation de la femme : « La femme dans son foyer doit avoir une indépendance financière et contribuer aux dépenses dans le but d'éviter les tensions et conflits. »</p>
+<p>Isabelle Tano, directrice générale des Loisirs représentant la ministre de la Culture, a salué un concours qui « doit inspirer les jeunes et contribuer à la promotion de la destination ivoirienne » — la vitrine du patrimoine culturel du pays.</p>`,
+      tags: ['Awoulaba', 'concours de beauté', 'Moronou'],
+      format: 'EDITION', rubrique: culture, auteur: chefCulture, heures: 265,
+    },
+    {
+      slug: 'marie-laure-ngoran-sacree-lauréate-prix-excellence-medias',
+      titre: 'Prix national d\'Excellence 2026 pour le développement des médias : Marie-Laure N\'Goran sacrée lauréate',
+      chapo: "Présentatrice-vedette du Journal Télévisé de 20H et fraîchement élue présidente de l'UNJCI, elle a reçu sa distinction des mains du président Alassane Ouattara.",
+      contenuHtml: `<p>« Mon premier sentiment, c'est la reconnaissance », a déclaré Marie-Laure N'Goran, présidente de l'Union nationale des journalistes de Côte d'Ivoire (UNJCI), après avoir reçu le Prix national d'Excellence 2026 pour le développement des médias, au palais de la présidence de la République.</p>
+<p>« Recevoir ce prix au moment même où les confrères me confient la présidence de l'UNJCI, c'est pour moi un signe que l'engagement, le travail bien fait et l'éthique finissent toujours par être vus et reconnus », s'est-elle félicitée, fixant trois priorités : le journaliste, l'excellence et la crédibilité, et l'unité de la corporation.</p>
+<p>Présentatrice-vedette du Journal Télévisé de 20H et triple lauréate du prix « Ebony du Meilleur Présentateur », Marie-Laure N'Goran s'impose depuis 2011 comme une figure majeure des médias ivoiriens, également fondatrice de la plateforme « Les Marielordivoire ».</p>`,
+      tags: ['UNJCI', 'médias', 'distinction'],
+      format: 'EDITION', rubrique: culture, auteur: chefCulture, heures: 240,
+    },
+    {
+      slug: 'amah-helene-enflamme-palais-culture-identite-agni',
+      titre: 'Concert à Treichville : Amah Hélène enflamme le Palais de la Culture et célèbre l\'identité Agni',
+      chapo: "La diva de la musique tradi-moderne agni a rempli la salle de 4000 places, portée par des délégations venues de tout le Moronou.",
+      contenuHtml: `<p>La diva de la musique tradi-moderne agni, Amah Hélène, a offert un concert d'exception au Palais de la Culture de Treichville. Ce rendez-vous culturel restera gravé dans les mémoires des populations du Moronou et de l'ensemble de la communauté agni, venues nombreuses célébrer l'une des plus grandes voix de la musique traditionnelle ivoirienne.</p>
+<p>La salle de 4 000 places, archicomble, a vibré durant plusieurs heures au rythme des sonorités agni. La communion entre l'artiste et son public a constitué l'un des temps forts de la soirée, les spectateurs reprenant en chœur la plupart des chansons.</p>
+<p>Au-delà du spectacle, ce concert a constitué une véritable célébration de l'identité culturelle agni, démontrant que la valorisation des cultures locales demeure un puissant facteur de cohésion et de transmission des valeurs.</p>`,
+      tags: ['musique agni', 'concert', 'Moronou'],
+      format: 'EDITION', rubrique: culture, auteur: chefCulture, heures: 212,
+    },
+    // --- Régions ---
+    {
+      slug: 'incendie-orphelinat-mamie-therese-gouvernement-prise-en-charge',
+      titre: 'Après l\'incendie dans un orphelinat, le gouvernement annonce la prise en charge des brûlés',
+      chapo: "Deux nourrissons sont morts brûlés vifs à l'orphelinat Mamie Thérèse d'Abengourou ; la ministre de la Femme, de la Famille et de l'Enfant, Nassénéba Touré, s'est rendue au chevet des blessés.",
+      contenuHtml: `<p>Après l'incendie meurtrier survenu à l'orphelinat Mamie Thérèse, le ministre de la Communication Amadou Coulibaly et la ministre de la Femme, de la Famille et de l'Enfant, Nassénéba Touré, se sont rendus à l'Établissement public hospitalier régional et à l'orphelinat pour exprimer leur compassion.</p>
+<p>« Deux de nos enfants nous ont quittés. Nous partageons la douleur de tous », a déclaré Nassénéba Touré, annonçant une prise en charge médicale, psychologique et sociale des pensionnaires et du personnel. Deux autres nourrissons brûlés ont survécu.</p>
+<p>Les enfants évacués sont provisoirement accueillis dans un centre de la petite enfance du ministère. « Notre objectif est qu'avant la prochaine rentrée scolaire, un site conforme aux normes et dûment agréé soit identifié », a-t-elle précisé. Ce drame intervient moins de deux semaines après un premier incendie dans le même établissement.</p>`,
+      tags: ['Abengourou', 'incendie', 'orphelinat'],
+      format: 'FLASH', rubrique: regions, auteur: chefPolitique, heures: 285,
+    },
+    {
+      slug: 'bouna-deux-allogenes-condamnes-20-ans-tentative-meurtre',
+      titre: 'Bouna : deux allogènes condamnés à 20 ans de prison pour tentative de meurtre sur un bouvier',
+      chapo: "Criblé de balles et jeté dans un trou pour effacer les traces, le bouvier de Govitan a survécu et identifié l'un de ses agresseurs, habitant du village.",
+      contenuHtml: `<p>Le tribunal de première instance de Bouna a infligé une peine de 20 ans de prison ferme à deux ressortissants étrangers reconnus coupables de tentative de meurtre sur un bouvier, dans le département de Téhini. Les faits remontent au 9 novembre 2024, près de Govitan, un village proche de la frontière avec le Burkina Faso.</p>
+<p>Grièvement blessé par des tirs de fusil de calibre 12, le bouvier a été jeté dans un trou par ses agresseurs, qui le croyaient mort, pendant que son complice convoyait le troupeau volé vers l'autre côté de la frontière. Profitant d'un sursaut de lucidité, la victime est parvenue à s'extirper de la fosse et à rejoindre son village.</p>
+<p>Le lendemain, l'un des malfaiteurs est revenu sur les lieux pour refermer le trou et effacer les preuves — à sa grande surprise, la victime avait disparu. Elle a formellement identifié l'un de ses agresseurs, permettant l'interpellation des deux hommes. Quant aux bœufs volés, ils restent à ce jour introuvables.</p>`,
+      tags: ['Bouna', 'justice', 'fait divers'],
+      format: 'FLASH', rubrique: regions, auteur: chefPolitique, heures: 218,
+    },
+    {
+      slug: 'bangolo-brule-essence-incendie-domicile',
+      titre: 'Bangolo : il la brûle en l\'aspergeant d\'essence et incendie son domicile',
+      chapo: "Pris de colère après avoir été surpris en infidélité, un homme de 28 ans a aspergé d'essence sa compagne et incendié la maison, avec leur fille dans les bras de la victime.",
+      contenuHtml: `<p>La brigade de gendarmerie de Bangolo a interpellé le présumé auteur d'une tentative de meurtre consécutive à l'incendie volontaire d'une habitation, survenu à Gaoya. Le suspect, B. Franck, 28 ans, est soupçonné d'avoir délibérément mis le feu à une maisonnette dans laquelle dormait une jeune femme, qui a réussi à s'extraire des flammes à temps.</p>
+<p>Selon les habitants du village, les faits trouvent leur origine dans un différend sentimental : le suspect aurait agi par crise de jalousie après avoir été surpris en flagrant délit d'infidélité par sa compagne.</p>
+<p>Marquée dans sa chair et traumatisée, la victime, K.E., a raconté aux forces de l'ordre : « Prise de colère du fait de mes remontrances, il prend de l'essence dans le réservoir de sa moto, entre dans ma chambre, m'asperge d'essence ainsi que tous les biens meubles et incendie tout à l'aide d'un briquet. » Elle portait leur fille au dos au moment des faits.</p>`,
+      tags: ['Bangolo', 'violence conjugale', 'fait divers'],
+      format: 'FLASH', rubrique: regions, auteur: chefPolitique, heures: 205,
+    },
+    // --- Sport ---
+    {
+      slug: 'fifa-bute-uefa-concacaf-vente-parts-coupe-du-monde',
+      titre: 'Vente des parts de la Coupe du monde : la FIFA bute sur l\'UEFA et la CONCACAF',
+      chapo: "La FIFA veut créer une société commerciale sur la valeur marchande de la Coupe du monde, avec 20 % détenus par des investisseurs privés — l'UEFA dénonce un projet qui piétine « l'âme du football ».",
+      contenuHtml: `<p>La FIFA a confirmé son projet de création d'une société commerciale sur la valeur marchande de la Coupe du monde, liée à la diffusion, au sponsoring, à la billetterie et aux licences, dont 20 % seraient détenus par des investisseurs privés. L'instance va travailler avec la banque JP Morgan pour ce projet baptisé FIFA Forward Enterprise, qui pourrait lever plus de 2 400 milliards FCFA.</p>
+<p>Mais l'UEFA rejette l'objectif et accuse l'instance de piétiner « l'âme et la gouvernance du football qui ne sont pas des biens que l'on puisse échanger en l'absence totale de transparence sur les bénéficiaires financiers ». La Confédération nord et centraméricaine (CONCACAF) dénonce elle aussi un « projet flou et solitaire ».</p>
+<p>Pour la FIFA, l'émanation de 211 fédérations à travers le monde doit préalablement approuver tout projet allant dans ce sens. L'instance annonce avoir lancé « un processus de consultation ». Affaire à suivre.</p>`,
+      tags: ['FIFA', 'Coupe du monde', 'gouvernance'],
+      format: 'EDITION', rubrique: sport, auteur: redacteurSport, heures: 280,
+    },
+    {
+      slug: 'emerse-fae-vire-fif-je-suis-decu-oui',
+      titre: 'Viré par la FIF : Émerse Faé, « je suis déçu, oui »',
+      chapo: "Champion d'Afrique 2023 puis qualifié pour le Mondial 2026, le sélectionneur des Éléphants voit son contrat non renouvelé sans explication détaillée.",
+      contenuHtml: `<p>« Le Comité Exécutif de la Fédération Ivoirienne de Football exprime sa profonde reconnaissance à Monsieur Émerse Faé pour son engagement, son professionnalisme et les services rendus à la tête de la Sélection nationale A », écrit la FIF dans un communiqué annonçant le non-renouvellement de son contrat, arrivé à terme le 31 juillet 2026.</p>
+<p>« Hier matin, les dirigeants m'ont appelé pour me dire qu'il n'y aurait pas de prolongation. Ça s'est fait d'un coup, sans explication (…) Je suis déçu, oui. Cette équipe possède un énorme potentiel », a confié Émerse Faé au journal français L'Équipe.</p>
+<p>Nommé sélectionneur par intérim en janvier 2024, il avait réussi l'exploit de conduire les Éléphants au sacre continental la même année, avant d'enchaîner qualification à la CAN 2025 et à la phase finale du Mondial 2026 — au total 36 matchs, 25 victoires, pour 2,19 points par match.</p>`,
+      tags: ['Émerse Faé', 'Éléphants', 'FIF'],
+      format: 'EDITION', rubrique: sport, auteur: redacteurSport, heures: 260,
+    },
+    {
+      slug: 'qui-etait-franco-baresi-mort-31-juillet-2026',
+      titre: 'Mort le 31 juillet 2026 : qui était Franco Baresi ?',
+      chapo: "Le légendaire libero de l'AC Milan des années 1980-1990, triple vainqueur de la Coupe des clubs champions européens, est mort à 66 ans.",
+      contenuHtml: `<p>Franco Baresi, le légendaire défenseur italien du grand AC Milan des années 1980 et 1990, est mort à l'âge de 66 ans, le 31 juillet. C'est une grande figure du football mondial que les moins de 20 ans ne peuvent pas connaître.</p>
+<p>Avec le Milan AC, où il a effectué toute sa carrière après y avoir été intégré dès 1974, il a remporté trois Coupes des clubs champions européens (1989, 1990, 1994) et six titres de champion d'Italie, aux côtés de Paolo Maldini, dans la grande défense de fer de l'ère Arrigo Sacchi.</p>
+<p>Champion du monde avec l'Italie en 1982 (sans jouer) et finaliste du Mondial 1994 face au Brésil, où il a raté son tir au but, Baresi est considéré comme l'un des plus grands liberos de l'histoire, avec 719 matchs disputés en rouge et noir et 81 sélections en Nazionale.</p>`,
+      tags: ['Franco Baresi', 'AC Milan', 'nécrologie'],
+      format: 'FLASH', rubrique: sport, auteur: redacteurSport, heures: 262,
+    },
+    {
+      slug: 'herve-renard-retrouve-les-elephants',
+      titre: 'Football : Hervé Renard retrouve les Éléphants',
+      chapo: "Champion d'Afrique 2015 avec la Côte d'Ivoire, le technicien français revient officiellement comme sélectionneur de l'équipe nationale A, sur décision du président de la FIF Idriss Diallo.",
+      contenuHtml: `<p>« La Fédération Ivoirienne de Football informe la famille du football ivoirien, ses associations membres, ses partenaires institutionnels et commerciaux et le grand public, que M. Hervé Jean-Marie Roger Renard est désigné en qualité de sélectionneur-entraîneur de l'équipe nationale A de Côte d'Ivoire », lit-on dans le communiqué de la fédération.</p>
+<p>Hervé Renard retrouve donc les Éléphants qu'il avait conduits sur le toit de l'Afrique en 2015, lorsqu'il leur a permis de décrocher leur deuxième titre continental. « Champion d'Afrique avec la Côte d'Ivoire en 2015, M. Hervé Renard effectue son retour à la tête des Éléphants avec pour mission de conduire la sélection nationale dans la préparation et la participation aux prochaines compétitions internationales », explique le président de la FIF, Idriss Diallo.</p>
+<p>Âgé de 58 ans, Hervé Renard est le premier sélectionneur à avoir remporté la CAN avec deux sélections différentes (Zambie 2012, Côte d'Ivoire 2015). Il a aussi conduit le Maroc au Mondial 2018 et l'Arabie saoudite au Mondial 2022, avant de diriger l'équipe de France féminine puis la Tunisie au Mondial 2026.</p>`,
+      tags: ['Hervé Renard', 'Éléphants', 'sélectionneur'],
+      format: 'EDITION', rubrique: sport, auteur: redacteurSport, heures: 210,
+    },
+  ];
+
+  let crees = 0;
+  for (const a of articles) {
+    const existant = await prisma.article.findUnique({ where: { slug: a.slug } });
+    if (existant) continue;
+    const publieLe = h(a.heures);
+    await prisma.article.create({
+      data: {
+        slug: a.slug, titre: a.titre, chapo: a.chapo, contenuHtml: a.contenuHtml, tags: a.tags,
+        format: a.format, statut: 'PUBLIE', paywall: 'LIBRE',
+        rubriqueId: a.rubrique.id, auteurId: a.auteur.id, valideParId: redacteurEnChef.id,
+        publieLe, createdAt: publieLe, updatedAt: publieLe,
+        vuesTotal: Math.floor(200 + Math.random() * 4000),
+      },
+    });
+    crees++;
+  }
+  console.log(`✔ ${crees} article(s) du troisième lot créé(s) (${articles.length - crees} déjà existant(s)).`);
+}
+
 async function main() {
   await seedRubriques();
   await seedStaff();
@@ -521,6 +771,8 @@ async function main() {
   if (dejaDesArticles === 0) await seedArticles();
   const batch2Existe = await prisma.article.findUnique({ where: { slug: 'affi-nguessan-souverainete-veritable-institutions-fortes' } });
   if (!batch2Existe) await seedArticlesBatch2();
+  const batch3Existe = await prisma.article.findUnique({ where: { slug: 'cote-ivoire-demene-sortir-guepier-blanchiment-capitaux' } });
+  if (!batch3Existe) await seedArticlesBatch3();
 }
 
 main()
