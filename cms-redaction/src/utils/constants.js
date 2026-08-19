@@ -61,6 +61,8 @@ export const PAYWALL_LABELS = { LIBRE: 'Libre', PAYANT: 'Payant (abonnés)' };
 
 export const VERDICT_LABELS = { VRAI: 'Vrai', FAUX: 'Faux', TROMPEUR: 'Trompeur', NON_VERIFIABLE: 'Non vérifiable' };
 
+export const MEDIA_TYPE_LABELS = { PHOTO: 'Photo', VIDEO: 'Vidéo', AUDIO: 'Audio', PDF: 'PDF' };
+
 // Checklist créée automatiquement à la création d'un article Flash/Vérité ou
 // Intox côté API (voir api/src/controllers/articles.controller.js) — reprise
 // ici uniquement pour afficher un aperçu avant création.

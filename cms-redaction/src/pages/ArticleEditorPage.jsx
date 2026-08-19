@@ -9,6 +9,7 @@ import LiveUpdatesPanel from '../components/LiveUpdatesPanel';
 import FactCheckPanel from '../components/FactCheckPanel';
 import WorkflowActions from '../components/WorkflowActions';
 import ArticlePreview from '../components/ArticlePreview';
+import MediaManager from '../components/MediaManager';
 
 const EMPTY_FORM = {
   titre: '', chapo: '', contenuHtml: '', format: 'EDITION', rubriqueId: '',
@@ -61,6 +62,21 @@ export default function ArticleEditorPage() {
   const rubriqueActive = rubriques.find((r) => r.id === form.rubriqueId);
 
   const canEditContent = !article || article.statut !== 'PUBLIE' || ROLES_VALIDATION.includes(staff.role);
+
+  // Définir l'image principale depuis la galerie : mise à jour du formulaire
+  // + persistance immédiate si l'article existe déjà (pas besoin de cliquer
+  // "Enregistrer" pour que la Une soit prise en compte).
+  const setPrincipale = async (url) => {
+    setForm((f) => ({ ...f, imageUneUrl: url }));
+    if (article) {
+      try {
+        await articlesAPI.update(article.id, { imageUneUrl: url });
+        toast.success('Image principale mise à jour.');
+      } catch (err) {
+        toast.error(err.response?.data?.error || 'Mise à jour impossible.');
+      }
+    }
+  };
 
   const handleSave = async (e) => {
     e.preventDefault();
@@ -169,6 +185,12 @@ export default function ArticleEditorPage() {
 
       <div className="mt-5">
         <ArticlePreview form={form} rubrique={rubriqueActive} />
+      </div>
+
+      <div className="mt-5 space-y-5">
+        <MediaManager articleId={article?.id} type="PHOTO" title="Photos légendées / Galerie" multiple onSetPrincipale={setPrincipale} />
+        <MediaManager articleId={article?.id} type="VIDEO" title="Vidéo" />
+        <MediaManager articleId={article?.id} type="AUDIO" title="Audio" />
       </div>
 
       {article && (article.format === 'FLASH' || article.format === 'VERITE_OU_INTOX') && (

@@ -2,13 +2,15 @@ import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { ROLE_LABELS, ROLE_COLORS } from '../utils/constants';
 import {
-  HomeIcon, NewspaperIcon, BanknotesIcon, BookOpenIcon,
+  HomeIcon, NewspaperIcon, BanknotesIcon, BookOpenIcon, PhotoIcon, ArchiveBoxIcon,
   ArrowRightOnRectangleIcon, PlusCircleIcon,
 } from '@heroicons/react/24/outline';
 
 const NAV = [
   { to: '/', label: 'Tableau de bord', icon: HomeIcon, exact: true },
   { to: '/articles', label: 'Articles', icon: NewspaperIcon },
+  { to: '/articles?statut=PUBLIE', label: 'Archives (articles publiés)', icon: ArchiveBoxIcon },
+  { to: '/mediatheque', label: 'Photothèque', icon: PhotoIcon },
   { to: '/prix-vie-chere', label: 'Vie chère (ticker)', icon: BanknotesIcon },
   { to: '/editions', label: 'Kiosque / Éditions', icon: BookOpenIcon },
 ];

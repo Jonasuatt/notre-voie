@@ -8,6 +8,7 @@ import ArticlesListPage from './pages/ArticlesListPage';
 import ArticleEditorPage from './pages/ArticleEditorPage';
 import PrixVieCherePage from './pages/PrixVieCherePage';
 import EditionsPage from './pages/EditionsPage';
+import MediathequePage from './pages/MediathequePage';
 
 export default function App() {
   return (
@@ -29,6 +30,7 @@ export default function App() {
           <Route path="articles/:id" element={<ArticleEditorPage />} />
           <Route path="prix-vie-chere" element={<PrixVieCherePage />} />
           <Route path="editions" element={<EditionsPage />} />
+          <Route path="mediatheque" element={<MediathequePage />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />

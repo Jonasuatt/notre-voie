@@ -96,6 +96,13 @@ let EDITIONS = [
   { id: 'e2', numero: 7969, dateParution: il(2880), pdfUrl: '#', couvertureUrl: null, prix: 300 },
 ];
 
+// Photothèque/médiathèque simulée. articleId: null = média "en stock",
+// pas encore rattaché à un article.
+let MEDIAS = [
+  { id: 'm1', type: 'PHOTO', url: 'https://res.cloudinary.com/demo/image/upload/w_600/samples/landscapes/nature-mountains.jpg', legende: 'Vue du fleuve Cavally', credit: 'Sercom', dureeSec: null, ordre: 0, articleId: null, createdAt: il(500) },
+  { id: 'm2', type: 'PHOTO', url: 'https://res.cloudinary.com/demo/image/upload/w_600/samples/people/kitchen-bar.jpg', legende: 'Marché couvert de Korhogo', credit: 'Benjamin Koré', dureeSec: null, ordre: 0, articleId: null, createdAt: il(300) },
+];
+
 function fail(status, message) {
   const e = new Error(message);
   e.response = { status, data: { error: message } };
@@ -263,5 +270,65 @@ export const mockBackend = {
     const edition = { id: `e${Date.now()}`, ...data };
     EDITIONS = [edition, ...EDITIONS];
     return { edition };
+  },
+  mediaList({ type, q, unattached, articleId } = {}) {
+    let list = MEDIAS.filter((m) =>
+      (!type || m.type === type) &&
+      (unattached !== 'true' || !m.articleId) &&
+      (!articleId || m.articleId === articleId) &&
+      (!q || `${m.legende || ''} ${m.credit || ''}`.toLowerCase().includes(q.toLowerCase()))
+    );
+    list = [...list].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    return { medias: list, total: list.length };
+  },
+  mediaUpload(file, meta = {}) {
+    if (!currentStaff()) fail(401, 'Authentification requise.');
+    // Pas de vrai hébergeur en mode démo : aperçu local via URL.createObjectURL
+    // (valable pour la session du navigateur, exactement comme un vrai
+    // upload le temps de tester la mise en page).
+    const type = meta.type || (file.type.startsWith('video') ? 'VIDEO' : file.type.startsWith('audio') ? 'AUDIO' : file.type === 'application/pdf' ? 'PDF' : 'PHOTO');
+    const media = {
+      id: `m${Date.now()}`, type, url: URL.createObjectURL(file),
+      legende: meta.legende || null, credit: meta.credit || null, dureeSec: null,
+      ordre: meta.ordre ? Number(meta.ordre) : 0, articleId: meta.articleId || null, createdAt: new Date().toISOString(),
+    };
+    MEDIAS = [media, ...MEDIAS];
+    return { media };
+  },
+  mediaCreate(data) {
+    if (!currentStaff()) fail(401, 'Authentification requise.');
+    if (!data.type || !data.url) fail(422, 'Type et URL requis.');
+    const media = {
+      id: `m${Date.now()}`, type: data.type, url: data.url,
+      legende: data.legende || null, credit: data.credit || null,
+      dureeSec: data.dureeSec ? Number(data.dureeSec) : null,
+      ordre: data.ordre ? Number(data.ordre) : 0, articleId: data.articleId || null,
+      createdAt: new Date().toISOString(),
+    };
+    MEDIAS = [media, ...MEDIAS];
+    return { media };
+  },
+  mediaUpdate(id, data) {
+    const m = MEDIAS.find((x) => x.id === id);
+    if (!m) fail(404, 'Média introuvable.');
+    Object.assign(m, {
+      ...(data.legende !== undefined ? { legende: data.legende } : {}),
+      ...(data.credit !== undefined ? { credit: data.credit } : {}),
+      ...(data.ordre !== undefined ? { ordre: Number(data.ordre) } : {}),
+      ...(data.dureeSec !== undefined ? { dureeSec: data.dureeSec } : {}),
+      ...(data.articleId !== undefined ? { articleId: data.articleId } : {}),
+    });
+    return { media: m };
+  },
+  mediaReorder(ids) {
+    ids.forEach((id, index) => {
+      const m = MEDIAS.find((x) => x.id === id);
+      if (m) m.ordre = index;
+    });
+    return { ok: true };
+  },
+  mediaRemove(id) {
+    MEDIAS = MEDIAS.filter((m) => m.id !== id);
+    return { ok: true };
   },
 };

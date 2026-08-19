@@ -82,6 +82,35 @@ export const prixVieChereAPI = {
   create: (data) => withMockFallback(() => api.post('/prix-vie-chere', data), () => mockBackend.createPrix(data)),
 };
 
+// Médiathèque / photothèque : illustration des articles (photos légendées,
+// galeries, vidéos, audios). `list` sert aussi bien la photothèque libre
+// (?unattached=true) que la galerie d'un article précis (?articleId=…).
+export const mediaAPI = {
+  list: (params) => withMockFallback(() => api.get('/media', { params }), () => mockBackend.mediaList(params)),
+  upload: (file, meta = {}) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    Object.entries(meta).forEach(([k, v]) => {
+      if (v !== undefined && v !== null && v !== '') formData.append(k, v);
+    });
+    return withMockFallback(
+      () => {
+        const token = localStorage.getItem('nv_staff_token');
+        const headers = token && !token.startsWith('mock.') ? { Authorization: `Bearer ${token}` } : {};
+        // Requête axios "nue" (pas l'instance `api`) : son Content-Type par
+        // défaut (application/json) casserait la frontière multipart —
+        // ici on laisse axios/le navigateur la déduire eux-mêmes du FormData.
+        return axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:4000/api'}/media/upload`, formData, { headers });
+      },
+      () => mockBackend.mediaUpload(file, meta)
+    );
+  },
+  create: (data) => withMockFallback(() => api.post('/media', data), () => mockBackend.mediaCreate(data)),
+  update: (id, data) => withMockFallback(() => api.patch(`/media/${id}`, data), () => mockBackend.mediaUpdate(id, data)),
+  reorder: (ids) => withMockFallback(() => api.patch('/media/reorder', { ids }), () => mockBackend.mediaReorder(ids)),
+  remove: (id) => withMockFallback(() => api.delete(`/media/${id}`), () => mockBackend.mediaRemove(id)),
+};
+
 export const notificationsAPI = {
   getAll: (params) => api.get('/notifications', { params }),
   envoyer: (id) => api.post(`/notifications/${id}/envoyer`),

@@ -46,6 +46,7 @@ app.get('/api/health', (req, res) => res.json({ status: 'ok', service: 'notre-vo
 app.use('/api/auth', require('./routes/auth.routes'));
 app.use('/api/rubriques', require('./routes/rubriques.routes'));
 app.use('/api/articles', require('./routes/articles.routes'));
+app.use('/api/media', require('./routes/media.routes'));
 app.use('/api/editions', require('./routes/editions.routes'));
 app.use('/api/prix-vie-chere', require('./routes/prixVieChere.routes'));
 app.use('/api/notifications', require('./routes/notifications.routes'));
