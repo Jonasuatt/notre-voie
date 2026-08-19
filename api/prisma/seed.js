@@ -888,6 +888,42 @@ async function fixMediaBatch1Rotation() {
   console.log(`✔ ${corriges} photo(s) réorientée(s) (URL remplacée) sur ${remplacements.length}.`);
 }
 
+// Photothèque — second lot, complète les 12 articles du n°7970 (les seuls
+// jusque-là sans image, ce qui les rendait invisibles en photo sur
+// l'accueil puisque ce sont les plus récents). Une même photo peut illustrer
+// deux articles (pasteur Jérémie Koffi / Vérité ou Intox) — dédoublonnage
+// sur (url, articleSlug), pas seulement sur l'url.
+async function seedMediaBatch7970() {
+  const medias = [
+    { url: "https://res.cloudinary.com/ataat5bs/image/upload/v1787177133/notre-voie/photo-v2/ydy6z4intaheufl8yijb.jpg", legende: "Le prophète David Jérémie a subi une opération chirurgicale en détention, à en croire le procureur de la République.", credit: "DR", articleSlug: "pouvoir-ternit-image-republique-arrestation-pasteur-jeremie-koffi" },
+    { url: "https://res.cloudinary.com/ataat5bs/image/upload/v1787177136/notre-voie/photo-v2/xectdgfjxytouwqu2lpa.jpg", legende: "Le secrétaire exécutif du PDCI et les militants mettent le cap sur Korhogo.", credit: "DR", articleSlug: "korhogo-defi-pour-le-pdci-rda" },
+    { url: "https://res.cloudinary.com/ataat5bs/image/upload/v1787177138/notre-voie/photo-v2/ik11c8oqjhlez9yftnfv.jpg", legende: "Pour Georges Aka, le scandale des 39 milliards révèle l'urgence d'une refonte de la sécurité numérique de la DGI.", credit: "DR", articleSlug: "faille-cachee-scandale-39-milliards-fraude-dgi" },
+    { url: "https://res.cloudinary.com/ataat5bs/image/upload/v1787177140/notre-voie/photo-v2/v4r3qolvugli1853tmk0.jpg", legende: "Selon Dr William Yoboué Kouamé, l'intelligence artificielle peut être un précieux outil au service du journalisme.", credit: "DR", articleSlug: "anp-interpelle-medias-usage-ethique-intelligence-artificielle" },
+    { url: "https://res.cloudinary.com/ataat5bs/image/upload/v1787177142/notre-voie/photo-v2/oibcyv8k3qvuuwy8oozq.jpg", legende: "L'édition 2026 de la fête aura une connotation Bhété.", credit: "DR", articleSlug: "fete-de-yorokloi-2026-ouragahio-femme-bhete-celebree" },
+    { url: "https://res.cloudinary.com/ataat5bs/image/upload/v1787177144/notre-voie/photo-v2/rjlsmrib3ru77wtsw5yq.jpg", legende: "Le commissaire principal Kounvolo Coulibaly.", credit: "DR", articleSlug: "commissaire-kounvolo-coulibaly-lance-campagne-fppn" },
+    { url: "https://res.cloudinary.com/ataat5bs/image/upload/v1787177146/notre-voie/photo-v2/orvf8n9u7l4ypt075zqn.jpg", legende: "Les jeunes ont reçu assez de promesses du gouvernement.", credit: "DR", articleSlug: "jeunes-presentent-priorites-gouvernement-journee-internationale-jeunesse" },
+    { url: "https://res.cloudinary.com/ataat5bs/image/upload/v1787177147/notre-voie/photo-v2/nkep87wnm2bsmqxlv2zc.jpg", legende: "Une vue du fleuve Cavally.", credit: "DR", articleSlug: "cinq-morts-chavirement-pirogue-fleuve-cavally-toulepleu" },
+    { url: "https://res.cloudinary.com/ataat5bs/image/upload/v1787177149/notre-voie/photo-v2/ohlaekkosqtiiqcyr5vd.jpg", legende: "Une vue des participants au Forum.", credit: "DR", articleSlug: "bouake-jeunesse-18-pays-sous-region-conclave" },
+    { url: "https://res.cloudinary.com/ataat5bs/image/upload/v1787177151/notre-voie/photo-v2/xagmdfzfemfjuxwus0ht.jpg", legende: "Idriss Diallo sous pression avant le scrutin.", credit: "DR", articleSlug: "election-fif-clubs-exigent-300-millions-subvention" },
+    { url: "https://res.cloudinary.com/ataat5bs/image/upload/v1787177153/notre-voie/photo-v2/xmp8ibbb2gs2acm8ooac.jpg", legende: "Ousmane Diomandé dans les couleurs de son nouveau club.", credit: "DR", articleSlug: "ousmane-diomande-nottingham-forest-osa-540-millions" },
+    { url: "https://res.cloudinary.com/ataat5bs/image/upload/v1787177133/notre-voie/photo-v2/ydy6z4intaheufl8yijb.jpg", legende: "Le pasteur Jérémie Koffi, alias prophète David Jérémie.", credit: "DR", articleSlug: "une-curieuse-operation-chirurgicale-du-pasteur" },
+  ];
+
+  let crees = 0;
+  for (const m of medias) {
+    const article = await prisma.article.findUnique({ where: { slug: m.articleSlug } });
+    if (!article) continue;
+    const existant = await prisma.media.findFirst({ where: { url: m.url, articleId: article.id } });
+    if (existant) continue;
+    await prisma.media.create({ data: { type: 'PHOTO', url: m.url, legende: m.legende, credit: m.credit, articleId: article.id } });
+    if (!article.imageUneUrl) {
+      await prisma.article.update({ where: { id: article.id }, data: { imageUneUrl: m.url } });
+    }
+    crees++;
+  }
+  console.log(`✔ ${crees} photo(s) du n°7970 importée(s) (${medias.length - crees} déjà existante(s)).`);
+}
+
 async function main() {
   await seedRubriques();
   await seedStaff();
@@ -903,6 +939,8 @@ async function main() {
   if (!mediaBatch1Existe) await seedMediaBatch1();
   const rotationAFaireExiste = await prisma.media.findFirst({ where: { url: { contains: 'notre-voie/photo/amqgywoe3g9gwiirg6wq' } } });
   if (rotationAFaireExiste) await fixMediaBatch1Rotation();
+  const mediaBatch7970Existe = await prisma.media.findFirst({ where: { url: { contains: 'notre-voie/photo-v2/ydy6z4intaheufl8yijb' } } });
+  if (!mediaBatch7970Existe) await seedMediaBatch7970();
 }
 
 main()
