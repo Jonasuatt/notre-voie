@@ -274,6 +274,244 @@ async function seedArticles() {
   console.log(`✔ ${crees} article(s) de lancement créé(s) (${articles.length - crees} déjà existant(s)).`);
 }
 
+// Second lot — contenu réel des n°7965 à 7969 (6-13 août 2026), pour
+// étoffer l'archive avec un vrai historique sur plusieurs jours. Même
+// principe d'attribution (chef du service concerné) et d'idempotence
+// (upsert implicite via vérification du slug).
+async function seedArticlesBatch2() {
+  const rubrique = async (nom) => prisma.rubrique.findUniqueOrThrow({ where: { slug: slugify(nom) } });
+  const staff = async (email) => prisma.staff.findUniqueOrThrow({ where: { email } });
+
+  const [politique, economie, societe, regions, culture, sport] = await Promise.all(
+    ['Politique', 'Économie', 'Société', 'Régions', 'Culture', 'Sport'].map(rubrique)
+  );
+  const [redacteurEnChef, secretaireGeneral, chefPolitique, chefCulture, redacteurSport] = await Promise.all([
+    staff('redacteur-en-chef@notrevoienews.com'),
+    staff('secretaire-general@notrevoienews.com'),
+    staff('chef-politique@notrevoienews.com'),
+    staff('chef-culture@notrevoienews.com'),
+    staff('redacteur@notrevoienews.com'),
+  ]);
+
+  const h = (heures) => new Date(Date.now() - heures * 3600 * 1000);
+
+  const articles = [
+    // --- n°7965 (06-09 août) — heures ~145-200h avant "maintenant" ---
+    {
+      slug: 'affi-nguessan-souverainete-veritable-institutions-fortes',
+      titre: "66e anniversaire de l'indépendance : Pascal Affi N'Guessan appelle à une « souveraineté véritable » et à des institutions fortes",
+      chapo: "Dans son message du 7 août, le président du FPI appelle à un nouveau pacte national fondé sur le dialogue, la justice et la réconciliation.",
+      contenuHtml: `<p>Soixante-six ans après son accession à la souveraineté, la Côte d'Ivoire doit encore, selon Pascal Affi N'Guessan, président du Front populaire ivoirien (FPI), franchir une étape définitive : passer d'une indépendance symbolique à une véritable autonomie politique, économique et sociale.</p>
+<p>« L'indépendance ne se résume pas à un drapeau, à un hymne national ou à une reconnaissance internationale. Elle se mesure à la capacité d'un peuple à décider librement de son destin, à maîtriser son économie, à protéger ses richesses », a-t-il déclaré, dressant un bilan contrasté des six décennies écoulées.</p>
+<p>Le président du FPI a appelé solennellement le chef de l'État à poser des actes d'apaisement : libération des personnes détenues pour des affaires liées à la vie politique, ouverture d'un dialogue franc avec l'ensemble des forces politiques, et réorientation des priorités du gouvernement vers la lutte contre la vie chère et la création d'emplois pour les jeunes.</p>`,
+      tags: ['FPI', 'Affi N\'Guessan', 'indépendance'],
+      format: 'EDITION', rubrique: politique, auteur: chefPolitique, heures: 190,
+    },
+    {
+      slug: 'cacao-ivoirien-or-brun-epreuve-records',
+      titre: 'Cacao ivoirien : l\'or brun à l\'épreuve de ses propres records',
+      chapo: "2 800 FCFA le kilogramme bord champ en octobre, contre 1 200 FCFA six mois plus tard : le grand écart de la campagne cacaoyère 2025-2026.",
+      contenuHtml: `<p>Premier producteur mondial avec environ 40 % de l'offre planétaire, la Côte d'Ivoire tire de la fève brune 15 à 20 % de son PIB et fait vivre, directement ou indirectement, près de six millions de personnes. Le 1er octobre 2025, le prix bord champ record de 2 800 FCFA/kg avait été porté par des cours mondiaux exceptionnellement élevés — avant que le marché ne se retourne brutalement, les cours internationaux chutant d'environ 70 % dès décembre 2025.</p>
+<p>Face à cette crise, le chef de l'État a arbitré à la hausse un prix intermédiaire de 1 200 FCFA/kg, annoncé le 4 mars par le ministre de l'Agriculture Bruno Nabagné Koné, au prix d'une subvention de plus de 231 milliards de FCFA. La récolte a néanmoins surpris par son ampleur, dépassant finalement les 2 millions de tonnes, un record.</p>
+<p>L'échéance de septembre 2026 approche pour la carte du producteur et le Système national de traçabilité, qui deviendront obligatoires afin d'endiguer la contrebande transfrontalière et de mettre la filière en conformité avec le règlement européen sur la déforestation (EUDR).</p>`,
+      tags: ['cacao', 'agriculture', 'prix bord champ'],
+      format: 'DECRYPTAGE', rubrique: economie, auteur: secretaireGeneral, heures: 185,
+    },
+    {
+      slug: 'gaha-carine-reine-guemon-finale-awoulaba-2026',
+      titre: 'Finale Awoulaba 2026 : Gaha Carine, reine du Guémon',
+      chapo: "Élue le 25 juillet au palais de la Culture Bernard Dadié, la nouvelle reine de beauté ivoirienne a reçu un million FCFA et plusieurs lots des partenaires de l'événement.",
+      contenuHtml: `<p>Gaha Carine, de la région du Guémon, est l'Awoulaba de l'édition 2026 du concours de beauté. Cette année, un accent particulier a été mis sur le savoir-faire culinaire, permettant aux candidates de montrer leurs talents en la matière. L'édition 2026 était placée sous le thème : « L'éducation de la jeune fille : un investissement pour l'avenir ».</p>
+<p>« Le rêve de Pol Dokui était de célébrer la beauté naturelle, la dignité, l'intelligence et l'identité culturelle de la femme ivoirienne, nous poursuivons cette vision avec la même passion », a déclaré la présidente Reine Dokui, présidente du Comité Awoulaba Côte d'Ivoire (CACI), épouse du défunt Paul Dokui, initiateur du concours.</p>
+<p>Kouadio Amenan Glwadys, de la région du Bélier, est élue première Saraman, et Djite Achicha Sarrah, de Bingerville, deuxième Saraman. Le concours Awoulaba met en lumière l'élégance, la morphologie naturelle et toute l'authenticité de la beauté africaine.</p>`,
+      tags: ['Awoulaba', 'concours de beauté', 'culture'],
+      format: 'EDITION', rubrique: culture, auteur: chefCulture, heures: 180,
+    },
+    {
+      slug: 'dabou-planteur-retrouve-mort-plantation-cosrou',
+      titre: 'Dabou : un planteur retrouvé mort dans sa plantation',
+      chapo: "Akpa Michel, 75 ans, a été retrouvé sans vie dans sa plantation d'hévéa à Cosrou. Deux de ses fils, recherchés dans le cadre de l'enquête, demeurent introuvables.",
+      contenuHtml: `<p>Cosrou, un village situé à une trentaine de kilomètres de Dabou, est sous le choc après le meurtre d'Akpa Michel, un planteur de 75 ans retrouvé sans vie dans sa plantation d'hévéa. Selon les premiers témoignages, le septuagénaire s'était rendu dans sa plantation avec un saigneur pour acheminer une importante quantité de latex. À son retour, le saigneur découvre Akpa Michel sans vie, victime de graves blessures.</p>
+<p>Les premiers constats ont intrigué les enquêteurs : ni l'argent du planteur, ni son téléphone portable, ni même le latex récolté n'ont été emportés. Selon des sources locales, un conflit familial opposait depuis plusieurs années Akpa Michel à sa seconde épouse, alimentant diverses hypothèses au sein du village.</p>
+<p>Saisis de l'affaire, les éléments de la gendarmerie nationale ont ouvert une enquête afin d'établir les circonstances exactes de ce meurtre et d'identifier les auteurs. Les deux fils du défunt sont recherchés pour être entendus dans le cadre des investigations.</p>`,
+      tags: ['fait divers', 'Dabou', 'Cosrou'],
+      format: 'FLASH', rubrique: regions, auteur: chefPolitique, heures: 175,
+    },
+    {
+      slug: 'retour-herve-renard-elephants-pari-progression',
+      titre: 'Retour d\'Hervé Renard chez les Éléphants : le pari de la progression',
+      chapo: "La Fédération ivoirienne de football a confié les rênes de la zone technique des Éléphants au Français Hervé Renard, en remplacement d'Émerse Faé.",
+      contenuHtml: `<p>Hervé Renard a la réputation d'avoir assez d'autorité pour se faire entendre sur le terrain et dans les vestiaires, surtout dans l'équité relative aux listes des joueurs sélectionnés et au onze titulaire. « Le meilleur schéma est celui qui s'adapte le mieux à l'effectif. La priorité, ce sont les joueurs. Pas le système », expliquait-il en 2018.</p>
+<p>Depuis la CAN remportée en 2015 avec les Ivoiriens, le technicien n'a pas glané de titre majeur, mais son parcours (Lille, sélections marocaine et saoudienne, équipe nationale féminine de France) est couvert de plusieurs expériences. Il fonde principalement ses dispositions tactiques sur le 4-5-1, avec un milieu renforcé et un pressing haut.</p>
+<p>« Sélectionner les joueurs les plus en forme possible. On peut avoir eu une énorme carrière ou beaucoup de sélections mais si on n'est pas performant, c'est difficile d'évoluer au haut niveau », a-t-il expliqué, laissant présager de multiples réaménagements dans l'effectif version Hervé Renard.</p>`,
+      tags: ['football', 'Éléphants', 'Hervé Renard'],
+      format: 'EDITION', rubrique: sport, auteur: redacteurSport, heures: 170,
+    },
+    // --- n°7966 (10 août) — heures ~120-150h ---
+    {
+      slug: 'discours-nation-ouattara-promesses-epreuve-faits',
+      titre: "Discours à la Nation du chef de l'État : les promesses de Ouattara à l'épreuve des faits",
+      chapo: "Langue de bois, démagogie, déni de réalité : l'adresse à la Nation du 6 août n'a pas convaincu, entre vie chère occultée et prisonniers d'opinion passés sous silence.",
+      contenuHtml: `<p>Plusieurs termes viennent à l'esprit à l'analyse de l'adresse du chef de l'État à la Nation, à la faveur de la commémoration des 66 ans de l'indépendance de la Côte d'Ivoire, le 7 août 2026 : la langue de bois, la démagogie, ou le déni de réalité.</p>
+<p>La question des prisonniers d'opinion a été occultée : la grâce présidentielle accordée à plus de 4000 détenus concerne les délits mineurs de droit commun, tandis que des milliers d'opposants emprisonnés en lien avec les crises électorales restent, pour la plupart, accusés de terrorisme ou d'atteinte à la sûreté de l'État — des chefs d'inculpation de notoriété politique.</p>
+<p>Sur la filière café-cacao, aucun mot non plus : les paysans, selon l'éditorialiste, ne profitent pas de leur cacao et les 291 milliards FCFA dégagés pour le racheter n'auraient pas été utilisés dans la transparence. « Les Ivoiriens ne sont pas tombés de la dernière pluie », conclut l'analyse, rappelant la promesse jamais tenue de faire la lumière sur la rébellion armée.</p>`,
+      tags: ['Ouattara', 'discours à la Nation', 'analyse'],
+      format: 'DECRYPTAGE', rubrique: politique, auteur: redacteurEnChef, heures: 145,
+    },
+    {
+      slug: 'exportation-or-monte-puissance-face-cacao',
+      titre: "Exportation des matières premières : l'or monte en puissance face au cacao",
+      chapo: "Les recettes d'exportation de l'or non monétaire sont passées de 90,3 milliards FCFA en 2010 à 1 906 milliards en 2024, selon une analyse de l'économiste Mamadou Koulibaly.",
+      contenuHtml: `<p>La progression spectaculaire des recettes d'exportation de l'or en Côte d'Ivoire modifie progressivement la structure des ressources extérieures du pays. « Si en 2010 les recettes d'exportation de l'or ne représentaient qu'environ 5 % des recettes d'exportation du cacao, ce ratio est passé à plus de 43 % en 2024 », observe Mamadou Koulibaly, professeur d'économie et ancien ministre de l'Économie et des Finances.</p>
+<p>Le taux de croissance annuel moyen des recettes du cacao s'établit à 5,77 % entre 2010 et 2024, contre 22,5 % pour l'or. Le cacao demeure largement devant l'or en valeur absolue, mais la rapidité de la progression aurifère témoigne d'une diversification progressive des recettes d'exportation ivoiriennes.</p>
+<p>L'économiste insiste sur le coût environnemental de cette mutation : « Le boom de la production d'or se paye avec la destruction des eaux », résume-t-il, alors que certaines formes de production cacaoyère se développent déjà « au prix de la destruction du couvert forestier ».</p>`,
+      tags: ['or', 'cacao', 'exportations'],
+      format: 'EDITION', rubrique: economie, auteur: secretaireGeneral, heures: 140,
+    },
+    {
+      slug: 'alepe-kossandji-six-morts-violences-conflit-foncier',
+      titre: 'Alépé : six morts dans des violences liées à un conflit foncier à Kossandji',
+      chapo: "Un différend sur l'exploitation d'une parcelle familiale a dégénéré en violences intercommunautaires meurtrières dans cette sous-préfecture située à 67 km d'Alépé.",
+      contenuHtml: `<p>Six personnes ont été tuées, plusieurs autres blessées et d'importants dégâts matériels enregistrés à Kossandji, à la suite de violences survenues dans un contexte de conflit foncier opposant des membres de la communauté autochtone Akyé à des habitants allochtones, notamment Lobi et Mossi, selon l'enquête de l'AIP.</p>
+<p>Le litige a dégénéré le 4 août après la destruction de plants de manioc, provoquant une altercation au cours de laquelle une femme a été blessée. Dans la nuit du mardi au mercredi, des individus armés ont attaqué le village, faisant six morts et détruisant magasins et boutiques. De nombreux habitants ont fui vers un poste des Eaux et Forêts ou des localités voisines.</p>
+<p>Le président de l'Assemblée nationale, Patrick Achi, et le député de la circonscription, N'Cho Christophe, ont présenté leurs condoléances aux familles endeuillées et appelé les populations à la retenue et à la préservation de la cohésion sociale. Une enquête doit être ouverte pour établir les responsabilités.</p>`,
+      tags: ['Alépé', 'Kossandji', 'conflit foncier'],
+      format: 'FLASH', rubrique: regions, auteur: chefPolitique, heures: 135,
+    },
+    {
+      slug: 'president-gabonais-experience-ivoirienne-relogement',
+      titre: "Relogement des populations impactées par les grands projets : le président gabonais s'imprègne de l'expérience ivoirienne",
+      chapo: "Brice Clotaire Oligui Nguema a visité la cité de relogement de Songon Ayewahi, où plus de 400 ménages touchés par le 4e pont d'Abidjan ont été réinstallés.",
+      contenuHtml: `<p>Le président de la République gabonaise s'est d'abord rendu au 4e pont d'Abidjan pour s'imprégner de l'expérience ivoirienne en matière de relogement des populations impactées par les grands projets d'infrastructures, avant de se rendre à la cité de relogement de Songon Ayewahi. Il a offert un logement de deux pièces à des parents d'une fillette ainsi que 10 millions FCFA aux résidents de la cité.</p>
+<p>Le directeur général de l'Agence de gestion des routes (AGEROUTE), Fabrice Coulibaly, a indiqué qu'environ 20 000 ménages ont été affectés par le projet. « À ce jour, près de 18 000 ménages ont été entièrement indemnisés, tandis qu'environ 2000 dossiers sont en cours de traitement », a-t-il précisé.</p>
+<p>Concernant le relogement, 437 ménages ont opté pour une indemnisation en nature et ont été réinstallés sur les sites de Songon Ayewahi, réalisés dans le cadre du Projet de transport urbain d'Abidjan (PTUA).</p>`,
+      tags: ['Songon Ayewahi', '4e pont', 'relogement'],
+      format: 'EDITION', rubrique: societe, auteur: secretaireGeneral, heures: 130,
+    },
+    // --- n°7967 (11 août) — heures ~95-120h ---
+    {
+      slug: 'hausse-carburant-gouvernement-impuissant-lache-ivoiriens',
+      titre: 'Hausse du prix du carburant : le Gouvernement impuissant lâche les Ivoiriens',
+      chapo: "Le porte-parole du Gouvernement, Amadou Coulibaly, évoque une augmentation contrainte par la crise au Moyen-Orient et les engagements pris avec le FMI.",
+      contenuHtml: `<p>« Nous avons été contraints de procéder à cette augmentation qui reste contenue puisque c'est environ 3,5 % globalement d'augmentation par rapport à l'ancien prix. Mais cela nécessite quand même plus de 200 milliards de subvention de l'État », a déclaré le ministre de la Communication, Amadou Coulibaly, au sortir du conseil des ministres.</p>
+<p>Le porte-parole du Gouvernement évoque, parmi les raisons de cette flambée, la crise armée au Moyen-Orient et ses conséquences sur le transport du gaz et du pétrole, ainsi que les contraintes liées au respect des engagements pris avec le Fonds monétaire international. « Nous essayons de contenir ce déficit dans les limites de ce que nous avons convenu avec le Fonds monétaire », a-t-il reconnu.</p>
+<p>« Le Gouvernement fait vite le choix de sacrifier le peuple pour ne pas se mettre à dos le FMI », commente l'éditorial, qui interroge la solidité de l'assise économique du pays au regard de la croissance dont il se prévaut par ailleurs.</p>`,
+      tags: ['carburant', 'FMI', 'pouvoir d\'achat'],
+      format: 'EDITION', rubrique: politique, auteur: chefPolitique, heures: 115,
+    },
+    {
+      slug: 'grace-presidentielle-clemence-ouattara-portes-politique',
+      titre: 'Grâce présidentielle : la clémence de Ouattara s\'arrête aux portes du politique',
+      chapo: "Le président Ouattara a signé deux décrets accordant la liberté à 4 661 détenus de droit commun, mais aucun geste envers les personnes détenues pour des affaires liées à la vie politique.",
+      contenuHtml: `<p>À la veille du 66e anniversaire de l'indépendance, le président Alassane Ouattara a signé deux décrets accordant la liberté à 4 661 détenus de droit commun : grâce présidentielle pour 2 064 d'entre eux, remise de peine pour 2 597 autres condamnés à un reliquat inférieur à trente-six mois.</p>
+<p>Le même jour, le président du FPI, Pascal Affi N'Guessan, appelait à la libération des personnes détenues pour des affaires liées à la vie politique. La distinction opérée par le chef de l'État est explicite : ses décrets ciblent des détenus de droit commun condamnés pour des infractions mineures, une catégorie qui exclut par définition les dossiers à connotation politique.</p>
+<p>Or la loi ivoirienne ne limite pas le droit de grâce présidentielle à cette seule catégorie. Rien, sur le plan constitutionnel, n'empêchait un geste plus large — ce choix dessine, en creux, une ligne de fracture persistante entre le pouvoir et une partie de l'opposition.</p>`,
+      tags: ['grâce présidentielle', 'détenus politiques', 'FPI'],
+      format: 'DECRYPTAGE', rubrique: politique, auteur: chefPolitique, heures: 110,
+    },
+    {
+      slug: 'litige-foncier-modeste-procureur-suspend-decision-grand-bassam',
+      titre: 'Litige foncier sur un projet immobilier à Modeste : un procureur général suspend la décision du tribunal de Grand-Bassam',
+      chapo: "Le tribunal de première instance de Grand-Bassam avait ordonné le déguerpissement de la société Italia Construction et la démolition de logements haut standing déjà vendus.",
+      contenuHtml: `<p>Le procureur près la Cour d'appel d'Abidjan, Sory Naye Henriette, a requis qu'il soit sursis à l'exécution de la décision du tribunal de première instance de Grand-Bassam, laquelle ordonnait le déguerpissement de la société Italia Construction d'un terrain urbain de 10 000 m² et la démolition de ses constructions.</p>
+<p>En attendant la décision de la Cour d'appel saisie par la société, les acquéreurs qui ont payé très cher ces logements — appartements et villas basses — retiennent leur souffle face à ce « séisme immobilier » auquel ils ne s'attendaient pas.</p>
+<p>« L'exécution immédiate de ce jugement étant susceptible d'entraîner des conséquences manifestement excessives et difficilement réversibles pour les parties concernées », le Parquet général a requis le sursis, précisant que cette décision ne préjuge en rien du fond du litige ni des droits respectifs des parties.</p>`,
+      tags: ['foncier', 'Grand-Bassam', 'justice'],
+      format: 'EDITION', rubrique: societe, auteur: secretaireGeneral, heures: 105,
+    },
+    // --- n°7968 (12 août) — heures ~70-95h ---
+    {
+      slug: 'ouattara-yopougon-prisonniers-opinion-vie-chere-orpaillage',
+      titre: 'Prisonniers d\'opinion, vie chère, ordures, orpaillage illégal… Ouattara était à Yopougon, et la suite ?',
+      chapo: "Le défilé militaire du 66e anniversaire a marqué les esprits, mais les grands maux dénoncés par la rédaction restent sans réponse dans l'adresse du chef de l'État.",
+      contenuHtml: `<p>Le président de la République était le 7 août dans la commune de Yopougon, choisie pour accueillir les festivités de 2026. Il s'y est rendu avec l'armée de la Côte d'Ivoire pour un défilé militaire présenté comme une démonstration de force. Mais après le faste, la question demeure : et après ?</p>
+<p>Sur la vie chère, aucune réponse forte n'a été donnée depuis Yopougon. L'augmentation du prix du carburant qui a précédé la fête nationale a été un non-événement pour le chef de l'État, dont les compatriotes ne sont pourtant pas logés à la même enseigne que lui face à cette charge économique.</p>
+<p>L'orpaillage illégal, devenu un « véritable cancer » pour le gouvernement selon plusieurs préfets, n'a pas davantage été abordé, pas plus que la prolifération des ordures ménagères à Abidjan, dénoncée de longue date par le président du FPI Pascal Affi N'Guessan.</p>`,
+      tags: ['Ouattara', 'Yopougon', 'orpaillage', 'vie chère'],
+      format: 'DECRYPTAGE', rubrique: politique, auteur: redacteurEnChef, heures: 90,
+    },
+    {
+      slug: 'bictogo-brigade-salubrite-yopougon',
+      titre: "Commune de Yopougon : Bictogo annonce la création d'une brigade de salubrité",
+      chapo: "Le député-maire a aussi acté la pérennisation du Village de l'Indépendance, qui a accueilli jusqu'à 7500 visiteurs par jour durant les festivités.",
+      contenuHtml: `<p>Le député-maire de Yopougon, Adama Bictogo, a annoncé la création d'une brigade de salubrité indépendante de la police municipale, ainsi que la pérennisation du Village de l'Indépendance, au terminus 47, lors d'une réunion extraordinaire du conseil municipal.</p>
+<p>« On va rapidement rouvrir », a annoncé Bictogo, précisant qu'un espace numérique consacré à la formation et aux start-up sera intégré au site, ainsi qu'un guichet de financement doté de 500 millions FCFA destiné à soutenir des projets portés par les jeunes.</p>
+<p>Sur le volet salubrité, la nouvelle brigade, placée sous l'autorité directe du cabinet du maire, viendra renforcer l'action des 50 chefs de comités locaux d'assainissement déjà mobilisés dans les quartiers de la commune.</p>`,
+      tags: ['Yopougon', 'Bictogo', 'salubrité'],
+      format: 'EDITION', rubrique: societe, auteur: secretaireGeneral, heures: 85,
+    },
+    {
+      slug: 'daloa-38-millions-voles-caches-puits',
+      titre: '38 millions volés cachés dans un puits à Daloa',
+      chapo: "Un vigile de l'entreprise cambriolée, âgé de 37 ans, a reconnu son implication dans le vol de plus de 47 millions FCFA et l'agression mortelle du gardien de nuit.",
+      contenuHtml: `<p>Le cambriolage d'une importante société à Daloa a eu lieu dans la nuit du 2 au 3 août dernier : plus de 47 millions FCFA volés, le bureau du responsable de zone incendié, et le gardien de nuit, âgé de 60 ans, violemment agressé. Grièvement blessé, il a succombé à ses blessures au Centre hospitalier régional de Daloa.</p>
+<p>Les enquêtes de la Brigade de recherche et d'intervention (BRI) se sont rapidement orientées vers un homme connaissant bien les lieux. Interpellé le 5 août, B.M., de nationalité malienne, a reconnu son implication dans le cambriolage et l'agression mortelle de son collègue.</p>
+<p>Une perquisition à son domicile a permis de découvrir une partie du butin cachée dans une fosse septique : 38 425 400 FCFA ont été récupérés. Le suspect a été placé en garde à vue, et les enquêteurs poursuivent leurs investigations pour retrouver le reliquat.</p>`,
+      tags: ['Daloa', 'cambriolage', 'fait divers'],
+      format: 'FLASH', rubrique: regions, auteur: chefPolitique, heures: 80,
+    },
+    // --- n°7969 (13 août) — heures ~45-65h ---
+    {
+      slug: 'affi-nguessan-gouvernement-complice-orpaillage',
+      titre: "Exploitation minière tous azimuts : Affi N'Guessan accuse « le Gouvernement est complice de l'orpaillage »",
+      chapo: "Pour le président du FPI, l'orpaillage illégal expose les régions à la famine en détournant l'agriculture de ses bras valides, avec la complicité d'autorités locales.",
+      contenuHtml: `<p>« Si aujourd'hui les choses n'avancent pas, c'est parce que le gouvernement actuel n'a pas intérêt à ce que cela avance. Puisqu'il connaît tous ceux qui sont dans ce réseau et que, quelque part, il est complice de ce qui se passe », a déclaré Pascal Affi N'Guessan dans une interview accordée à un média en ligne.</p>
+<p>L'ancien Premier ministre indexe aussi les autorités locales : « Il y a des autorités administratives et sécuritaires qui sont souvent impliquées dans l'orpaillage clandestin. Ce sont elles-mêmes qui entretiennent les réseaux. » Il révèle que son propre village, dans le Moronou, est concerné, avec des terres attribuées à des entreprises minières semi-industrielles.</p>
+<p>Comme solution, il propose d'encadrer la délivrance des agréments et de responsabiliser les propriétaires terriens : « Il faut impliquer les propriétaires terriens dans la lutte contre l'orpaillage clandestin et les considérer comme complices s'ils ne font rien pour empêcher que leurs terres soient exploitées illégalement. »</p>`,
+      tags: ['orpaillage', 'Affi N\'Guessan', 'environnement'],
+      format: 'EDITION', rubrique: politique, auteur: chefPolitique, heures: 60,
+    },
+    {
+      slug: 'financement-medias-gouvernement-capter-recettes-publicitaires',
+      titre: 'Financement des médias : le gouvernement veut mieux capter les recettes du marché publicitaire',
+      chapo: "Un atelier réuni à Grand-Bassam constate un écart croissant entre la progression du marché publicitaire ivoirien et les recettes de la Taxe sur la Publicité effectivement recouvrées.",
+      contenuHtml: `<p>Pour l'Agence de soutien et de développement des médias (ASDM), la question est devenue urgente : seulement 2,384 milliards FCFA de Taxe sur la Publicité (TSP) ont été recouvrés et effectivement affectés à l'agence entre 2022 et août 2026, alors que le financement de son Plan stratégique 2024-2026 en attend près de 7 milliards.</p>
+<p>Les investissements publicitaires sont pourtant passés de 38 milliards FCFA en 2022 à 49 milliards en 2024. En appliquant le taux de 3 % à cette valeur du marché, l'ASDM aurait potentiellement dû recevoir bien davantage — un écart estimé à environ 747 millions FCFA pour 2023 et 2024 selon l'expert-consultant Yao Angara.</p>
+<p>« Une agence sans ressources suffisantes est une ambition sans bras pour agir », a martelé le ministre de la Communication, Amadou Coulibaly, plaidant pour un dispositif digitalisé rapprochant déclarations des entreprises, encaissements du Trésor et reversements à l'ASDM.</p>`,
+      tags: ['médias', 'taxe publicité', 'ASDM'],
+      format: 'EDITION', rubrique: economie, auteur: secretaireGeneral, heures: 55,
+    },
+    {
+      slug: 'derives-mercantiles-certains-pretres',
+      titre: 'Contribution : les dérives mercantiles de certains prêtres',
+      chapo: "Un ancien prêtre dénonce la multiplication des célébrations d'anniversaires d'ordination, contraires aux directives de la Conférence des évêques catholiques de Côte d'Ivoire.",
+      contenuHtml: `<p>« On voit des prêtres célébrer 1, 5, 10, 13, 20, 22, 26, 30, 35, 40 ou 41 ans de sacerdoce », s'insurge l'auteur de cette contribution, rappelant que la Conférence des évêques catholiques de Côte d'Ivoire a clairement dit non aux célébrations intermédiaires, seuls les jubilés des 25, 50, 75 et 100 ans méritant d'être célébrés avec faste.</p>
+<p>Au début de l'année pastorale 2025-2026, Mgr Ignace Bessi a rappelé cette décision, insistant sur le fait que les quêtes, dons et offrandes sont faits pour la vie de l'Église et non pour un individu, fût-il prêtre ou évêque. Un rappel qui, selon l'auteur, reste trop souvent lettre morte.</p>
+<p>« Il est temps que chaque évêque mette fin à ces dérives mercantiles qui sont une atteinte au vœu de pauvreté », conclut la contribution, qui appelle à des anniversaires « sobres, discrets et strictement personnels » en dehors des grands jubilés.</p>`,
+      tags: ['Église catholique', 'contribution', 'société'],
+      format: 'DECRYPTAGE', rubrique: culture, auteur: chefCulture, heures: 50,
+    },
+    {
+      slug: 'yan-diomande-real-madrid-impossible-dire-non',
+      titre: 'Yan Diomandé : « Quand le Real appelle, impossible de dire non »',
+      chapo: "Arrivé du RB Leipzig, l'international ivoirien évoque avec enthousiasme ses premiers jours au Real Madrid et sa relation avec José Mourinho.",
+      contenuHtml: `<p>« Avant tout, je tiens à remercier José Mourinho. C'est précisément grâce à José et à la confiance que m'ont accordée les dirigeants du club que j'ai aujourd'hui la chance de porter le maillot du Real », a déclaré Yan Diomandé après son arrivée au Real Madrid.</p>
+<p>Le joueur s'est montré impressionné par l'environnement du vestiaire : « Être côte à côte avec de tels joueurs de premier plan est une sensation incroyable. Avant, je regardais leurs matchs uniquement à la télévision, et maintenant je suis assis avec eux dans le même vestiaire. »</p>
+<p>« Lorsqu'un club comme le Real Madrid vous appelle, vous ne pouvez absolument pas dire non. Je veux atteindre les sommets avec ce club et aider mon équipe à remporter tous les trophées possibles », a conclu l'international ivoirien.</p>`,
+      tags: ['football', 'Real Madrid', 'mercato'],
+      format: 'FLASH', rubrique: sport, auteur: redacteurSport, heures: 45,
+    },
+  ];
+
+  let crees = 0;
+  for (const a of articles) {
+    const existant = await prisma.article.findUnique({ where: { slug: a.slug } });
+    if (existant) continue;
+    const publieLe = h(a.heures);
+    await prisma.article.create({
+      data: {
+        slug: a.slug, titre: a.titre, chapo: a.chapo, contenuHtml: a.contenuHtml, tags: a.tags,
+        format: a.format, statut: 'PUBLIE', paywall: 'LIBRE',
+        rubriqueId: a.rubrique.id, auteurId: a.auteur.id, valideParId: redacteurEnChef.id,
+        publieLe, createdAt: publieLe, updatedAt: publieLe,
+        vuesTotal: Math.floor(200 + Math.random() * 4000),
+      },
+    });
+    crees++;
+  }
+  console.log(`✔ ${crees} article(s) du second lot créé(s) (${articles.length - crees} déjà existant(s)).`);
+}
+
 async function main() {
   await seedRubriques();
   await seedStaff();
@@ -281,6 +519,8 @@ async function main() {
   if (dejaDesReleves === 0) await seedPrixVieChere();
   const dejaDesArticles = await prisma.article.count();
   if (dejaDesArticles === 0) await seedArticles();
+  const batch2Existe = await prisma.article.findUnique({ where: { slug: 'affi-nguessan-souverainete-veritable-institutions-fortes' } });
+  if (!batch2Existe) await seedArticlesBatch2();
 }
 
 main()
