@@ -828,6 +828,66 @@ async function seedMediaBatch1() {
   console.log(`✔ ${crees} photo(s) réelle(s) importée(s) dans la photothèque (${medias.length - crees} déjà existante(s)).`);
 }
 
+// Correctif — les 33 photos du premier lot avaient été extraites du flux
+// PDF brut (bytes de l'image telle que stockée) sans tenir compte de la
+// matrice de rotation appliquée par la page à l'affichage : elles
+// ressortaient toutes à l'envers. Nouvelle extraction par rendu de la
+// région de page (qui applique la bonne orientation), réhébergée sur
+// Cloudinary. Ici on ne fait que remplacer l'URL des Media déjà en base
+// (et l'imageUneUrl des articles qui la référençaient) — idempotent.
+async function fixMediaBatch1Rotation() {
+  const remplacements = [
+    { oldUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787174451/notre-voie/photo/amqgywoe3g9gwiirg6wq.jpg", newUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787175376/notre-voie/photo-v2/dwsbiacxnelx2b99wmuv.jpg" },
+    { oldUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787174453/notre-voie/photo/clnaefkk1eertnmrtmnc.jpg", newUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787175378/notre-voie/photo-v2/ehpwwjjebaxfcowgywdf.jpg" },
+    { oldUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787174455/notre-voie/photo/foxktrypnl9zsn654eq4.jpg", newUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787175381/notre-voie/photo-v2/gryaahlsenwwy0gj2mee.jpg" },
+    { oldUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787174457/notre-voie/photo/pon4najzxrvzyp4h1nfy.jpg", newUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787175383/notre-voie/photo-v2/l1cqcmtzviij7metsepf.jpg" },
+    { oldUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787174459/notre-voie/photo/frbivchkbxbam0htwdle.jpg", newUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787175385/notre-voie/photo-v2/h8c5k8bggmgxialiopt7.jpg" },
+    { oldUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787174461/notre-voie/photo/w9eryzaofho8brgnif5r.jpg", newUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787175387/notre-voie/photo-v2/vt2et1wiykrlrw6tbofd.jpg" },
+    { oldUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787174463/notre-voie/photo/xa26wxqrtblgu39u4xw9.jpg", newUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787175390/notre-voie/photo-v2/bkcmtk8n5qw18hyup200.jpg" },
+    { oldUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787174467/notre-voie/photo/g5f47g2vyxpbyrgzqxax.jpg", newUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787175393/notre-voie/photo-v2/mdyki75lnvyjmwhncsbc.jpg" },
+    { oldUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787174465/notre-voie/photo/cykylehdculbynan2g1d.jpg", newUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787175396/notre-voie/photo-v2/tncsn2jrke3xko1jfmeh.jpg" },
+    { oldUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787174469/notre-voie/photo/apvzshdtshkci961b9nt.jpg", newUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787175398/notre-voie/photo-v2/x4oz56yxlnkupwcx4iwm.jpg" },
+    { oldUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787174471/notre-voie/photo/dfrrhrd4dubkosfhhu2x.jpg", newUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787175400/notre-voie/photo-v2/hbuyk2pr63bwqygtikn5.jpg" },
+    { oldUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787174472/notre-voie/photo/kxh9iodevzlsmtusexqm.jpg", newUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787175402/notre-voie/photo-v2/qmrr6puikwfehvonvk3e.jpg" },
+    { oldUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787174474/notre-voie/photo/ftdgntcozhmotmxnrozs.jpg", newUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787175404/notre-voie/photo-v2/b45oinabwnzizgjj7if0.jpg" },
+    { oldUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787174476/notre-voie/photo/crhuyp04vxeye2i9xck5.jpg", newUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787175406/notre-voie/photo-v2/lqa3wreqkfl9boxbbif1.jpg" },
+    { oldUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787174478/notre-voie/photo/kpnlmqsyo2qlq60nm33s.jpg", newUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787175408/notre-voie/photo-v2/rnhfawad2vxc0dj46nw6.jpg" },
+    { oldUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787174479/notre-voie/photo/pcuvio7aummxg4xboz9f.jpg", newUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787175410/notre-voie/photo-v2/ff0t3enzbufidnkeaonv.jpg" },
+    { oldUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787174482/notre-voie/photo/tijpqig19vbytvi4q3mh.jpg", newUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787175413/notre-voie/photo-v2/gijgjidchndsjvktfkat.jpg" },
+    { oldUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787174485/notre-voie/photo/cznnmaapayuctzz5yxpr.jpg", newUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787175416/notre-voie/photo-v2/rbfcqlod3busk7vqwzt2.jpg" },
+    { oldUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787174486/notre-voie/photo/th8w4r4obepb6obgmwtx.jpg", newUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787175418/notre-voie/photo-v2/lxrxlbio3pjlqhagldvc.jpg" },
+    { oldUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787174488/notre-voie/photo/daelax4rmn1nwq95h9ub.jpg", newUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787175420/notre-voie/photo-v2/gimyisqrfirjpoofgzzx.jpg" },
+    { oldUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787174490/notre-voie/photo/xd2iprtst5ogshatkb7f.jpg", newUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787175422/notre-voie/photo-v2/erxqxiv1wuvavpjfoyxq.jpg" },
+    { oldUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787174492/notre-voie/photo/qkolvn1tmdxk4bm03sdd.jpg", newUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787175424/notre-voie/photo-v2/r9ecsxrixivsv4taw3i3.jpg" },
+    { oldUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787174494/notre-voie/photo/pl77u8lfljb5ppneieif.jpg", newUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787175426/notre-voie/photo-v2/fmsqrrv9srmithgw2nlm.jpg" },
+    { oldUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787174496/notre-voie/photo/sdkpgaa7yqauftoyh6pg.jpg", newUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787175428/notre-voie/photo-v2/wulefnmjkrevkkry2yuu.jpg" },
+    { oldUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787174497/notre-voie/photo/ejfghhvqgqjrrukzusbw.jpg", newUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787175431/notre-voie/photo-v2/cljr3brfyc2tlevzuahf.jpg" },
+    { oldUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787174499/notre-voie/photo/ecdjfzrsv9rhpjdt0aef.jpg", newUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787175433/notre-voie/photo-v2/rgp8mflewwnbljpyjlrs.jpg" },
+    { oldUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787174501/notre-voie/photo/q0qx8222w2ef5b6lwyux.jpg", newUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787175435/notre-voie/photo-v2/p8d3sjs8chebrrndzoiv.jpg" },
+    { oldUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787174502/notre-voie/photo/idn8mbakt3c66b3zfjc8.jpg", newUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787175437/notre-voie/photo-v2/dzphlybmuemythkzxkp9.jpg" },
+    { oldUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787174504/notre-voie/photo/kayokuvghbbghccgmdsw.jpg", newUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787175439/notre-voie/photo-v2/xwkpf2lcssiquycofjdi.jpg" },
+    { oldUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787174506/notre-voie/photo/q3hisng0twmig8arfysv.jpg", newUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787175441/notre-voie/photo-v2/br3dc4vzqgnuzdardgnt.jpg" },
+    { oldUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787174508/notre-voie/photo/fuxokdzolnph2r12fjbc.jpg", newUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787175444/notre-voie/photo-v2/bswe2usdtuolmw3ft4hz.jpg" },
+    { oldUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787174510/notre-voie/photo/mytzxmomqyt2vdpmcxjw.jpg", newUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787175446/notre-voie/photo-v2/okzgvv4fcahuxlqu3zrl.jpg" },
+    { oldUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787174512/notre-voie/photo/v1zte0s0mksiweaiqvfn.jpg", newUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787175448/notre-voie/photo-v2/gusq89xnpxdra2edluet.jpg" },
+  ];
+
+  let corriges = 0;
+  for (const { oldUrl, newUrl } of remplacements) {
+    const media = await prisma.media.findFirst({ where: { url: oldUrl } });
+    if (!media) continue;
+    await prisma.media.update({ where: { id: media.id }, data: { url: newUrl } });
+    if (media.articleId) {
+      const article = await prisma.article.findUnique({ where: { id: media.articleId } });
+      if (article && article.imageUneUrl === oldUrl) {
+        await prisma.article.update({ where: { id: article.id }, data: { imageUneUrl: newUrl } });
+      }
+    }
+    corriges++;
+  }
+  console.log(`✔ ${corriges} photo(s) réorientée(s) (URL remplacée) sur ${remplacements.length}.`);
+}
+
 async function main() {
   await seedRubriques();
   await seedStaff();
@@ -841,6 +901,8 @@ async function main() {
   if (!batch3Existe) await seedArticlesBatch3();
   const mediaBatch1Existe = await prisma.media.findFirst({ where: { url: { contains: 'notre-voie/photo/amqgywoe3g9gwiirg6wq' } } });
   if (!mediaBatch1Existe) await seedMediaBatch1();
+  const rotationAFaireExiste = await prisma.media.findFirst({ where: { url: { contains: 'notre-voie/photo/amqgywoe3g9gwiirg6wq' } } });
+  if (rotationAFaireExiste) await fixMediaBatch1Rotation();
 }
 
 main()
