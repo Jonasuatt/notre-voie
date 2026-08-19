@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { getArticles, getRubriques, getTicker, getFactChecks } from '@/lib/api';
 import FlashBar from '@/components/FlashBar';
 import TickerVieChere from '@/components/TickerVieChere';
@@ -31,6 +32,9 @@ export default async function AccueilPage() {
           <div className="grid lg:grid-cols-[1.55fr_1fr] gap-7">
             <Link href={`/article/${une.slug}`} className="group">
               <div className="relative h-[220px] sm:h-[300px] rounded-[10px] bg-gradient-to-br from-navy2 to-navy overflow-hidden">
+                {une.imageUneUrl && (
+                  <Image src={une.imageUneUrl} alt="" fill sizes="(max-width: 1024px) 100vw, 60vw" priority className="object-cover" />
+                )}
                 <FormatBadge format={une.format} />
               </div>
               <div className="pt-4">

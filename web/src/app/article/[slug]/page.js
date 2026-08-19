@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { getArticleBySlug } from '@/lib/api';
 import FormatBadge from '@/components/FormatBadge';
 import Paywall from '@/components/Paywall';
@@ -28,6 +29,11 @@ export default async function ArticlePage({ params }) {
 
   const verrouille = article.paywallLocked;
   const verdict = article.factCheck ? VERDICT_STYLE[article.factCheck.verdict] : null;
+  const medias = article.medias || [];
+  const imagePrincipale = article.imageUneUrl ? medias.find((m) => m.url === article.imageUneUrl) : null;
+  const galerie = medias.filter((m) => m.type === 'PHOTO' && m.url !== article.imageUneUrl).sort((a, b) => a.ordre - b.ordre);
+  const video = medias.find((m) => m.type === 'VIDEO');
+  const audio = medias.find((m) => m.type === 'AUDIO');
 
   return (
     <article className="max-w-[720px] mx-auto px-4 sm:px-8 py-10">
@@ -57,7 +63,46 @@ export default async function ArticlePage({ params }) {
         <span>👁 {article.vuesTotal?.toLocaleString('fr-FR')} lectures</span>
       </div>
 
-      <div className="relative h-[280px] rounded-[10px] bg-gradient-to-br from-navy2 to-navy mt-6" />
+      <figure className="mt-6">
+        <div className="relative h-[280px] sm:h-[400px] rounded-[10px] bg-gradient-to-br from-navy2 to-navy overflow-hidden">
+          {article.imageUneUrl && (
+            <Image src={article.imageUneUrl} alt={imagePrincipale?.legende || article.titre} fill sizes="720px" priority className="object-cover" />
+          )}
+        </div>
+        {imagePrincipale?.legende && (
+          <figcaption className="text-[12px] text-muted mt-2 leading-snug">
+            {imagePrincipale.legende}
+            {imagePrincipale.credit && <span className="text-muted/70"> — {imagePrincipale.credit}</span>}
+          </figcaption>
+        )}
+      </figure>
+
+      {video && (
+        <figure className="mt-6">
+          {/^https?:\/\/(www\.)?(youtube\.com|youtu\.be)/.test(video.url) ? (
+            <div className="relative aspect-video rounded-[10px] overflow-hidden bg-ink">
+              <iframe
+                src={video.url.replace('watch?v=', 'embed/').replace('youtu.be/', 'youtube.com/embed/')}
+                className="absolute inset-0 w-full h-full" allowFullScreen title={video.legende || 'Vidéo'}
+              />
+            </div>
+          ) : (
+            <video src={video.url} controls className="w-full rounded-[10px] bg-ink" />
+          )}
+          {video.legende && (
+            <figcaption className="text-[12px] text-muted mt-2 leading-snug">
+              {video.legende}{video.credit && <span className="text-muted/70"> — {video.credit}</span>}
+            </figcaption>
+          )}
+        </figure>
+      )}
+
+      {audio && (
+        <div className="mt-6 bg-cream border border-line rounded-[10px] p-4">
+          <p className="font-mono text-[10.5px] uppercase tracking-wide text-muted mb-2">🎧 {audio.legende || 'Version audio'}</p>
+          <audio src={audio.url} controls className="w-full" />
+        </div>
+      )}
 
       {article.factCheck && (
         <div className="mt-6 border-l-4 rounded-r-lg bg-[#FBF3E4] p-5" style={{ borderColor: verdict.color }}>
@@ -90,6 +135,26 @@ export default async function ArticlePage({ params }) {
         article.contenuHtml && (
           <div className="prose-article mt-7 text-[16px] text-ink" dangerouslySetInnerHTML={{ __html: article.contenuHtml }} />
         )
+      )}
+
+      {galerie.length > 0 && (
+        <div className="mt-8 pt-6 border-t border-line">
+          <h3 className="font-mono text-[11px] uppercase tracking-widest text-muted mb-4">Galerie photo</h3>
+          <div className="grid sm:grid-cols-2 gap-5">
+            {galerie.map((m) => (
+              <figure key={m.id}>
+                <div className="relative h-[220px] rounded-[10px] overflow-hidden bg-navy2">
+                  <Image src={m.url} alt={m.legende || ''} fill sizes="360px" className="object-cover" />
+                </div>
+                {m.legende && (
+                  <figcaption className="text-[12px] text-muted mt-2 leading-snug">
+                    {m.legende}{m.credit && <span className="text-muted/70"> — {m.credit}</span>}
+                  </figcaption>
+                )}
+              </figure>
+            ))}
+          </div>
+        </div>
       )}
 
       {article.tags?.length > 0 && (

@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import FormatBadge from './FormatBadge';
 import { timeAgo } from '@/lib/format';
 
@@ -6,6 +7,12 @@ export default function ArticleCard({ article }) {
   return (
     <Link href={`/article/${article.slug}`} className="block bg-white rounded-[10px] border border-line overflow-hidden group">
       <div className="relative h-[150px] bg-gradient-to-br from-navy2 to-navy overflow-hidden">
+        {article.imageUneUrl && (
+          <Image
+            src={article.imageUneUrl} alt="" fill sizes="(max-width: 640px) 100vw, 33vw"
+            className="object-cover group-hover:scale-105 transition-transform duration-300"
+          />
+        )}
         <FormatBadge format={article.format} />
         {article.paywall === 'PAYANT' && (
           <span className="absolute top-2.5 right-2.5 bg-ink/70 text-white text-[9px] font-mono px-1.5 py-1 rounded">Abonnés</span>
