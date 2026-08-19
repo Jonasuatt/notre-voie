@@ -762,6 +762,72 @@ async function seedArticlesBatch3() {
   console.log(`✔ ${crees} article(s) du troisième lot créé(s) (${articles.length - crees} déjà existant(s)).`);
 }
 
+// Photothèque — premier lot de vraies photos, extraites des archives PDF du
+// journal (n°7961 à 7969) via PyMuPDF, puis hébergées sur Cloudinary.
+// Chaque photo rattachée à son article (galerie + image principale) via son
+// slug ; une photo sans slug reste "en stock" dans la photothèque.
+// Idempotent : vérifie l'URL Cloudinary avant de créer.
+async function seedMediaBatch1() {
+  const medias = [
+    { url: "https://res.cloudinary.com/ataat5bs/image/upload/v1787174451/notre-voie/photo/amqgywoe3g9gwiirg6wq.jpg", legende: "Le chef de l'État ivoirien face au dossier GAFI.", credit: "DR", articleSlug: "cote-ivoire-demene-sortir-guepier-blanchiment-capitaux" },
+    { url: "https://res.cloudinary.com/ataat5bs/image/upload/v1787174453/notre-voie/photo/clnaefkk1eertnmrtmnc.jpg", legende: "Les deux ministres en train de signer la convention qui lie les deux pays.", credit: "DR", articleSlug: "accord-cote-ivoire-botswana-or-africain-richesse-durable" },
+    { url: "https://res.cloudinary.com/ataat5bs/image/upload/v1787174455/notre-voie/photo/foxktrypnl9zsn654eq4.jpg", legende: "Dominique Ouattara s'adressant aux Premières dames d'Afrique à Luanda.", credit: "DR", articleSlug: null },
+    { url: "https://res.cloudinary.com/ataat5bs/image/upload/v1787174457/notre-voie/photo/pon4najzxrvzyp4h1nfy.jpg", legende: "Nassénéba Touré au chevet des blessés.", credit: "DR", articleSlug: "incendie-orphelinat-mamie-therese-gouvernement-prise-en-charge" },
+    { url: "https://res.cloudinary.com/ataat5bs/image/upload/v1787174459/notre-voie/photo/frbivchkbxbam0htwdle.jpg", legende: "Gianni Infantino et Donald Trump font à nouveau parler d'eux.", credit: "DR", articleSlug: "fifa-bute-uefa-concacaf-vente-parts-coupe-du-monde" },
+    { url: "https://res.cloudinary.com/ataat5bs/image/upload/v1787174461/notre-voie/photo/w9eryzaofho8brgnif5r.jpg", legende: "L'illustre disparu, Henri Konan Bédié, a vécu et servi son pays.", credit: "DR", articleSlug: "bedie-le-sphinx-de-daoukro-il-y-a-trois-ans" },
+    { url: "https://res.cloudinary.com/ataat5bs/image/upload/v1787174463/notre-voie/photo/xa26wxqrtblgu39u4xw9.jpg", legende: "Merci Faé !", credit: "DR", articleSlug: "emerse-fae-vire-fif-je-suis-decu-oui" },
+    { url: "https://res.cloudinary.com/ataat5bs/image/upload/v1787174465/notre-voie/photo/cykylehdculbynan2g1d.jpg", legende: "La photo de famille des lauréats et du chef de l'État et son épouse.", credit: "DR", articleSlug: "13e-prix-national-excellence-80-laureats-primes" },
+    { url: "https://res.cloudinary.com/ataat5bs/image/upload/v1787174467/notre-voie/photo/g5f47g2vyxpbyrgzqxax.jpg", legende: "Marie-Laure N'Goran, entre le président Alassane Ouattara et son épouse Dominique Ouattara.", credit: "DR", articleSlug: "marie-laure-ngoran-sacree-lauréate-prix-excellence-medias" },
+    { url: "https://res.cloudinary.com/ataat5bs/image/upload/v1787174469/notre-voie/photo/apvzshdtshkci961b9nt.jpg", legende: "Franco Baresi.", credit: "DR", articleSlug: "qui-etait-franco-baresi-mort-31-juillet-2026" },
+    { url: "https://res.cloudinary.com/ataat5bs/image/upload/v1787174471/notre-voie/photo/dfrrhrd4dubkosfhhu2x.jpg", legende: "Les dernières législatives ont vu des candidats devenir députés sans la majorité des suffrages inscrits.", credit: "DR", articleSlug: "assemblee-nationale-deputes-95-pourcent-electeurs-non-choisis" },
+    { url: "https://res.cloudinary.com/ataat5bs/image/upload/v1787174472/notre-voie/photo/kxh9iodevzlsmtusexqm.jpg", legende: "La Côte d'Ivoire, un pays riche, un sous-sol généreux mais des populations ruinées par la cherté de la vie.", credit: "DR", articleSlug: "cherte-carburant-loyer-vivres-transport-pouvoir-achat-souffrance" },
+    { url: "https://res.cloudinary.com/ataat5bs/image/upload/v1787174474/notre-voie/photo/ftdgntcozhmotmxnrozs.jpg", legende: "Un rassemblement discipliné et responsable dans une célèbre école catholique d'Abidjan Cocody.", credit: "DR", articleSlug: "ecole-catholique-ecrase-moyennes-nationales-examens-2026" },
+    { url: "https://res.cloudinary.com/ataat5bs/image/upload/v1787174476/notre-voie/photo/crhuyp04vxeye2i9xck5.jpg", legende: "Sale temps pour ces criminels.", credit: "DR", articleSlug: "bouna-deux-allogenes-condamnes-20-ans-tentative-meurtre" },
+    { url: "https://res.cloudinary.com/ataat5bs/image/upload/v1787174478/notre-voie/photo/kpnlmqsyo2qlq60nm33s.jpg", legende: "Hervé Renard retrouve le banc ivoirien qu'il convoitait tant.", credit: "DR", articleSlug: "herve-renard-retrouve-les-elephants" },
+    { url: "https://res.cloudinary.com/ataat5bs/image/upload/v1787174479/notre-voie/photo/pcuvio7aummxg4xboz9f.jpg", legende: "Pascal Affi N'Guessan, président du Front populaire ivoirien.", credit: "DR", articleSlug: "affi-nguessan-souverainete-veritable-institutions-fortes" },
+    { url: "https://res.cloudinary.com/ataat5bs/image/upload/v1787174482/notre-voie/photo/tijpqig19vbytvi4q3mh.jpg", legende: "La filière café-cacao ivoirienne face au grand écart des prix.", credit: "DR", articleSlug: "cacao-ivoirien-or-brun-epreuve-records" },
+    { url: "https://res.cloudinary.com/ataat5bs/image/upload/v1787174485/notre-voie/photo/cznnmaapayuctzz5yxpr.jpg", legende: "Gaha Carine, la nouvelle reine de beauté ivoirienne Awoulaba 2026.", credit: "DR", articleSlug: "gaha-carine-reine-guemon-finale-awoulaba-2026" },
+    { url: "https://res.cloudinary.com/ataat5bs/image/upload/v1787174486/notre-voie/photo/th8w4r4obepb6obgmwtx.jpg", legende: "Cosrou, un village sous le choc après le meurtre d'un planteur.", credit: "DR", articleSlug: "dabou-planteur-retrouve-mort-plantation-cosrou" },
+    { url: "https://res.cloudinary.com/ataat5bs/image/upload/v1787174488/notre-voie/photo/daelax4rmn1nwq95h9ub.jpg", legende: "Adresse à la Nation du chef de l'État, à la veille des 66 ans de l'indépendance.", credit: "DR", articleSlug: "discours-nation-ouattara-promesses-epreuve-faits" },
+    { url: "https://res.cloudinary.com/ataat5bs/image/upload/v1787174490/notre-voie/photo/xd2iprtst5ogshatkb7f.jpg", legende: "Exportations ivoiriennes : la montée en puissance de l'or face au cacao.", credit: "DR", articleSlug: "exportation-or-monte-puissance-face-cacao" },
+    { url: "https://res.cloudinary.com/ataat5bs/image/upload/v1787174492/notre-voie/photo/qkolvn1tmdxk4bm03sdd.jpg", legende: "Le président gabonais Brice Clotaire Oligui Nguema à la cité de relogement de Songon Ayewahi.", credit: "DR", articleSlug: "president-gabonais-experience-ivoirienne-relogement" },
+    { url: "https://res.cloudinary.com/ataat5bs/image/upload/v1787174494/notre-voie/photo/pl77u8lfljb5ppneieif.jpg", legende: "Violences intercommunautaires à Kossandji, dans la sous-préfecture d'Alépé.", credit: "DR", articleSlug: "alepe-kossandji-six-morts-violences-conflit-foncier" },
+    { url: "https://res.cloudinary.com/ataat5bs/image/upload/v1787174496/notre-voie/photo/sdkpgaa7yqauftoyh6pg.jpg", legende: "Nouvelle hausse du prix du carburant à la pompe.", credit: "DR", articleSlug: "hausse-carburant-gouvernement-impuissant-lache-ivoiriens" },
+    { url: "https://res.cloudinary.com/ataat5bs/image/upload/v1787174497/notre-voie/photo/ejfghhvqgqjrrukzusbw.jpg", legende: "Grâce présidentielle : 4661 détenus de droit commun libérés.", credit: "DR", articleSlug: "grace-presidentielle-clemence-ouattara-portes-politique" },
+    { url: "https://res.cloudinary.com/ataat5bs/image/upload/v1787174499/notre-voie/photo/ecdjfzrsv9rhpjdt0aef.jpg", legende: "Le litige foncier autour d'un projet immobilier à Grand-Bassam.", credit: "DR", articleSlug: "litige-foncier-modeste-procureur-suspend-decision-grand-bassam" },
+    { url: "https://res.cloudinary.com/ataat5bs/image/upload/v1787174501/notre-voie/photo/q0qx8222w2ef5b6lwyux.jpg", legende: "Le président de la République lors du défilé militaire du 66e anniversaire, à Yopougon.", credit: "DR", articleSlug: "ouattara-yopougon-prisonniers-opinion-vie-chere-orpaillage" },
+    { url: "https://res.cloudinary.com/ataat5bs/image/upload/v1787174502/notre-voie/photo/idn8mbakt3c66b3zfjc8.jpg", legende: "Le député-maire de Yopougon, Adama Bictogo, annonce la création d'une brigade de salubrité.", credit: "DR", articleSlug: "bictogo-brigade-salubrite-yopougon" },
+    { url: "https://res.cloudinary.com/ataat5bs/image/upload/v1787174504/notre-voie/photo/kayokuvghbbghccgmdsw.jpg", legende: "Le cambriolage d'une société à Daloa qui a coûté la vie au gardien de nuit.", credit: "DR", articleSlug: "daloa-38-millions-voles-caches-puits" },
+    { url: "https://res.cloudinary.com/ataat5bs/image/upload/v1787174506/notre-voie/photo/q3hisng0twmig8arfysv.jpg", legende: "Pascal Affi N'Guessan accuse le gouvernement d'être complice de l'orpaillage illégal.", credit: "DR", articleSlug: "affi-nguessan-gouvernement-complice-orpaillage" },
+    { url: "https://res.cloudinary.com/ataat5bs/image/upload/v1787174508/notre-voie/photo/fuxokdzolnph2r12fjbc.jpg", legende: "Amadou Coulibaly, au centre, en compagnie du préfet du département de Grand-Bassam.", credit: "DR", articleSlug: "financement-medias-gouvernement-capter-recettes-publicitaires" },
+    { url: "https://res.cloudinary.com/ataat5bs/image/upload/v1787174510/notre-voie/photo/mytzxmomqyt2vdpmcxjw.jpg", legende: "Jean-Claude Djéréké interpelle les prêtres sur les dérives mercantiles.", credit: "DR", articleSlug: "derives-mercantiles-certains-pretres" },
+    { url: "https://res.cloudinary.com/ataat5bs/image/upload/v1787174512/notre-voie/photo/v1zte0s0mksiweaiqvfn.jpg", legende: "Yan Diomandé, trop heureux d'être au Real de Mourinho.", credit: "DR", articleSlug: "yan-diomande-real-madrid-impossible-dire-non" },
+  ];
+
+  let crees = 0;
+  for (const m of medias) {
+    const existant = await prisma.media.findFirst({ where: { url: m.url } });
+    if (existant) continue;
+    let articleId = null;
+    if (m.articleSlug) {
+      const article = await prisma.article.findUnique({ where: { slug: m.articleSlug } });
+      if (article) {
+        articleId = article.id;
+        // La première photo rattachée à l'article devient aussi son image
+        // principale (Une / carte d'article), si elle n'en a pas déjà une.
+        if (!article.imageUneUrl) {
+          await prisma.article.update({ where: { id: article.id }, data: { imageUneUrl: m.url } });
+        }
+      }
+    }
+    await prisma.media.create({
+      data: { type: 'PHOTO', url: m.url, legende: m.legende, credit: m.credit, articleId },
+    });
+    crees++;
+  }
+  console.log(`✔ ${crees} photo(s) réelle(s) importée(s) dans la photothèque (${medias.length - crees} déjà existante(s)).`);
+}
+
 async function main() {
   await seedRubriques();
   await seedStaff();
@@ -773,6 +839,8 @@ async function main() {
   if (!batch2Existe) await seedArticlesBatch2();
   const batch3Existe = await prisma.article.findUnique({ where: { slug: 'cote-ivoire-demene-sortir-guepier-blanchiment-capitaux' } });
   if (!batch3Existe) await seedArticlesBatch3();
+  const mediaBatch1Existe = await prisma.media.findFirst({ where: { url: { contains: 'notre-voie/photo/amqgywoe3g9gwiirg6wq' } } });
+  if (!mediaBatch1Existe) await seedMediaBatch1();
 }
 
 main()
