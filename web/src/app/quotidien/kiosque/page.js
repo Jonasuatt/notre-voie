@@ -3,6 +3,8 @@ import Image from 'next/image';
 import { getEditions } from '@/lib/api';
 import { formatDateRange } from '@/lib/format';
 
+const BASE_PATH = '/quotidien';
+
 // Contenu qui change chaque jour (nouvelle édition quotidienne) : jamais
 // figé au build, toujours interrogé à la demande.
 export const dynamic = 'force-dynamic';
@@ -38,7 +40,7 @@ export default async function KiosquePage() {
                 </a>
                 <span className="font-mono text-[10.5px] text-ink font-bold block mt-2.5">N°{e.numero}</span>
                 <span className="font-mono text-[10px] text-muted block">{formatDateRange(e.dateParution, e.dateFin)}</span>
-                <Link href={`/recherche?date=${dateISO}`} className="text-[11px] text-navy font-semibold hover:text-coral transition-colors block mt-1">
+                <Link href={`${BASE_PATH}/recherche?date=${dateISO}`} className="text-[11px] text-navy font-semibold hover:text-coral transition-colors block mt-1">
                   Voir les articles du jour →
                 </Link>
               </div>

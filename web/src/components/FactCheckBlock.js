@@ -4,7 +4,7 @@ const VERDICT_LABEL = { VRAI: 'Vrai', FAUX: 'Faux', TROMPEUR: 'Trompeur', NON_VE
 
 // Mis en avant sur l'accueil, pas seulement en rubrique — construit la
 // réputation de fiabilité du titre (cahier des charges §3.4).
-export default function FactCheckBlock({ factChecks }) {
+export default function FactCheckBlock({ factChecks, basePath = '' }) {
   if (!factChecks?.length) return null;
   const fc = factChecks[0];
   const article = fc.article;
@@ -17,7 +17,7 @@ export default function FactCheckBlock({ factChecks }) {
         <h4 className="font-serif text-[17px] mt-1">{article?.titre}</h4>
         {article?.chapo && <p className="text-muted text-[13px] mt-1">{article.chapo}</p>}
       </div>
-      <Link href={`/article/${article?.slug}`} className="shrink-0 bg-ink text-white text-[12px] font-bold px-4 py-2.5 rounded-full">
+      <Link href={`${basePath}/article/${article?.slug}`} className="shrink-0 bg-ink text-white text-[12px] font-bold px-4 py-2.5 rounded-full">
         Lire la vérification
       </Link>
     </div>

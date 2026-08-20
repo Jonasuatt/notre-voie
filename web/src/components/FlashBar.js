@@ -3,14 +3,14 @@ import Link from 'next/link';
 // Bandeau "façon stories" — le format qui capte l'attention avant même le
 // premier scroll (cf. cahier des charges §3.4). Chaque bulle renvoie à un
 // Flash ; les Live actifs se distinguent par un anneau plein + badge DIRECT.
-export default function FlashBar({ articles }) {
+export default function FlashBar({ articles, basePath = '' }) {
   if (!articles?.length) return null;
 
   return (
     <div className="bg-navy py-5">
       <div className="max-w-[1180px] mx-auto px-4 sm:px-8 flex gap-[22px] overflow-x-auto">
         {articles.map((a) => (
-          <Link key={a.id} href={`/article/${a.slug}`} className="flex-none w-[78px] text-center">
+          <Link key={a.id} href={`${basePath}/article/${a.slug}`} className="flex-none w-[78px] text-center">
             <div
               className="w-[66px] h-[66px] rounded-full p-[3px] mx-auto mb-2"
               style={{

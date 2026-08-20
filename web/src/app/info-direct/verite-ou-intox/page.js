@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { getFactChecks } from '@/lib/api';
 
+const BASE_PATH = '/info-direct';
+
 export const metadata = { title: 'Vérité ou Intox' };
 export const dynamic = 'force-dynamic';
 
@@ -29,7 +31,7 @@ export default async function VeriteOuIntoxPage() {
           return (
             <Link
               key={article.id}
-              href={`/article/${article.slug}`}
+              href={`${BASE_PATH}/article/${article.slug}`}
               className="block border border-line rounded-xl p-5 bg-white hover:border-gold transition"
             >
               <span className="font-mono text-[10px] uppercase tracking-widest font-bold" style={{ color: v.color }}>

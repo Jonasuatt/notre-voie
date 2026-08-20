@@ -1,6 +1,8 @@
 import { getArticles, getRubriques } from '@/lib/api';
 import ArticleCard from '@/components/ArticleCard';
 
+const BASE_PATH = '/info-direct';
+
 export const metadata = { title: 'Recherche' };
 
 // Archivage et recherche — par jour de parution, mot-clé (titre/sujet) et
@@ -27,7 +29,7 @@ export default async function RecherchePage({ searchParams }) {
         Par jour de parution, par mot-clé ou par rubrique — tout le fonds documentaire de Notre Voie, jour après jour.
       </p>
 
-      <form method="GET" action="/recherche" className="grid sm:grid-cols-4 gap-3 mt-6 bg-white border border-line rounded-[10px] p-5">
+      <form method="GET" action={`${BASE_PATH}/recherche`} className="grid sm:grid-cols-4 gap-3 mt-6 bg-white border border-line rounded-[10px] p-5">
         <div className="sm:col-span-2">
           <label className="block text-[11px] font-mono uppercase tracking-wide text-muted mb-1.5">Mot-clé / sujet</label>
           <input type="text" name="q" defaultValue={q} placeholder="Un nom, un lieu, un sujet…" className="w-full border border-line rounded-md px-3 py-2 text-[14px]" />
@@ -47,7 +49,7 @@ export default async function RecherchePage({ searchParams }) {
         </div>
         <div className="sm:col-span-4 flex justify-end gap-2">
           {aUneRecherche && (
-            <a href="/recherche" className="text-[13px] font-semibold text-muted hover:text-ink px-4 py-2">Réinitialiser</a>
+            <a href={`${BASE_PATH}/recherche`} className="text-[13px] font-semibold text-muted hover:text-ink px-4 py-2">Réinitialiser</a>
           )}
           <button type="submit" className="bg-navy text-white font-bold text-[13px] px-5 py-2.5 rounded-full hover:brightness-95 transition">
             Rechercher
@@ -65,7 +67,7 @@ export default async function RecherchePage({ searchParams }) {
             <p className="text-muted text-[12.5px] font-mono mb-4">{resultats.total} résultat{resultats.total > 1 ? 's' : ''}</p>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-[22px]">
               {resultats.articles.map((a) => (
-                <ArticleCard key={a.id} article={a} />
+                <ArticleCard key={a.id} article={a} basePath={BASE_PATH} />
               ))}
             </div>
           </>

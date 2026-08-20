@@ -3,6 +3,8 @@ import Image from 'next/image';
 import { getArticles } from '@/lib/api';
 import { timeAgo } from '@/lib/format';
 
+const BASE_PATH = '/quotidien';
+
 export const metadata = { title: 'En direct' };
 export const dynamic = 'force-dynamic';
 
@@ -27,7 +29,7 @@ export default async function DirectPage() {
       ) : (
         <div className="mt-8 space-y-5">
           {articles.map((a) => (
-            <Link key={a.id} href={`/article/${a.slug}`} className="flex gap-4 bg-white border border-line rounded-[10px] overflow-hidden group">
+            <Link key={a.id} href={`${BASE_PATH}/article/${a.slug}`} className="flex gap-4 bg-white border border-line rounded-[10px] overflow-hidden group">
               <div className="relative w-[140px] h-[110px] shrink-0 bg-gradient-to-br from-navy2 to-navy">
                 {a.imageUneUrl && <Image src={a.imageUneUrl} alt="" fill sizes="140px" className="object-cover" />}
               </div>

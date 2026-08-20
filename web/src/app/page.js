@@ -1,127 +1,53 @@
 import Link from 'next/link';
-import Image from 'next/image';
-import { getArticles, getRubriques, getTicker, getFactChecks, getCampagnesActives, getEditions } from '@/lib/api';
-import FlashBar from '@/components/FlashBar';
-import TickerVieChere from '@/components/TickerVieChere';
-import RubriqueTabs from '@/components/RubriqueTabs';
-import ArticleCard from '@/components/ArticleCard';
-import FactCheckBlock from '@/components/FactCheckBlock';
-import FormatBadge from '@/components/FormatBadge';
-import PubCard from '@/components/PubCard';
-import { timeAgo, formatDateRange } from '@/lib/format';
 
-// Quotidien : la Une et le fil changent chaque jour, jamais figés au build.
-export const dynamic = 'force-dynamic';
+export const metadata = { title: 'Notre Voie' };
 
-export default async function AccueilPage() {
-  const [{ articles }, rubriques, prix, factChecks, campagnes, editions] = await Promise.all([
-    getArticles({ pageSize: 24 }),
-    getRubriques(),
-    getTicker(),
-    getFactChecks(),
-    getCampagnesActives({ format: 'NATIVE_CARTE' }),
-    getEditions({ pageSize: 1 }),
-  ]);
-  const uneDuJour = editions?.[0];
-
-  const flashEtLive = articles.filter((a) => a.format === 'FLASH' || a.format === 'LIVE').slice(0, 8);
-  const une = articles[0];
-  const resumeDuJour = articles.slice(1, 6);
-  const grille = articles.slice(0, 9);
-  const directEnCours = articles.find((a) => a.format === 'LIVE');
-  const pub = campagnes?.[0];
-
+// Portail d'entrée — deux rédactions, deux portes. « Le Quotidien » (la
+// rédaction qui confectionne le journal papier : contenu déversé tel que
+// présent dans les PDF, rubriques traditionnelles) est pleinement
+// opérationnel. « Info en direct » (la rédaction qui animera le site au
+// quotidien, style éditorial distinct) est pour l'instant une copie
+// conforme du Quotidien, destinée à diverger dans une prochaine étape.
+export default function PortailPage() {
   return (
-    <>
-      <TickerVieChere prix={prix} />
+    <div className="min-h-screen bg-ink flex flex-col items-center justify-center px-6 py-16 text-center">
+      <div className="inline-flex items-center rounded-full overflow-hidden shadow-lg font-serif font-extrabold mb-10">
+        <span className="bg-navy text-white h-11 text-[18px] px-4 flex items-center">Notre</span>
+        <span className="bg-white text-coral font-black h-11 text-[18px] px-4 flex items-center">Voie</span>
+      </div>
 
-      {directEnCours && (
-        <Link href={`/article/${directEnCours.slug}`} className="block bg-ink text-white">
-          <div className="max-w-[1180px] mx-auto px-4 sm:px-8 py-2.5 flex items-center gap-3">
-            <span className="flex items-center gap-1.5 bg-coral text-white text-[10.5px] font-bold px-2.5 py-1 rounded-full">
-              <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" /> EN DIRECT
-            </span>
-            <span className="text-[13px] font-medium truncate hover:text-coral transition-colors">{directEnCours.titre}</span>
-          </div>
+      <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-white/40 mb-2">Choisissez votre édition</p>
+      <h1 className="font-serif text-white text-[28px] sm:text-[34px] max-w-lg leading-tight">
+        Aussi rapide que les réseaux sociaux, aussi fiable qu&apos;un journal
+      </h1>
+
+      <div className="grid sm:grid-cols-2 gap-6 mt-12 w-full max-w-3xl">
+        <Link
+          href="/quotidien"
+          className="group bg-white rounded-2xl p-8 text-left hover:-translate-y-1 transition-transform shadow-xl"
+        >
+          <span className="font-mono text-[10.5px] uppercase tracking-widest text-coral font-bold">Le journal, chaque jour</span>
+          <h2 className="font-serif text-[26px] text-ink mt-2 group-hover:text-coral transition-colors">Le Quotidien</h2>
+          <p className="text-muted text-[14px] mt-3 leading-relaxed">
+            L&apos;édition fidèle au journal papier : rubriques traditionnelles, Une du jour, kiosque numérique et archives.
+          </p>
+          <span className="inline-block mt-5 text-[13px] font-bold text-navy group-hover:text-coral transition-colors">Entrer →</span>
         </Link>
-      )}
 
-      <section className="max-w-[1180px] mx-auto px-4 sm:px-8 pt-8">
-        {(uneDuJour?.couvertureUrl || resumeDuJour.length > 0) && (
-          <div className="grid lg:grid-cols-[minmax(0,380px)_1fr] gap-8">
-            {uneDuJour?.couvertureUrl && (
-              <div>
-                <a href={uneDuJour.pdfUrl} target="_blank" rel="noreferrer" className="block group">
-                  <div className="relative aspect-[3/4] rounded-[10px] overflow-hidden shadow-xl border border-line">
-                    <Image src={uneDuJour.couvertureUrl} alt={`Une n°${uneDuJour.numero}`} fill sizes="(max-width: 1024px) 100vw, 380px" priority className="object-cover" />
-                  </div>
-                </a>
-                <div className="flex items-center justify-between mt-3">
-                  <span className="font-mono text-[11px] text-muted">
-                    N°{uneDuJour.numero} — {formatDateRange(uneDuJour.dateParution, uneDuJour.dateFin)}
-                  </span>
-                  <a href={uneDuJour.pdfUrl} target="_blank" rel="noreferrer" className="text-[11.5px] font-bold text-coral hover:underline shrink-0 ml-3">
-                    Lire le journal (PDF) →
-                  </a>
-                </div>
-              </div>
-            )}
+        <Link
+          href="/info-direct"
+          className="group bg-white rounded-2xl p-8 text-left hover:-translate-y-1 transition-transform shadow-xl"
+        >
+          <span className="font-mono text-[10.5px] uppercase tracking-widest text-gold font-bold">L&apos;actualité au fil de l&apos;eau</span>
+          <h2 className="font-serif text-[26px] text-ink mt-2 group-hover:text-coral transition-colors">Info en direct</h2>
+          <p className="text-muted text-[14px] mt-3 leading-relaxed">
+            L&apos;édition animée au quotidien par la rédaction web, pour suivre l&apos;actualité en temps réel.
+          </p>
+          <span className="inline-block mt-5 text-[13px] font-bold text-navy group-hover:text-coral transition-colors">Entrer →</span>
+        </Link>
+      </div>
 
-            <div className="bg-navy rounded-[10px] p-5 text-white">
-              <h3 className="font-serif text-[16px] mb-3">5 choses à retenir aujourd&apos;hui</h3>
-              <ol className="list-decimal pl-[18px] space-y-2.5 text-[12.5px] text-[#D8DCEA]">
-                {resumeDuJour.map((a) => (
-                  <li key={a.id}>
-                    <Link href={`/article/${a.slug}`} className="hover:text-white">{a.titre}</Link>
-                  </li>
-                ))}
-              </ol>
-            </div>
-          </div>
-        )}
-
-        {/* Article vedette — tiré du numéro du jour, en pleine taille, juste après le bloc Une + 5 choses. */}
-        {une && (
-          <Link href={`/article/${une.slug}`} className="group block mt-8">
-            <div className="relative h-[220px] sm:h-[300px] rounded-[10px] bg-gradient-to-br from-navy2 to-navy overflow-hidden">
-              {une.imageUneUrl && (
-                <Image src={une.imageUneUrl} alt="" fill sizes="(max-width: 1024px) 100vw, 1180px" className="object-cover" />
-              )}
-              <FormatBadge format={une.format} />
-            </div>
-            <div className="pt-4">
-              <span className="font-mono text-[11px] uppercase tracking-wide" style={{ color: une.rubrique?.couleur }}>
-                {une.rubrique?.nom}
-              </span>
-              <h2 className="font-serif text-[26px] sm:text-[28px] leading-tight mt-2 group-hover:text-coral transition-colors">
-                {une.titre}
-              </h2>
-              {une.chapo && <p className="text-muted text-[14.5px] mt-2.5 leading-relaxed max-w-2xl">{une.chapo}</p>}
-              <div className="flex gap-3 items-center mt-3.5 font-mono text-[11px] text-muted">
-                <span>{timeAgo(une.publieLe)}</span>
-                {une.auteur && <span>· {une.auteur.prenom} {une.auteur.nom}</span>}
-              </div>
-            </div>
-          </Link>
-        )}
-
-        <FactCheckBlock factChecks={factChecks} />
-      </section>
-
-      <FlashBar articles={flashEtLive} />
-
-      <section className="max-w-[1180px] mx-auto px-4 sm:px-8 py-10">
-        <RubriqueTabs rubriques={rubriques} />
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-[22px]">
-          {grille.slice(0, 5).map((a) => (
-            <ArticleCard key={a.id} article={a} />
-          ))}
-          {pub && <PubCard campagne={pub} />}
-          {grille.slice(5).map((a) => (
-            <ArticleCard key={a.id} article={a} />
-          ))}
-        </div>
-      </section>
-    </>
+      <p className="text-white/30 text-[11px] font-mono mt-14">© {new Date().getFullYear()} Notre Voie — La Refondation</p>
+    </div>
   );
 }

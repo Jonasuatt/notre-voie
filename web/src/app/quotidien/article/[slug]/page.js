@@ -4,7 +4,9 @@ import Image from 'next/image';
 import { getArticleBySlug } from '@/lib/api';
 import FormatBadge from '@/components/FormatBadge';
 import Paywall from '@/components/Paywall';
-import { formatDate, timeAgo, LABEL_FORMAT } from '@/lib/format';
+import { formatDate, timeAgo } from '@/lib/format';
+
+const BASE_PATH = '/quotidien';
 
 const VERDICT_STYLE = {
   VRAI: { label: 'Vrai', color: '#4ADE80' },
@@ -39,11 +41,11 @@ export default async function ArticlePage({ params }) {
     <article className="max-w-[720px] mx-auto px-4 sm:px-8 py-10">
       <div className="flex items-center gap-2.5 flex-wrap">
         <FormatBadge format={article.format} />
-        <Link href={`/rubrique/${article.rubrique?.slug}`} className="font-mono text-[11px] uppercase tracking-wide" style={{ color: article.rubrique?.couleur }}>
+        <Link href={`${BASE_PATH}/rubrique/${article.rubrique?.slug}`} className="font-mono text-[11px] uppercase tracking-wide" style={{ color: article.rubrique?.couleur }}>
           {article.rubrique?.nom}
         </Link>
         {article.rubriquesSecondaires?.map((r) => (
-          <Link key={r.id} href={`/rubrique/${r.slug}`} className="font-mono text-[11px] uppercase tracking-wide text-muted">
+          <Link key={r.id} href={`${BASE_PATH}/rubrique/${r.slug}`} className="font-mono text-[11px] uppercase tracking-wide text-muted">
             + {r.nom}
           </Link>
         ))}
@@ -130,7 +132,7 @@ export default async function ArticlePage({ params }) {
       )}
 
       {verrouille ? (
-        <Paywall article={article} />
+        <Paywall article={article} basePath={BASE_PATH} />
       ) : (
         article.contenuHtml && (
           <div className="prose-article mt-7 text-[16px] text-ink" dangerouslySetInnerHTML={{ __html: article.contenuHtml }} />

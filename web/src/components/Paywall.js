@@ -4,7 +4,7 @@ import Link from 'next/link';
 // reste dans le flux (titre, chapo, badges visibles), seul le corps est
 // masqué, avec un double choix abonnement / paiement à l'unité
 // (cahier des charges §3.4 + modèle économique §4).
-export default function Paywall({ article }) {
+export default function Paywall({ article, basePath = '' }) {
   return (
     <div className="mt-8 border border-line rounded-xl bg-white p-6 sm:p-8 text-center">
       <span className="font-mono text-[10px] uppercase tracking-widest text-coral font-bold">Article réservé</span>
@@ -13,7 +13,7 @@ export default function Paywall({ article }) {
         Cet article fait partie du contenu Notre Voie premium. Abonnez-vous pour un accès illimité, ou lisez celui-ci à l&apos;unité.
       </p>
       <div className="flex flex-col sm:flex-row gap-3 justify-center mt-6">
-        <Link href="/abonnement" className="bg-coral text-white font-bold text-[13.5px] px-6 py-3 rounded-full">
+        <Link href={`${basePath}/abonnement`} className="bg-coral text-white font-bold text-[13.5px] px-6 py-3 rounded-full">
           S&apos;abonner (à partir de 2 000 FCFA/mois)
         </Link>
         <button className="border border-line font-bold text-[13.5px] px-6 py-3 rounded-full text-ink">

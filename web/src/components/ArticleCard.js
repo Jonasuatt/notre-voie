@@ -3,9 +3,9 @@ import Image from 'next/image';
 import FormatBadge from './FormatBadge';
 import { timeAgo } from '@/lib/format';
 
-export default function ArticleCard({ article }) {
+export default function ArticleCard({ article, basePath = '' }) {
   return (
-    <Link href={`/article/${article.slug}`} className="block bg-white rounded-[10px] border border-line overflow-hidden group">
+    <Link href={`${basePath}/article/${article.slug}`} className="block bg-white rounded-[10px] border border-line overflow-hidden group">
       <div className="relative h-[150px] bg-gradient-to-br from-navy2 to-navy overflow-hidden">
         {article.imageUneUrl && (
           <Image

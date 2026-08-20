@@ -1,6 +1,4 @@
 import { Fraunces, Inter, Space_Mono } from 'next/font/google';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
 import './globals.css';
 
 const fraunces = Fraunces({ subsets: ['latin'], variable: '--font-fraunces', weight: ['400', '600', '700', '900'] });
@@ -23,9 +21,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="fr">
       <body className={`${fraunces.variable} ${inter.variable} ${spaceMono.variable} font-sans`}>
-        <Header />
-        <main>{children}</main>
-        <Footer />
+        {children}
       </body>
     </html>
   );
