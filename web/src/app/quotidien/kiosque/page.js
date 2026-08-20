@@ -1,8 +1,7 @@
 import Link from 'next/link';
 import { getEditions } from '@/lib/api';
 import { formatDateRange } from '@/lib/format';
-import DeverrouillerPdf from '@/components/DeverrouillerPdf';
-import ImageProtegee from '@/components/ImageProtegee';
+import UneVerrouillee from '@/components/UneVerrouillee';
 
 const BASE_PATH = '/quotidien';
 
@@ -31,19 +30,19 @@ export default async function KiosquePage() {
             const dateISO = e.dateParution.slice(0, 10);
             return (
               <div key={e.id} className="text-center group">
-                <Link href={`${BASE_PATH}/recherche?date=${dateISO}`} className="block">
-                  <div className="relative aspect-[3/4] rounded-md overflow-hidden bg-gradient-to-b from-navy2 to-navy shadow-lg group-hover:opacity-90 transition">
-                    {e.couvertureUrl && (
-                      <ImageProtegee src={e.couvertureUrl} alt={`Une n°${e.numero}`} fill sizes="220px" className="object-cover" />
-                    )}
-                  </div>
-                </Link>
+                <div className="relative aspect-[3/4] rounded-md overflow-hidden bg-gradient-to-b from-navy2 to-navy shadow-lg group-hover:opacity-90 transition">
+                  {e.couvertureUrl && (
+                    <UneVerrouillee
+                      editionId={e.id} verrouille={e.verrouille} couvertureUrl={e.couvertureUrl}
+                      numero={e.numero} sizes="220px" basePath={BASE_PATH}
+                    />
+                  )}
+                </div>
                 <span className="font-mono text-[10.5px] text-ink font-bold block mt-2.5">N°{e.numero}</span>
                 <span className="font-mono text-[10px] text-muted block">{formatDateRange(e.dateParution, e.dateFin)}</span>
                 <Link href={`${BASE_PATH}/recherche?date=${dateISO}`} className="text-[11px] text-navy font-semibold hover:text-coral transition-colors block mt-1">
                   Voir les articles du jour →
                 </Link>
-                <DeverrouillerPdf editionId={e.id} verrouille={e.verrouille} />
               </div>
             );
           })}

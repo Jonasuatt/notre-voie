@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { formatDateRange } from '@/lib/format';
-import DeverrouillerPdf from './DeverrouillerPdf';
+import UneVerrouillee from './UneVerrouillee';
 import ImageProtegee from './ImageProtegee';
 
 // Reproduit la maquette papier : chaque vignette est la vraie page imprimée
@@ -25,14 +25,14 @@ export default function PagesDuJournal({ edition, basePath = '' }) {
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-6">
         <div>
           <div className="relative aspect-[3/4] rounded-[10px] overflow-hidden shadow-xl border border-line">
-            <ImageProtegee src={edition.couvertureUrl} alt={`Une n°${edition.numero}`} fill sizes="(max-width: 640px) 50vw, 300px" priority className="object-cover" />
+            <UneVerrouillee
+              editionId={edition.id} verrouille={edition.verrouille} couvertureUrl={edition.couvertureUrl}
+              numero={edition.numero} sizes="(max-width: 640px) 50vw, 300px" priority basePath={basePath}
+            />
           </div>
           <span className="block text-center font-mono text-[11px] text-muted mt-2">
             N°{edition.numero} — {formatDateRange(edition.dateParution, edition.dateFin)}
           </span>
-          <div className="text-center">
-            <DeverrouillerPdf editionId={edition.id} verrouille={edition.verrouille} />
-          </div>
         </div>
 
         {pages.map((p) => {

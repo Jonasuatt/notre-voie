@@ -9,8 +9,7 @@ import ArticleCard from '@/components/ArticleCard';
 import FactCheckBlock from '@/components/FactCheckBlock';
 import FormatBadge from '@/components/FormatBadge';
 import PubCard from '@/components/PubCard';
-import DeverrouillerPdf from '@/components/DeverrouillerPdf';
-import ImageProtegee from '@/components/ImageProtegee';
+import UneVerrouillee from '@/components/UneVerrouillee';
 import { timeAgo, formatDateRange } from '@/lib/format';
 
 const BASE_PATH = '/info-direct';
@@ -58,12 +57,14 @@ export default async function QuotidienAccueilPage() {
             {uneDuJour?.couvertureUrl && (
               <div>
                 <div className="relative aspect-[3/4] rounded-[10px] overflow-hidden shadow-xl border border-line">
-                  <ImageProtegee src={uneDuJour.couvertureUrl} alt={`Une n°${uneDuJour.numero}`} fill sizes="(max-width: 1024px) 100vw, 380px" priority className="object-cover" />
+                  <UneVerrouillee
+                    editionId={uneDuJour.id} verrouille={uneDuJour.verrouille} couvertureUrl={uneDuJour.couvertureUrl}
+                    numero={uneDuJour.numero} sizes="(max-width: 1024px) 100vw, 380px" priority basePath={BASE_PATH}
+                  />
                 </div>
                 <span className="font-mono text-[11px] text-muted mt-3 block">
                   N°{uneDuJour.numero} — {formatDateRange(uneDuJour.dateParution, uneDuJour.dateFin)}
                 </span>
-                <DeverrouillerPdf editionId={uneDuJour.id} verrouille={uneDuJour.verrouille} />
               </div>
             )}
 
