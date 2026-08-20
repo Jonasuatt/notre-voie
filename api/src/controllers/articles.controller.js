@@ -41,7 +41,7 @@ const listPublic = asyncHandler(async (req, res) => {
 
   const where = {
     statut: 'PUBLIE',
-    ...(rubrique ? { rubrique: { slug: rubrique } } : {}),
+    ...(rubrique ? { rubrique: { slug: rubrique } } : { rubrique: { type: 'EDITORIALE' } }), // fil général = rubriques éditoriales uniquement ; les rubriques de service (Nécrologie, Test…) ne doivent jamais concurrencer l'actualité en Une, seulement accessibles via leur propre page
     ...(format ? { format } : {}),
     ...(tag ? { tags: { has: tag } } : {}),
     ...(q ? { OR: [{ titre: { contains: q, mode: 'insensitive' } }, { chapo: { contains: q, mode: 'insensitive' } }] } : {}),
