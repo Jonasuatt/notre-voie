@@ -980,9 +980,13 @@ async function seedNecrologie() {
   const rubrique = await prisma.rubrique.findUniqueOrThrow({ where: { slug: 'necrologie' } });
   const redacteurEnChef = await prisma.staff.findUniqueOrThrow({ where: { email: 'redacteur-en-chef@notrevoienews.com' } });
 
+  // Rubrique de service : contenu commun aux deux rédactions (comme le
+  // Kiosque), donc diffusée sur les deux portails plutôt que réservée au
+  // Quotidien — d'où le update explicite (et pas seulement le create) pour
+  // corriger aussi la ligne déjà en base.
   await prisma.article.upsert({
     where: { slug: 'notre-service-de-necrologie-avis-et-communiques' },
-    update: {},
+    update: { portails: ['QUOTIDIEN', 'INFO_DIRECT'] },
     create: {
       slug: 'notre-service-de-necrologie-avis-et-communiques',
       titre: 'Notre service de Nécrologie : avis et communiqués',
@@ -1000,6 +1004,7 @@ async function seedNecrologie() {
       format: 'EDITION', statut: 'PUBLIE', paywall: 'LIBRE',
       rubriqueId: rubrique.id, auteurId: redacteurEnChef.id, valideParId: redacteurEnChef.id,
       imageUneUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787190429/notre-voie/photo-v2/yo11nf5kxkoo9ix5tgqr.jpg",
+      portails: ['QUOTIDIEN', 'INFO_DIRECT'],
       publieLe: new Date(), createdAt: new Date(), updatedAt: new Date(), vuesTotal: 1,
     },
   });
@@ -1430,8 +1435,7 @@ async function main() {
   if (!mediaBatch7970Existe) await seedMediaBatch7970();
   const testExiste = await prisma.article.findUnique({ where: { slug: 'article-vitrine-tous-les-formats' } });
   if (!testExiste) await seedTestShowcase();
-  const necroExiste = await prisma.article.findUnique({ where: { slug: 'notre-service-de-necrologie-avis-et-communiques' } });
-  if (!necroExiste) await seedNecrologie();
+  await seedNecrologie();
   await seedRegieDemo();
   await seedMediaGap1();
   await seedMediaGap2();
