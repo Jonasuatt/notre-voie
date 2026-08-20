@@ -25,3 +25,38 @@ body {
 .card {
   @apply bg-white rounded-xl border border-gray-200 shadow-sm;
 }
+
+/* Thème « Info en direct » côté CMS — même logique que web/src/app/globals.css :
+   un seul wrapper `.theme-direct-cms` sur la zone de contenu reskinne les
+   composants partagés (cards, listes, titres) sans dupliquer les pages, pour
+   qu'un rédacteur ne confonde jamais visuellement les deux espaces de travail. */
+.theme-direct-cms {
+  background: #0a0e1a;
+  color: #E7EBF7;
+  min-height: 100%;
+}
+.theme-direct-cms .card {
+  background: #131a2b;
+  border-color: #232B45;
+  color: #E7EBF7;
+}
+.theme-direct-cms .bg-gray-50 { background: #0a0e1a; }
+.theme-direct-cms .bg-gray-100 { background: #1c2740; }
+.theme-direct-cms .hover\:bg-gray-50:hover { background: #1c2740; }
+.theme-direct-cms .text-gray-400 { color: #6B7694; }
+.theme-direct-cms .text-gray-500 { color: #8993B0; }
+.theme-direct-cms .border-gray-100,
+.theme-direct-cms .border-gray-200,
+.theme-direct-cms .divide-gray-100 > * + * {
+  border-color: #232B45;
+}
+.theme-direct-cms .text-navy { color: #22D3EE; }
+.theme-direct-cms .bg-navy { background: #22D3EE; color: #0a0e1a; }
+.theme-direct-cms .btn-primary { background: #22D3EE; color: #0a0e1a; }
+.theme-direct-cms .input {
+  background: #131a2b;
+  border-color: #232B45;
+  color: #E7EBF7;
+}
+.theme-direct-cms .amber-50,
+.theme-direct-cms .bg-amber-50 { background: #2a2410; border-color: #4a3f1a; color: #FFC857; }

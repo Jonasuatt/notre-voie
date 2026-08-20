@@ -9,6 +9,7 @@ import { fr } from 'date-fns/locale';
 
 export default function ArticlesListPage() {
   const { portailActif } = useAuth();
+  const estInfoDirect = portailActif === 'INFO_DIRECT';
   const [searchParams, setSearchParams] = useSearchParams();
   const [articles, setArticles] = useState([]);
   const [total, setTotal] = useState(0);
@@ -44,7 +45,7 @@ export default function ArticlesListPage() {
   return (
     <div className="p-8">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Articles</h1>
+        <h1 className="text-2xl font-bold">{estInfoDirect ? 'Le fil' : 'Articles'}</h1>
         <Link to="/articles/nouveau" className="btn-primary">+ Nouvel article</Link>
       </div>
 
@@ -65,9 +66,32 @@ export default function ArticlesListPage() {
 
       <div className="card mt-5">
         {loading ? (
-          <p className="p-8 text-center text-sm text-gray-400">Chargement…</p>
+          <p className="p-8 text-center text-sm" style={estInfoDirect ? { color: '#6B7694' } : undefined}>Chargement…</p>
         ) : articles.length === 0 ? (
-          <p className="p-8 text-center text-sm text-gray-400">Aucun article ne correspond à ces filtres.</p>
+          <p className="p-8 text-center text-sm" style={estInfoDirect ? { color: '#6B7694' } : undefined}>Aucun article ne correspond à ces filtres.</p>
+        ) : estInfoDirect ? (
+          // Disposition dense, horodatage en tête, titre en serif — fil de
+          // rédaction plutôt que liste éditoriale classique (cf. DashboardPage).
+          <>
+            <p className="px-5 py-3 text-xs font-mono" style={{ color: '#6B7694', borderBottom: '1px solid #232B45' }}>{total} résultat{total > 1 ? 's' : ''}</p>
+            {articles.map((a, i) => (
+              <Link
+                key={a.id}
+                to={`/articles/${a.id}`}
+                className="flex items-center gap-3 px-5 py-3 hover:bg-white/5 transition"
+                style={{ borderTop: i === 0 ? 'none' : '1px solid #1c2740' }}
+              >
+                <span className="font-mono text-[10.5px] shrink-0 tabular-nums" style={{ color: '#6B7694' }}>
+                  {formatDistanceToNow(new Date(a.updatedAt), { addSuffix: true, locale: fr })}
+                </span>
+                <span className="font-mono text-[10px] uppercase tracking-wide shrink-0 hidden sm:inline" style={{ color: a.rubrique?.couleur || '#22D3EE' }}>
+                  {a.rubrique?.nom}
+                </span>
+                <span className="flex-1 font-serif text-[14.5px] truncate">{a.titre}</span>
+                <StatutBadge statut={a.statut} />
+              </Link>
+            ))}
+          </>
         ) : (
           <>
             <p className="px-5 py-3 text-xs text-gray-400 font-mono border-b border-gray-100">{total} résultat{total > 1 ? 's' : ''}</p>

@@ -107,7 +107,7 @@ export default function Layout() {
         </div>
       </aside>
 
-      <main className="flex-1 min-w-0 bg-gray-50">
+      <main className={`flex-1 min-w-0 bg-gray-50 overflow-y-auto ${portailActif === 'INFO_DIRECT' ? 'theme-direct-cms' : ''}`}>
         <Outlet />
       </main>
     </div>
