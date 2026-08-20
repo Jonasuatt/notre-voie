@@ -2,6 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { getArticles, getRubriques, getTicker, getFactChecks, getCampagnesActives, getEditions } from '@/lib/api';
 import FlashBar from '@/components/FlashBar';
+import DerniereMinute from '@/components/DerniereMinute';
 import TickerVieChere from '@/components/TickerVieChere';
 import RubriqueTabs from '@/components/RubriqueTabs';
 import ArticleCard from '@/components/ArticleCard';
@@ -36,6 +37,7 @@ export default async function QuotidienAccueilPage() {
   return (
     <>
       <TickerVieChere prix={prix} />
+      <DerniereMinute articles={articles.slice(0, 6)} basePath={BASE_PATH} />
 
       {directEnCours && (
         <Link href={`${BASE_PATH}/article/${directEnCours.slug}`} className="block bg-ink text-white">
@@ -70,11 +72,12 @@ export default async function QuotidienAccueilPage() {
             )}
 
             <div className="bg-navy rounded-[10px] p-5 text-white">
-              <h3 className="font-serif text-[16px] mb-3">5 choses à retenir aujourd&apos;hui</h3>
-              <ol className="list-decimal pl-[18px] space-y-2.5 text-[12.5px] text-[#D8DCEA]">
-                {resumeDuJour.map((a) => (
-                  <li key={a.id}>
-                    <Link href={`${BASE_PATH}/article/${a.slug}`} className="hover:text-white">{a.titre}</Link>
+              <h3 className="font-serif text-[16px] mb-1">5 choses à retenir aujourd&apos;hui</h3>
+              <ol className="pl-0 text-[12.5px] text-[#D8DCEA]">
+                {resumeDuJour.map((a, i) => (
+                  <li key={a.id} className="flex gap-2.5 py-2.5 border-t border-white/10 first:border-t-0">
+                    <span className="font-mono text-[#22D3EE] font-bold shrink-0">{String(i + 1).padStart(2, '0')}</span>
+                    <Link href={`${BASE_PATH}/article/${a.slug}`} className="hover:text-white leading-snug">{a.titre}</Link>
                   </li>
                 ))}
               </ol>
