@@ -20,6 +20,7 @@ const NAV = [
 export default function Layout() {
   const { staff, logout, portailActif, setPortailActif } = useAuth();
   const navigate = useNavigate();
+  const portail = PORTAILS.find((p) => p.valeur === portailActif);
 
   return (
     <PortailGate>
@@ -31,6 +32,14 @@ export default function Layout() {
             <span className="bg-white text-coral font-black px-3 py-1.5">Voie</span>
           </div>
           <p className="text-[10px] font-mono uppercase tracking-widest text-white/40 mt-2">CMS 2 — Rédaction</p>
+          {/* Rappel visuel de l'espace de travail actif, en toutes lettres —
+              évite de devoir regarder le sélecteur pour savoir où l'on est. */}
+          {portail && (
+            <span className="inline-flex items-center gap-1.5 mt-2 font-mono text-[10.5px] font-bold" style={{ color: portail.accent }}>
+              <span className="w-1.5 h-1.5 rounded-full" style={{ background: portail.accent }} />
+              {portail.label}
+            </span>
+          )}
         </div>
 
         {/* Sélecteur d'espace de travail — deux rédactions distinctes,
