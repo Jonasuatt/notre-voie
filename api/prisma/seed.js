@@ -1256,6 +1256,17 @@ async function seedEditionPages() {
   console.log(`✔ ${inserees} page(s) de journal insérée(s).`);
 }
 
+// Code d'accès de démonstration pour le numéro 7970 — à communiquer aux
+// abonnés (SMS, email…) ou à changer depuis le CMS Rédaction (Kiosque /
+// Éditions) à tout moment ; ce seed ne fait que l'amorcer une première fois
+// (idempotent, ne touche pas à un code déjà défini par la rédaction).
+async function seedCodeAccesDemo() {
+  const edition = await prisma.edition.findUnique({ where: { numero: 7970 } });
+  if (!edition || edition.codeAcces) return;
+  await prisma.edition.update({ where: { id: edition.id }, data: { codeAcces: 'NV7970-DEMO' } });
+  console.log('✔ Code d\'accès NV7970-DEMO défini pour le n°7970.');
+}
+
 async function seedEditions() {
   const editions = [
     { numero: 7961, dateParution: "2026-07-30", pdfUrl: "https://res.cloudinary.com/ataat5bs/raw/upload/v1787194110/notre-voie/edition/nv5erwj7eoplvj4f7i5q.pdf", couvertureUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787194106/notre-voie/une/elo8nuazwzz1vboa9oma.jpg" },
@@ -1615,6 +1626,7 @@ async function main() {
   const dejaDesEditions = await prisma.edition.count();
   if (dejaDesEditions === 0) await seedEditions();
   await seedEditionPages();
+  await seedCodeAccesDemo();
   await fixArticleDates();
   await seedInfoDirectFlashs();
   await seedInfoDirectImages();
