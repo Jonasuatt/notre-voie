@@ -1,5 +1,49 @@
 const prisma = require('../config/prisma');
 const asyncHandler = require('../utils/asyncHandler');
+const { cloudinary, isConfigured } = require('../config/cloudinary');
+
+// Gabarit de pagination du journal — constaté de façon identique sur les 10
+// numéros déjà archivés (page 1 = citation du jour/Une, 2-3 = Politique,
+// 4 = Économie, 5 = Culture, 6 = Société, 7 = Régions, 8 = Sport). Sert de
+// rubriquage par défaut à l'archivage automatique d'un nouveau numéro ; si
+// la maquette change un jour, seules les pages hors gabarit resteront sans
+// rubrique assignée (jamais une rubrique devinée au hasard).
+const GABARIT_PAGES = {
+  2: ['politique'], 3: ['politique'], 4: ['economie'], 5: ['culture'], 6: ['societe'], 7: ['regions'], 8: ['sport'],
+};
+
+// Retrouve le public_id Cloudinary à partir de l'URL sécurisée renvoyée à
+// l'upload (…/image/upload/v123456/notre-voie/pdf/xxxxx.pdf -> notre-voie/pdf/xxxxx).
+function publicIdDepuisUrl(url) {
+  const m = url.match(/\/upload\/(?:v\d+\/)?(.+?)\.[a-zA-Z0-9]+$/);
+  return m ? m[1] : null;
+}
+
+// Archive chaque page du PDF en image (une par page, via la transformation
+// Cloudinary pg_N) et lui associe la rubrique du gabarit ci-dessus. Best
+// effort : si Cloudinary n'est pas configuré ou que la lecture des pages
+// échoue, l'édition reste créée sans page — le PDF complet reste consultable.
+async function archiverPagesDuNumero(edition, pdfUrl) {
+  if (!isConfigured) return;
+  const publicId = publicIdDepuisUrl(pdfUrl);
+  if (!publicId) return;
+
+  try {
+    const info = await cloudinary.api.resource(publicId, { resource_type: 'image', pages: true });
+    const nbPages = info.pages || 1;
+
+    for (let n = 1; n <= nbPages; n++) {
+      const imageUrl = cloudinary.url(publicId, { resource_type: 'image', page: n, format: 'jpg', secure: true, transformation: [{ quality: 'auto' }] });
+      await prisma.editionPage.upsert({
+        where: { editionId_numeroPage: { editionId: edition.id, numeroPage: n } },
+        update: {},
+        create: { editionId: edition.id, numeroPage: n, imageUrl, rubriques: GABARIT_PAGES[n] || [] },
+      });
+    }
+  } catch (err) {
+    console.error('Archivage automatique des pages impossible :', err.message);
+  }
+}
 
 // GET /api/editions — kiosque numérique (public)
 const list = asyncHandler(async (req, res) => {
@@ -40,6 +84,12 @@ const create = asyncHandler(async (req, res) => {
       prix: prix ? Number(prix) : undefined,
     },
   });
+
+  // Archivage automatique des pages (image par page + rubrique du gabarit) —
+  // le numéro reste consultable même si cette étape échoue, elle ne bloque
+  // donc pas la réponse ; les pages apparaîtront dès qu'elle aura réussi.
+  archiverPagesDuNumero(edition, pdfUrl).catch(() => {});
+
   res.status(201).json({ edition });
 });
 

@@ -55,19 +55,12 @@ export default async function QuotidienAccueilPage() {
           <div className="grid lg:grid-cols-[minmax(0,380px)_1fr] gap-8">
             {uneDuJour?.couvertureUrl && (
               <div>
-                <a href={uneDuJour.pdfUrl} target="_blank" rel="noreferrer" className="block group">
-                  <div className="relative aspect-[3/4] rounded-[10px] overflow-hidden shadow-xl border border-line">
-                    <Image src={uneDuJour.couvertureUrl} alt={`Une n°${uneDuJour.numero}`} fill sizes="(max-width: 1024px) 100vw, 380px" priority className="object-cover" />
-                  </div>
-                </a>
-                <div className="flex items-center justify-between mt-3">
-                  <span className="font-mono text-[11px] text-muted">
-                    N°{uneDuJour.numero} — {formatDateRange(uneDuJour.dateParution, uneDuJour.dateFin)}
-                  </span>
-                  <a href={uneDuJour.pdfUrl} target="_blank" rel="noreferrer" className="text-[11.5px] font-bold text-coral hover:underline shrink-0 ml-3">
-                    Lire le journal (PDF) →
-                  </a>
+                <div className="relative aspect-[3/4] rounded-[10px] overflow-hidden shadow-xl border border-line">
+                  <Image src={uneDuJour.couvertureUrl} alt={`Une n°${uneDuJour.numero}`} fill sizes="(max-width: 1024px) 100vw, 380px" priority className="object-cover" onContextMenu={(e) => e.preventDefault()} draggable={false} />
                 </div>
+                <span className="font-mono text-[11px] text-muted mt-3 block">
+                  N°{uneDuJour.numero} — {formatDateRange(uneDuJour.dateParution, uneDuJour.dateFin)}
+                </span>
               </div>
             )}
 

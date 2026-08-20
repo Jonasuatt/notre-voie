@@ -19,7 +19,7 @@ export default async function KiosquePage() {
       <span className="font-mono text-[11px] uppercase tracking-widest text-coral">Rubrique de service</span>
       <h1 className="font-serif text-[30px] mt-1">Kiosque numérique</h1>
       <p className="text-muted text-[14px] mt-2 max-w-2xl">
-        La Une de chaque parution, jour après jour — le journal papier au format PDF, et les articles du jour en un clic.
+        La Une de chaque parution, jour après jour, et les articles du jour en un clic.
       </p>
 
       {editions.length === 0 ? (
@@ -30,14 +30,13 @@ export default async function KiosquePage() {
             const dateISO = e.dateParution.slice(0, 10);
             return (
               <div key={e.id} className="text-center group">
-                <a href={e.pdfUrl} target="_blank" rel="noreferrer" className="block">
+                <Link href={`${BASE_PATH}/recherche?date=${dateISO}`} className="block">
                   <div className="relative aspect-[3/4] rounded-md overflow-hidden bg-gradient-to-b from-navy2 to-navy shadow-lg group-hover:opacity-90 transition">
                     {e.couvertureUrl && (
-                      <Image src={e.couvertureUrl} alt={`Une n°${e.numero}`} fill sizes="220px" className="object-cover" />
+                      <Image src={e.couvertureUrl} alt={`Une n°${e.numero}`} fill sizes="220px" className="object-cover" onContextMenu={(ev) => ev.preventDefault()} draggable={false} />
                     )}
-                    <span className="absolute bottom-2 right-2 bg-white/90 text-navy font-mono text-[9px] font-bold px-1.5 py-0.5 rounded">PDF</span>
                   </div>
-                </a>
+                </Link>
                 <span className="font-mono text-[10.5px] text-ink font-bold block mt-2.5">N°{e.numero}</span>
                 <span className="font-mono text-[10px] text-muted block">{formatDateRange(e.dateParution, e.dateFin)}</span>
                 <Link href={`${BASE_PATH}/recherche?date=${dateISO}`} className="text-[11px] text-navy font-semibold hover:text-coral transition-colors block mt-1">

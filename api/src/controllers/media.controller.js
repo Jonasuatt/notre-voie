@@ -10,7 +10,11 @@ const { cloudinary, isConfigured } = require('../config/cloudinary');
 // Audio) et §3 (Galerie photo légendée, module transversal).
 
 const MIME_TO_TYPE = { image: 'PHOTO', video: 'VIDEO', audio: 'AUDIO', application: 'PDF' };
-const RESOURCE_TYPE = { PHOTO: 'image', VIDEO: 'video', AUDIO: 'video', PDF: 'raw' }; // Cloudinary route l'audio via "video"
+// Cloudinary route l'audio via "video". Le PDF est hébergé en "image" (et
+// non "raw") : c'est ce qui permet d'en extraire chaque page en image
+// (transformation pg_N), utilisé pour archiver automatiquement les pages
+// du journal à l'import d'une édition — cf. editions.controller.js.
+const RESOURCE_TYPE = { PHOTO: 'image', VIDEO: 'video', AUDIO: 'video', PDF: 'image' };
 
 function inferType(mimetype = '') {
   const kind = mimetype.split('/')[0];
