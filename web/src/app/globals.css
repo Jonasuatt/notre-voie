@@ -19,3 +19,28 @@ body {
   margin-bottom: 1.1em;
   line-height: 1.75;
 }
+
+/* Thème « Info en direct » — identité visuelle distincte du Quotidien
+   (fond sombre, accent cyan façon direct TV, au lieu du blanc/crème et du
+   corail « presse papier »). Un seul wrapper `.theme-direct` en tête de
+   /info-direct suffit : les mêmes composants partagés (Header, ArticleCard,
+   FlashBar…) sont ainsi reskinnés sans dupliquer leur code, la spécificité
+   CSS (2 classes vs 1) l'emporte naturellement sur les utilitaires Tailwind. */
+.theme-direct .bg-white { background-color: #131a2b; }
+.theme-direct .bg-cream { background-color: #0a0e1a; }
+.theme-direct .text-ink { color: #E7EBF7; }
+.theme-direct .text-muted { color: #8993B0; }
+.theme-direct .border-line { border-color: #232B45; }
+.theme-direct .text-coral { color: #22D3EE; }
+.theme-direct .bg-coral { background-color: #22D3EE; color: #0a0e1a; }
+.theme-direct .hover\:text-coral:hover { color: #22D3EE; }
+.theme-direct .bg-navy { background-color: #131a2b; }
+.theme-direct .text-navy { color: #22D3EE; }
+.theme-direct .border-navy { border-color: #22D3EE; }
+.theme-direct .hover\:border-navy:hover { border-color: #22D3EE; }
+.theme-direct .text-gold { color: #FFC857; }
+.theme-direct .from-navy2 { --tw-gradient-from: #1c2740; }
+.theme-direct .to-navy { --tw-gradient-to: #0a0e1a; }
+.theme-direct .bg-gradient-to-r.from-white { --tw-gradient-from: #131a2b; }
+.theme-direct .to-\[\#FBF3E4\] { --tw-gradient-to: #1c1a12; }
+.theme-direct .border-\[\#F0DFB8\] { border-color: #3a331f; }

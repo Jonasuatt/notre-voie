@@ -9,10 +9,10 @@ export const metadata = { title: { default: 'Notre Voie — Info en direct', tem
 // rubriques. Pour l'instant, doublon volontaire à faire diverger ensuite.
 export default function InfoDirectLayout({ children }) {
   return (
-    <>
+    <div className="theme-direct bg-[#0a0e1a] text-[#E7EBF7] min-h-screen">
       <Header basePath="/info-direct" />
       <main>{children}</main>
       <Footer basePath="/info-direct" />
-    </>
+    </div>
   );
 }
