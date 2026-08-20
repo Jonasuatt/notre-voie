@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { articlesAPI, rubriquesAPI } from '../services/api';
+import { useAuth } from '../contexts/AuthContext';
 import { StatutBadge, FormatBadge, PaywallBadge } from '../components/Badges';
 import { STATUT_LABELS, FORMAT_LABELS } from '../utils/constants';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
 export default function ArticlesListPage() {
+  const { portailActif } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const [articles, setArticles] = useState([]);
   const [total, setTotal] = useState(0);
@@ -24,13 +26,13 @@ export default function ArticlesListPage() {
   useEffect(() => {
     setLoading(true);
     articlesAPI
-      .listCms({ statut: statut || undefined, format: format || undefined, rubrique: rubrique || undefined, pageSize: 50 })
+      .listCms({ statut: statut || undefined, format: format || undefined, rubrique: rubrique || undefined, portail: portailActif, pageSize: 50 })
       .then((r) => {
         setArticles(r.data.articles);
         setTotal(r.data.total);
       })
       .finally(() => setLoading(false));
-  }, [statut, format, rubrique]);
+  }, [statut, format, rubrique, portailActif]);
 
   const updateFilter = (key, value) => {
     const next = new URLSearchParams(searchParams);

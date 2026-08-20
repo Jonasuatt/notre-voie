@@ -9,28 +9,33 @@ import { fr } from 'date-fns/locale';
 
 const STATUTS = ['BROUILLON', 'EN_RELECTURE', 'VALIDE', 'PUBLIE', 'DEPUBLIE'];
 
+const PORTAIL_LABELS = { QUOTIDIEN: 'Le Quotidien', INFO_DIRECT: 'Info en direct' };
+
 export default function DashboardPage() {
-  const { staff } = useAuth();
+  const { staff, portailActif } = useAuth();
   const [counts, setCounts] = useState(null);
   const [recents, setRecents] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    setLoading(true);
     Promise.all([
-      Promise.all(STATUTS.map((statut) => articlesAPI.listCms({ statut, pageSize: 1 }).then((r) => [statut, r.data.total]))),
-      articlesAPI.listCms({ pageSize: 8 }),
+      Promise.all(STATUTS.map((statut) => articlesAPI.listCms({ statut, portail: portailActif, pageSize: 1 }).then((r) => [statut, r.data.total]))),
+      articlesAPI.listCms({ portail: portailActif, pageSize: 8 }),
     ])
       .then(([statutResults, recentsRes]) => {
         setCounts(Object.fromEntries(statutResults));
         setRecents(recentsRes.data.articles);
       })
       .finally(() => setLoading(false));
-  }, []);
+  }, [portailActif]);
 
   return (
     <div className="p-8 max-w-6xl">
       <h1 className="text-2xl font-bold">Bonjour {staff?.prenom} 👋</h1>
-      <p className="text-gray-500 text-sm mt-1">Vue d&apos;ensemble de la production éditoriale.</p>
+      <p className="text-gray-500 text-sm mt-1">
+        Vue d&apos;ensemble de la production éditoriale — espace <strong>{PORTAIL_LABELS[portailActif] || portailActif}</strong>.
+      </p>
 
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-4 mt-7">
         {STATUTS.map((statut) => (

@@ -22,11 +22,13 @@ const PORTAIL_LABELS = { QUOTIDIEN: 'Le Quotidien', INFO_DIRECT: 'Info en direct
 export default function ArticleEditorPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { staff } = useAuth();
+  const { staff, portailActif } = useAuth();
 
   const [rubriques, setRubriques] = useState([]);
   const [article, setArticle] = useState(null);
-  const [form, setForm] = useState(EMPTY_FORM);
+  // Un nouvel article démarre pré-coché sur l'espace de travail actif
+  // (cf. sélecteur dans Layout.jsx) — pas systématiquement Le Quotidien.
+  const [form, setForm] = useState(() => ({ ...EMPTY_FORM, portails: [portailActif || 'QUOTIDIEN'] }));
   const [loading, setLoading] = useState(!!id);
   const [saving, setSaving] = useState(false);
 

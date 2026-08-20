@@ -101,7 +101,7 @@ const getBySlug = asyncHandler(async (req, res) => {
 
 // GET /api/articles/cms — liste rédaction (tous statuts, filtrage par service)
 const listCms = asyncHandler(async (req, res) => {
-  const { statut, format, rubrique, auteurId, page = 1, pageSize = 30 } = req.query;
+  const { statut, format, rubrique, auteurId, portail, page = 1, pageSize = 30 } = req.query;
   const take = Math.min(Number(pageSize) || 30, 100);
   const skip = (Math.max(Number(page) || 1, 1) - 1) * take;
 
@@ -110,6 +110,11 @@ const listCms = asyncHandler(async (req, res) => {
     ...(format ? { format } : {}),
     ...(rubrique ? { rubriqueId: rubrique } : {}),
     ...(auteurId ? { auteurId } : {}),
+    // Espace de travail choisi dans le CMS (cf. sélecteur de portail) — pour
+    // que chaque rédaction ne voie que son propre fil, tout en gardant les
+    // contenus partagés (Kiosque, Nécrologie, Photos légendées…) visibles
+    // des deux côtés puisqu'ils portent les deux valeurs.
+    ...(portail ? { portails: { has: portail } } : {}),
   };
 
   const [articles, total] = await Promise.all([

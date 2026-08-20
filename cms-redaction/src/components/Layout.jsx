@@ -1,10 +1,13 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import PortailGate from './PortailGate';
 import { ROLE_LABELS, ROLE_COLORS } from '../utils/constants';
 import {
   HomeIcon, NewspaperIcon, BanknotesIcon, BookOpenIcon, PhotoIcon, ArchiveBoxIcon,
   ArrowRightOnRectangleIcon, PlusCircleIcon,
 } from '@heroicons/react/24/outline';
+
+const PORTAIL_LABELS = { QUOTIDIEN: 'Le Quotidien', INFO_DIRECT: 'Info en direct' };
 
 const NAV = [
   { to: '/', label: 'Tableau de bord', icon: HomeIcon, exact: true },
@@ -16,10 +19,11 @@ const NAV = [
 ];
 
 export default function Layout() {
-  const { staff, logout } = useAuth();
+  const { staff, logout, portailActif, setPortailActif } = useAuth();
   const navigate = useNavigate();
 
   return (
+    <PortailGate>
     <div className="min-h-screen flex">
       <aside className="w-64 bg-ink text-white flex flex-col shrink-0">
         <div className="px-5 py-5 border-b border-white/10">
@@ -28,6 +32,27 @@ export default function Layout() {
             <span className="bg-white text-coral font-black px-3 py-1.5">Voie</span>
           </div>
           <p className="text-[10px] font-mono uppercase tracking-widest text-white/40 mt-2">CMS 2 — Rédaction</p>
+        </div>
+
+        {/* Sélecteur d'espace de travail — deux rédactions distinctes,
+            cf. PortailGate.jsx. Change le filtre appliqué au tableau de
+            bord et à la liste des articles, et pré-coche le portail par
+            défaut d'un nouvel article. */}
+        <div className="px-3 pt-4">
+          <p className="text-[10px] font-mono uppercase tracking-widest text-white/40 px-1 mb-1.5">Espace de travail</p>
+          <div className="flex bg-white/5 rounded-lg p-1 gap-1">
+            {Object.entries(PORTAIL_LABELS).map(([valeur, libelle]) => (
+              <button
+                key={valeur}
+                onClick={() => setPortailActif(valeur)}
+                className={`flex-1 text-[11.5px] font-semibold px-2 py-1.5 rounded-md transition ${
+                  portailActif === valeur ? 'bg-coral text-white' : 'text-white/60 hover:text-white'
+                }`}
+              >
+                {libelle}
+              </button>
+            ))}
+          </div>
         </div>
 
         <nav className="flex-1 px-3 py-4 space-y-1">
@@ -75,5 +100,6 @@ export default function Layout() {
         <Outlet />
       </main>
     </div>
+    </PortailGate>
   );
 }
