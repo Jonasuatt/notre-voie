@@ -16,18 +16,18 @@ export default function PagesDuJournal({ pages, basePath = '' }) {
           const rubrique = p.rubriques?.[0];
           const contenu = (
             <>
-              <div className="relative w-[110px] aspect-[210/297] rounded-[6px] overflow-hidden border border-line shadow-sm group-hover:shadow-md transition-shadow">
-                <Image src={p.imageUrl} alt={`Page ${p.numeroPage}`} fill sizes="110px" className="object-cover" />
+              <div className="relative w-[300px] aspect-[3/4] rounded-[10px] overflow-hidden border border-line shadow-xl group-hover:shadow-2xl transition-shadow">
+                <Image src={p.imageUrl} alt={`Page ${p.numeroPage}`} fill sizes="300px" className="object-cover" />
               </div>
-              <span className="block text-center font-mono text-[10.5px] text-muted mt-1.5">Page {p.numeroPage}</span>
+              <span className="block text-center font-mono text-[11px] text-muted mt-2">Page {p.numeroPage}</span>
             </>
           );
           return rubrique ? (
-            <Link key={p.id} href={`${basePath}/rubrique/${rubrique}`} className="flex-none w-[110px] group">
+            <Link key={p.id} href={`${basePath}/rubrique/${rubrique}`} className="flex-none w-[300px] group">
               {contenu}
             </Link>
           ) : (
-            <div key={p.id} className="flex-none w-[110px]">
+            <div key={p.id} className="flex-none w-[300px]">
               {contenu}
             </div>
           );
