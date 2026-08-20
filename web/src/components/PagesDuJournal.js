@@ -1,12 +1,7 @@
 import Link from 'next/link';
-import Image from 'next/image';
 import { formatDateRange } from '@/lib/format';
 import DeverrouillerPdf from './DeverrouillerPdf';
-
-// Empêche le clic droit "Enregistrer l'image sous…" et le glisser-déposer —
-// un frein réel mais pas une protection totale : rien ne peut empêcher une
-// capture d'écran, c'est une limite du web, pas de ce composant.
-const antiEnregistrement = { onContextMenu: (e) => e.preventDefault(), draggable: false };
+import ImageProtegee from './ImageProtegee';
 
 // Reproduit la maquette papier : chaque vignette est la vraie page imprimée
 // du numéro du jour (pas une illustration), et renvoie vers la rubrique
@@ -30,7 +25,7 @@ export default function PagesDuJournal({ edition, basePath = '' }) {
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-6">
         <div>
           <div className="relative aspect-[3/4] rounded-[10px] overflow-hidden shadow-xl border border-line">
-            <Image src={edition.couvertureUrl} alt={`Une n°${edition.numero}`} fill sizes="(max-width: 640px) 50vw, 300px" priority className="object-cover" {...antiEnregistrement} />
+            <ImageProtegee src={edition.couvertureUrl} alt={`Une n°${edition.numero}`} fill sizes="(max-width: 640px) 50vw, 300px" priority className="object-cover" />
           </div>
           <span className="block text-center font-mono text-[11px] text-muted mt-2">
             N°{edition.numero} — {formatDateRange(edition.dateParution, edition.dateFin)}
@@ -44,7 +39,7 @@ export default function PagesDuJournal({ edition, basePath = '' }) {
           const rubrique = p.rubriques?.[0];
           const vignette = (
             <div className="relative aspect-[3/4] rounded-[10px] overflow-hidden border border-line shadow-xl group-hover:shadow-2xl transition-shadow">
-              <Image src={p.imageUrl} alt={`Page ${p.numeroPage}`} fill sizes="(max-width: 640px) 50vw, 300px" className="object-cover" {...antiEnregistrement} />
+              <ImageProtegee src={p.imageUrl} alt={`Page ${p.numeroPage}`} fill sizes="(max-width: 640px) 50vw, 300px" className="object-cover" />
             </div>
           );
           return rubrique ? (

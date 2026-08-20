@@ -1,8 +1,8 @@
 import Link from 'next/link';
-import Image from 'next/image';
 import { getEditions } from '@/lib/api';
 import { formatDateRange } from '@/lib/format';
 import DeverrouillerPdf from '@/components/DeverrouillerPdf';
+import ImageProtegee from '@/components/ImageProtegee';
 
 const BASE_PATH = '/quotidien';
 
@@ -34,7 +34,7 @@ export default async function KiosquePage() {
                 <Link href={`${BASE_PATH}/recherche?date=${dateISO}`} className="block">
                   <div className="relative aspect-[3/4] rounded-md overflow-hidden bg-gradient-to-b from-navy2 to-navy shadow-lg group-hover:opacity-90 transition">
                     {e.couvertureUrl && (
-                      <Image src={e.couvertureUrl} alt={`Une n°${e.numero}`} fill sizes="220px" className="object-cover" onContextMenu={(ev) => ev.preventDefault()} draggable={false} />
+                      <ImageProtegee src={e.couvertureUrl} alt={`Une n°${e.numero}`} fill sizes="220px" className="object-cover" />
                     )}
                   </div>
                 </Link>

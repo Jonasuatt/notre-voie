@@ -10,6 +10,7 @@ import FactCheckBlock from '@/components/FactCheckBlock';
 import FormatBadge from '@/components/FormatBadge';
 import PubCard from '@/components/PubCard';
 import DeverrouillerPdf from '@/components/DeverrouillerPdf';
+import ImageProtegee from '@/components/ImageProtegee';
 import { timeAgo, formatDateRange } from '@/lib/format';
 
 const BASE_PATH = '/info-direct';
@@ -57,7 +58,7 @@ export default async function QuotidienAccueilPage() {
             {uneDuJour?.couvertureUrl && (
               <div>
                 <div className="relative aspect-[3/4] rounded-[10px] overflow-hidden shadow-xl border border-line">
-                  <Image src={uneDuJour.couvertureUrl} alt={`Une n°${uneDuJour.numero}`} fill sizes="(max-width: 1024px) 100vw, 380px" priority className="object-cover" onContextMenu={(e) => e.preventDefault()} draggable={false} />
+                  <ImageProtegee src={uneDuJour.couvertureUrl} alt={`Une n°${uneDuJour.numero}`} fill sizes="(max-width: 1024px) 100vw, 380px" priority className="object-cover" />
                 </div>
                 <span className="font-mono text-[11px] text-muted mt-3 block">
                   N°{uneDuJour.numero} — {formatDateRange(uneDuJour.dateParution, uneDuJour.dateFin)}

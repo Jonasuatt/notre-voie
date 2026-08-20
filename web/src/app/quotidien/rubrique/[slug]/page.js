@@ -1,9 +1,9 @@
 import { notFound } from 'next/navigation';
-import Image from 'next/image';
 import { getArticles, getRubriques, getCampagnesActives, getEditions } from '@/lib/api';
 import RubriqueTabs from '@/components/RubriqueTabs';
 import ArticleCard from '@/components/ArticleCard';
 import PubCard from '@/components/PubCard';
+import ImageProtegee from '@/components/ImageProtegee';
 
 const BASE_PATH = '/quotidien';
 
@@ -42,7 +42,7 @@ export default async function RubriquePage({ params }) {
             {pagesRubrique.map((p) => (
               <div key={p.id} className="w-[300px]">
                 <div className="relative w-[300px] aspect-[3/4] rounded-[10px] overflow-hidden border border-line shadow-xl">
-                  <Image src={p.imageUrl} alt={`Page ${p.numeroPage}`} fill sizes="300px" className="object-cover" onContextMenu={(e) => e.preventDefault()} draggable={false} />
+                  <ImageProtegee src={p.imageUrl} alt={`Page ${p.numeroPage}`} fill sizes="300px" className="object-cover" />
                 </div>
                 <span className="block text-center font-mono text-[11px] text-muted mt-2">Page {p.numeroPage}</span>
               </div>
