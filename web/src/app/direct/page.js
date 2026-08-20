@@ -4,6 +4,7 @@ import { getArticles } from '@/lib/api';
 import { timeAgo } from '@/lib/format';
 
 export const metadata = { title: 'En direct' };
+export const dynamic = 'force-dynamic';
 
 // Fil des couvertures en direct (format LIVE) — élection, match, actualité
 // chaude avec mises à jour successives. Cf. cahier des charges §2 (format

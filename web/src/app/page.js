@@ -10,6 +10,9 @@ import FormatBadge from '@/components/FormatBadge';
 import PubCard from '@/components/PubCard';
 import { timeAgo } from '@/lib/format';
 
+// Quotidien : la Une et le fil changent chaque jour, jamais figés au build.
+export const dynamic = 'force-dynamic';
+
 export default async function AccueilPage() {
   const [{ articles }, rubriques, prix, factChecks, campagnes] = await Promise.all([
     getArticles({ pageSize: 24 }),

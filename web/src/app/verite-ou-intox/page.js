@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { getFactChecks } from '@/lib/api';
 
 export const metadata = { title: 'Vérité ou Intox' };
+export const dynamic = 'force-dynamic';
 
 const VERDICT_STYLE = {
   VRAI: { label: 'Vrai', color: '#4ADE80' },

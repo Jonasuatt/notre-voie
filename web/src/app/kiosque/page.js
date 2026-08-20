@@ -3,6 +3,10 @@ import Image from 'next/image';
 import { getEditions } from '@/lib/api';
 import { formatDate } from '@/lib/format';
 
+// Contenu qui change chaque jour (nouvelle édition quotidienne) : jamais
+// figé au build, toujours interrogé à la demande.
+export const dynamic = 'force-dynamic';
+
 export const metadata = { title: 'Kiosque numérique' };
 
 export default async function KiosquePage() {
