@@ -1,13 +1,12 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import PortailGate from './PortailGate';
+import { PORTAILS } from '../utils/portails';
 import { ROLE_LABELS, ROLE_COLORS } from '../utils/constants';
 import {
   HomeIcon, NewspaperIcon, BanknotesIcon, BookOpenIcon, PhotoIcon, ArchiveBoxIcon,
   ArrowRightOnRectangleIcon, PlusCircleIcon,
 } from '@heroicons/react/24/outline';
-
-const PORTAIL_LABELS = { QUOTIDIEN: 'Le Quotidien', INFO_DIRECT: 'Info en direct' };
 
 const NAV = [
   { to: '/', label: 'Tableau de bord', icon: HomeIcon, exact: true },
@@ -41,15 +40,18 @@ export default function Layout() {
         <div className="px-3 pt-4">
           <p className="text-[10px] font-mono uppercase tracking-widest text-white/40 px-1 mb-1.5">Espace de travail</p>
           <div className="flex bg-white/5 rounded-lg p-1 gap-1">
-            {Object.entries(PORTAIL_LABELS).map(([valeur, libelle]) => (
+            {PORTAILS.map((p) => (
               <button
-                key={valeur}
-                onClick={() => setPortailActif(valeur)}
-                className={`flex-1 text-[11.5px] font-semibold px-2 py-1.5 rounded-md transition ${
-                  portailActif === valeur ? 'bg-coral text-white' : 'text-white/60 hover:text-white'
-                }`}
+                key={p.valeur}
+                onClick={() => setPortailActif(p.valeur)}
+                className="flex-1 text-[11.5px] font-semibold px-2 py-1.5 rounded-md transition"
+                style={
+                  portailActif === p.valeur
+                    ? { background: p.accent, color: p.valeur === 'QUOTIDIEN' ? '#FFFFFF' : p.fond }
+                    : { color: 'rgba(255,255,255,0.6)' }
+                }
               >
-                {libelle}
+                {p.label}
               </button>
             ))}
           </div>

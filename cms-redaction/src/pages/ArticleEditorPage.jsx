@@ -4,6 +4,7 @@ import toast from 'react-hot-toast';
 import { articlesAPI, rubriquesAPI } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import { FORMAT_LABELS, FORMAT_DESCRIPTIONS, PAYWALL_LABELS, ROLES_VALIDATION } from '../utils/constants';
+import { PORTAILS } from '../utils/portails';
 import ChecklistPanel from '../components/ChecklistPanel';
 import LiveUpdatesPanel from '../components/LiveUpdatesPanel';
 import FactCheckPanel from '../components/FactCheckPanel';
@@ -16,8 +17,6 @@ const EMPTY_FORM = {
   rubriquesSecondairesIds: [], paywall: 'LIBRE', tags: '', imageUneUrl: '', datePublicationPrevue: '',
   portails: ['QUOTIDIEN'],
 };
-
-const PORTAIL_LABELS = { QUOTIDIEN: 'Le Quotidien', INFO_DIRECT: 'Info en direct' };
 
 export default function ArticleEditorPage() {
   const { id } = useParams();
@@ -179,15 +178,15 @@ export default function ArticleEditorPage() {
         <div>
           <label className="label">Portail(s) de diffusion</label>
           <div className="flex gap-4 mt-1">
-            {Object.entries(PORTAIL_LABELS).map(([valeur, libelle]) => (
-              <label key={valeur} className="flex items-center gap-2 text-sm">
+            {PORTAILS.map((p) => (
+              <label key={p.valeur} className="flex items-center gap-2 text-sm">
                 <input
                   type="checkbox"
-                  checked={form.portails.includes(valeur)}
-                  onChange={() => togglePortail(valeur)}
+                  checked={form.portails.includes(p.valeur)}
+                  onChange={() => togglePortail(p.valeur)}
                   disabled={!canEditContent}
                 />
-                {libelle}
+                {p.label}
               </label>
             ))}
           </div>

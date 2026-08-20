@@ -1,4 +1,5 @@
 import { useAuth } from '../contexts/AuthContext';
+import { PORTAILS } from '../utils/portails';
 
 // Sélection de l'espace de travail après connexion — Le Quotidien (contenu
 // du journal papier) ou Info en direct (rédaction web). Bloque l'accès au
@@ -23,27 +24,20 @@ export default function PortailGate({ children }) {
       </p>
 
       <div className="grid sm:grid-cols-2 gap-5 mt-8 w-full max-w-xl">
-        <button
-          onClick={() => setPortailActif('QUOTIDIEN')}
-          className="text-left card p-6 hover:-translate-y-0.5 hover:shadow-md transition"
-        >
-          <span className="font-mono text-[10.5px] uppercase tracking-widest text-coral font-bold">Le journal, chaque jour</span>
-          <h2 className="font-serif text-[20px] mt-1.5">Le Quotidien</h2>
-          <p className="text-xs text-gray-500 mt-2 leading-relaxed">
-            Contenu déversé tel que présent dans les PDF du journal imprimé, rubriques traditionnelles.
-          </p>
-        </button>
-
-        <button
-          onClick={() => setPortailActif('INFO_DIRECT')}
-          className="text-left card p-6 hover:-translate-y-0.5 hover:shadow-md transition"
-        >
-          <span className="font-mono text-[10.5px] uppercase tracking-widest text-navy font-bold">L&apos;actualité au fil de l&apos;eau</span>
-          <h2 className="font-serif text-[20px] mt-1.5">Info en direct</h2>
-          <p className="text-xs text-gray-500 mt-2 leading-relaxed">
-            Rédaction web animée au quotidien, style éditorial et rubriques propres.
-          </p>
-        </button>
+        {PORTAILS.map((p) => (
+          <button
+            key={p.valeur}
+            onClick={() => setPortailActif(p.valeur)}
+            className="text-left rounded-2xl p-6 border hover:-translate-y-0.5 hover:shadow-lg transition"
+            style={{ background: p.fond, color: p.texte, borderColor: p.valeur === 'QUOTIDIEN' ? '#E5E7EB' : 'transparent' }}
+          >
+            <span className="font-mono text-[10.5px] uppercase tracking-widest font-bold" style={{ color: p.accent }}>
+              {p.accroche}
+            </span>
+            <h2 className="font-serif text-[20px] mt-1.5">{p.label}</h2>
+            <p className="text-xs mt-2 leading-relaxed opacity-70">{p.description}</p>
+          </button>
+        ))}
       </div>
     </div>
   );

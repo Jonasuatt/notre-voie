@@ -4,12 +4,11 @@ import { articlesAPI } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import { StatutBadge, FormatBadge } from '../components/Badges';
 import { STATUT_LABELS } from '../utils/constants';
+import { PORTAIL_LABELS } from '../utils/portails';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
 const STATUTS = ['BROUILLON', 'EN_RELECTURE', 'VALIDE', 'PUBLIE', 'DEPUBLIE'];
-
-const PORTAIL_LABELS = { QUOTIDIEN: 'Le Quotidien', INFO_DIRECT: 'Info en direct' };
 
 export default function DashboardPage() {
   const { staff, portailActif } = useAuth();
