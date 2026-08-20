@@ -42,6 +42,15 @@ enum Format {
   VERITE_OU_INTOX // Fact-check, prioritairement publié en Flash
 }
 
+// Portail de diffusion — deux rédactions distinctes partagent la même base
+// éditoriale : Le Quotidien (contenu déversé tel que présent dans le
+// journal papier) et Info en direct (rédaction web, style éditorial et
+// rubriques propres). Un article peut appartenir aux deux.
+enum Portail {
+  QUOTIDIEN
+  INFO_DIRECT
+}
+
 // Cycle de validation éditoriale : Rédacteur → Chef de service →
 // Rédacteur en chef / Secrétaire général → Publié.
 enum StatutArticle {
@@ -230,6 +239,7 @@ model Article {
   format      Format        @default(EDITION)
   statut      StatutArticle @default(BROUILLON)
   paywall     Paywall       @default(LIBRE)
+  portails    Portail[]     @default([QUOTIDIEN]) // sur quel(s) portail(s) l'article est diffusé
 
   rubrique             Rubrique   @relation("ArticleRubriquePrincipale", fields: [rubriqueId], references: [id])
   rubriqueId           String

@@ -17,7 +17,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function QuotidienAccueilPage() {
   const [{ articles }, rubriques, prix, factChecks, campagnes, editions] = await Promise.all([
-    getArticles({ pageSize: 24 }),
+    getArticles({ pageSize: 24, portail: 'QUOTIDIEN' }),
     getRubriques(),
     getTicker(),
     getFactChecks(),

@@ -1185,6 +1185,192 @@ async function fixArticleDates() {
   console.log(`✔ ${corriges} article(s) réaligné(s) sur la vraie date de leur numéro d'origine.`);
 }
 
+// Contenu propre au portail "Info en direct" — deux rédactions distinctes
+// (cf. §"deux rédactions" du cahier des charges) : Le Quotidien reprend tel
+// quel le contenu du journal papier, tandis qu'Info en direct est animé au
+// quotidien par la rédaction web, dans un style éditorial différent — plus
+// condensé, factuel en tête de texte, pensé pour la lecture rapide en
+// mobilité. Chaque article ci-dessous est une réécriture, dans ce style,
+// d'un fait déjà vérifié et publié ailleurs sur Notre Voie (aucun fait
+// nouveau n'est inventé) : seule la forme change, pas le fond.
+async function seedInfoDirectFlashs() {
+  const [politique, refondation, economie, societe, regions, culture, sport, verite] = await Promise.all([
+    prisma.rubrique.findUniqueOrThrow({ where: { slug: 'politique' } }),
+    prisma.rubrique.findUniqueOrThrow({ where: { slug: 'refondation' } }),
+    prisma.rubrique.findUniqueOrThrow({ where: { slug: 'economie' } }),
+    prisma.rubrique.findUniqueOrThrow({ where: { slug: 'societe' } }),
+    prisma.rubrique.findUniqueOrThrow({ where: { slug: 'regions' } }),
+    prisma.rubrique.findUniqueOrThrow({ where: { slug: 'culture' } }),
+    prisma.rubrique.findUniqueOrThrow({ where: { slug: 'sport' } }),
+    prisma.rubrique.findUniqueOrThrow({ where: { slug: 'verite-ou-intox' } }),
+  ]);
+  const [redacteurEnChef, secretaireGeneral, chefPolitique, chefCulture, redacteurSport] = await Promise.all([
+    prisma.staff.findUniqueOrThrow({ where: { email: 'redacteur-en-chef@notrevoienews.com' } }),
+    prisma.staff.findUniqueOrThrow({ where: { email: 'secretaire-general@notrevoienews.com' } }),
+    prisma.staff.findUniqueOrThrow({ where: { email: 'chef-politique@notrevoienews.com' } }),
+    prisma.staff.findUniqueOrThrow({ where: { email: 'chef-culture@notrevoienews.com' } }),
+    prisma.staff.findUniqueOrThrow({ where: { email: 'redacteur@notrevoienews.com' } }),
+  ]);
+
+  const items = [
+    {
+      slug: 'flash-carburant-hausse-3-5-pourcent-subvention-200-milliards',
+      titre: 'Carburant : +3,5 % à la pompe, l\'État absorbe plus de 200 milliards de subvention',
+      chapo: "Le porte-parole du Gouvernement l'a confirmé au sortir du Conseil des ministres : la hausse est contrainte, entre crise au Moyen-Orient et engagements pris avec le FMI.",
+      contenuHtml: `<p><strong>L'essentiel</strong> — Le prix du carburant augmente d'environ 3,5 % à la pompe. Coût pour l'État : plus de 200 milliards de FCFA de subvention.</p>
+<ul>
+<li>Cause invoquée : la crise au Moyen-Orient, qui renchérit le transport du gaz et du pétrole.</li>
+<li>Le Gouvernement dit vouloir « contenir le déficit dans les limites convenues avec le FMI ».</li>
+<li>Réaction attendue dans les prochains jours des syndicats de transporteurs.</li>
+</ul>
+<p>Ce que Notre Voie suit pour vous : l'impact sur les prix du transport en commun, premier poste de dépense touché en général dans les 72 heures suivant une hausse.</p>`,
+      tags: ['carburant', 'FMI', 'pouvoir d\'achat'],
+      format: 'FLASH', rubriqueId: politique.id, auteurId: chefPolitique.id,
+    },
+    {
+      slug: 'flash-gafi-liste-grise-pole-penal-economique-financier',
+      titre: 'Blanchiment de capitaux : la Côte d\'Ivoire maintenue sur la liste grise du GAFI',
+      chapo: "Verdict tombé lors de la session de juin 2026 à Paris : l'Algérie et la Namibie sortent, pas Abidjan. Le pays mise sur une mission d'évaluateurs en septembre pour convaincre en octobre.",
+      contenuHtml: `<p><strong>L'essentiel</strong> — La Côte d'Ivoire reste sur la liste grise du GAFI et sur la liste noire de l'UE en matière de blanchiment de capitaux et de financement du terrorisme.</p>
+<ul>
+<li>Prochaine étape : une mission d'évaluateurs du GAFI attendue en Côte d'Ivoire en septembre 2026.</li>
+<li>Décision de retrait espérée à la plénière d'octobre 2026, si la mission confirme les progrès.</li>
+<li>Le nouveau Pôle pénal économique et financier vient de s'installer à Cocody 2 Plateaux.</li>
+</ul>
+<p>Point de vigilance : jusqu'ici, les procédures ouvertes concernent essentiellement de « petits calibres » — aucune personnalité politique ou haut fonctionnaire n'a encore été poursuivi.</p>`,
+      tags: ['GAFI', 'blanchiment de capitaux', 'justice'],
+      format: 'FLASH', rubriqueId: refondation.id, auteurId: redacteurEnChef.id,
+    },
+    {
+      slug: 'flash-cacao-2800-a-1200-fcfa-effondrement-cours-mondiaux',
+      titre: 'Cacao : du record de 2 800 FCFA/kg à la chute des cours en cinq mois',
+      chapo: "Le prix bord champ a été divisé par plus de deux entre octobre 2025 et mars 2026. L'État a arbitré à la hausse un prix intermédiaire de 1 200 FCFA/kg, au prix d'une subvention de plus de 231 milliards de FCFA.",
+      contenuHtml: `<p><strong>Les chiffres</strong></p>
+<ul>
+<li>2 800 FCFA/kg : prix bord champ record atteint le 1er octobre 2025.</li>
+<li>-70 % : chute des cours mondiaux dès décembre 2025.</li>
+<li>1 200 FCFA/kg : prix intermédiaire arbitré par le chef de l'État, annoncé le 4 mars 2026.</li>
+<li>231 milliards FCFA : coût de la subvention publique associée.</li>
+<li>Plus de 2 millions de tonnes : récolte finalement enregistrée, un record malgré la crise des prix.</li>
+</ul>
+<p>À surveiller d'ici septembre 2026 : l'entrée en vigueur obligatoire de la carte du producteur et du Système national de traçabilité, exigés par le règlement européen sur la déforestation (EUDR).</p>`,
+      tags: ['cacao', 'agriculture', 'prix bord champ'],
+      format: 'FLASH', rubriqueId: economie.id, auteurId: secretaireGeneral.id,
+    },
+    {
+      slug: 'flash-catholique-98-pourcent-reussite-cepe-2026',
+      titre: 'Examens 2026 : l\'école catholique creuse l\'écart avec la moyenne nationale',
+      chapo: "98,18 % de réussite au CEPE contre 85,76 % au niveau national ; 88,74 % au BEPC contre 52,17 %. Le réseau catholique compte 521 établissements et plus de 143 000 élèves.",
+      contenuHtml: `<p><strong>Les résultats, rubrique par rubrique</strong></p>
+<ul>
+<li>CEPE : 98,18 % (catholique) contre 85,76 % (national) — écart de 12,4 points.</li>
+<li>BEPC : 88,74 % contre 52,17 % — écart de 36,6 points.</li>
+<li>Baccalauréat : 67,89 % contre 40,60 % — écart de 27,3 points.</li>
+</ul>
+<p>« Ces écarts traduisent l'efficacité de notre accompagnement des élèves jusqu'au terme du cycle secondaire », commente le père Félicien Guessé, secrétaire exécutif national de l'Éducation catholique. Le réseau revendique des ratios favorables : 29 élèves par enseignant au préscolaire, 40 au primaire, 27 au secondaire.</p>`,
+      tags: ['éducation catholique', 'examens', 'résultats scolaires'],
+      format: 'FLASH', rubriqueId: societe.id, auteurId: secretaireGeneral.id,
+    },
+    {
+      slug: 'flash-jeunesse-trois-priorites-drogues-reseaux-sociaux-ia',
+      titre: 'Consultations nationales de la jeunesse : trois priorités remontent au Gouvernement',
+      chapo: "Drogues, usage responsable des réseaux sociaux, intelligence artificielle : voici ce que les jeunes ont mis sur la table lors de la 2e édition des consultations nationales, au Parc des expositions d'Abidjan.",
+      contenuHtml: `<p><strong>Ce qu'il faut retenir</strong></p>
+<ul>
+<li>3 priorités portées par les jeunes : lutte contre les drogues, réseaux sociaux, intelligence artificielle.</li>
+<li>86 % des préoccupations exprimées en 2025 auraient déjà été prises en compte, selon le CNJ-CI.</li>
+<li>Le Premier ministre Robert Beugré Mambé promet une méthode « écouter, agir, rendre compte, vérifier ».</li>
+</ul>
+<p>Instruction donnée : le ministre chargé de la Jeunesse doit garantir la transparence dans la mise en œuvre du Fonds d'appui aux organisations de jeunesse.</p>`,
+      tags: ['jeunesse', 'gouvernement', 'consultations nationales'],
+      format: 'FLASH', rubriqueId: societe.id, auteurId: chefPolitique.id,
+    },
+    {
+      slug: 'flash-toulepleu-cinq-morts-naufrage-pirogue-cavally',
+      titre: 'Toulépleu : cinq morts noyés en traversant le fleuve Cavally',
+      chapo: "Une mère et ses trois enfants figurent parmi les victimes. La pirogue a chaviré sur une distance de moins de 100 mètres, entre Pantroya et Grié 2.",
+      contenuHtml: `<p><strong>Les faits</strong> — Six passagers et un piroguier traversaient le fleuve Cavally entre Pantroya et Grié 2 (sous-préfecture de Bakoubly, département de Toulépleu) quand l'embarcation a chaviré. Le piroguier et deux passagers ont regagné la rive ; cinq personnes, dont une mère et ses trois enfants, sont mortes noyées.</p>
+<p>Les corps ont été inhumés au bord du fleuve, avec l'autorisation des services compétents. La gendarmerie a ouvert une enquête pour établir les circonstances exactes du drame.</p>`,
+      tags: ['fait divers', 'Toulépleu', 'fleuve Cavally'],
+      format: 'FLASH', rubriqueId: regions.id, auteurId: chefPolitique.id,
+    },
+    {
+      slug: 'flash-alepe-kossandji-six-morts-conflit-foncier',
+      titre: 'Alépé : six morts dans un conflit foncier qui dégénère à Kossandji',
+      chapo: "Un différend autour d'une parcelle a viré aux violences intercommunautaires. Le président de l'Assemblée nationale a appelé à la retenue.",
+      contenuHtml: `<p><strong>Chronologie</strong></p>
+<ul>
+<li>4 août : destruction de plants de manioc, une femme blessée lors d'une altercation.</li>
+<li>Nuit suivante : attaque armée du village de Kossandji (67 km d'Alépé) — 6 morts, magasins et boutiques détruits.</li>
+<li>De nombreux habitants fuient vers un poste des Eaux et Forêts ou des localités voisines.</li>
+</ul>
+<p>Le président de l'Assemblée nationale, Patrick Achi, et le député de la circonscription ont présenté leurs condoléances et appelé à la préservation de la cohésion sociale. Une enquête est en cours pour établir les responsabilités.</p>`,
+      tags: ['Alépé', 'Kossandji', 'conflit foncier'],
+      format: 'FLASH', rubriqueId: regions.id, auteurId: chefPolitique.id,
+    },
+    {
+      slug: 'flash-amah-helene-palais-culture-treichville-4000-places',
+      titre: 'Amah Hélène fait salle comble au Palais de la Culture de Treichville',
+      chapo: "4 000 places archicombles pour la diva de la musique tradi-moderne agni, portée par des délégations venues de tout le Moronou.",
+      contenuHtml: `<p>La communauté agni s'est massivement déplacée pour ce concert événement : salle pleine durant plusieurs heures, public reprenant en chœur la plupart des chansons.</p>
+<p>Au-delà du spectacle, la soirée a été vécue comme une célébration de l'identité culturelle agni — nouvelle démonstration que la valorisation des musiques locales reste un puissant facteur de cohésion.</p>`,
+      tags: ['musique agni', 'concert', 'Moronou'],
+      format: 'FLASH', rubriqueId: culture.id, auteurId: chefCulture.id,
+    },
+    {
+      slug: 'flash-diomande-nottingham-forest-540-millions-osa',
+      titre: 'Ousmane Diomandé file à Nottingham Forest, l\'OSA empoche environ 540 millions FCFA',
+      chapo: "Le défenseur international quitte le Sporting CP pour 40 millions d'euros. Son club formateur d'Abidjan touche un bonus de solidarité FIFA estimé à 524 millions FCFA.",
+      contenuHtml: `<p><strong>Le transfert</strong></p>
+<ul>
+<li>Ousmane Diomandé (22 ans, 16 sélections), Sporting CP → Nottingham Forest, contrat jusqu'en 2030.</li>
+<li>Montant : 40 millions d'euros.</li>
+<li>Retrouvailles en club avec Ibrahim Sangaré, son coéquipier en sélection.</li>
+</ul>
+<p>Côté ivoirien : l'OSA (Olympique Sport d'Abobo), club formateur, percevrait environ 524 millions FCFA au titre du mécanisme de solidarité FIFA ; Sol FC, son club juste avant l'exil, environ 131 millions FCFA.</p>`,
+      tags: ['football', 'transfert', 'Nottingham Forest'],
+      format: 'FLASH', rubriqueId: sport.id, auteurId: redacteurSport.id,
+    },
+    {
+      slug: 'flash-fif-clubs-300-millions-avant-de-voter',
+      titre: 'Élection à la FIF : des clubs réclament 300 millions FCFA de subvention avant de voter',
+      chapo: "Un bras de fer financier s'installe en coulisses à l'approche du scrutin fédéral, entre clubs et candidats à la présidence.",
+      contenuHtml: `<p>À quelques semaines de l'élection à la tête de la Fédération ivoirienne de football, plusieurs clubs conditionnent leur soutien à une subvention annuelle de 300 millions FCFA. Les tractations se poursuivent en coulisses, chaque camp cherchant à sécuriser les voix nécessaires.</p>
+<p>Notre Voie suit les prises de position des différents candidats sur ce dossier, qui pourrait peser lourd dans l'issue du scrutin.</p>`,
+      tags: ['FIF', 'football', 'élection'],
+      format: 'FLASH', rubriqueId: sport.id, auteurId: redacteurSport.id,
+    },
+    {
+      slug: 'flash-verif-pasteur-jeremie-koffi-rumeur-deces',
+      titre: 'Vérité ou Intox : non, le pasteur Jérémie Koffi n\'est pas mort',
+      chapo: "Une rumeur de décès a enflammé les réseaux sociaux après son arrestation. Notre Voie a vérifié : elle est fausse.",
+      contenuHtml: `<p><strong>La rumeur</strong> — Des publications virales ont affirmé que le pasteur Jérémie Koffi, arrêté dans un contexte de violence, serait mort en détention.</p>
+<p><strong>Les faits vérifiés</strong> — Cette information est fausse. Aucune source officielle ni aucun proche n'a confirmé un quelconque décès ; l'arrestation elle-même reste, elle, un fait établi et suivi par la rédaction.</p>
+<p>Notre Voie rappelle l'importance de vérifier une information avant de la partager, en particulier lorsqu'elle concerne un décès.</p>`,
+      tags: ['vérité ou intox', 'fact-check', 'réseaux sociaux'],
+      format: 'FLASH', rubriqueId: verite.id, auteurId: redacteurEnChef.id,
+    },
+  ];
+
+  let crees = 0;
+  for (const item of items) {
+    const existe = await prisma.article.findUnique({ where: { slug: item.slug } });
+    if (existe) continue;
+    const maintenant = new Date();
+    await prisma.article.create({
+      data: {
+        slug: item.slug, titre: item.titre, chapo: item.chapo, contenuHtml: item.contenuHtml,
+        tags: item.tags, format: item.format, statut: 'PUBLIE', paywall: 'LIBRE',
+        rubriqueId: item.rubriqueId, auteurId: item.auteurId, valideParId: redacteurEnChef.id,
+        portails: ['INFO_DIRECT'],
+        publieLe: maintenant, createdAt: maintenant, updatedAt: maintenant, vuesTotal: 1,
+      },
+    });
+    crees++;
+  }
+  console.log(`✔ ${crees} article(s) "Info en direct" créé(s) (portail INFO_DIRECT).`);
+}
+
 async function main() {
   await seedRubriques();
   await seedStaff();
@@ -1212,6 +1398,7 @@ async function main() {
   const dejaDesEditions = await prisma.edition.count();
   if (dejaDesEditions === 0) await seedEditions();
   await fixArticleDates();
+  await seedInfoDirectFlashs();
 }
 
 main()

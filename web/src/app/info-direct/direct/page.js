@@ -12,7 +12,7 @@ export const dynamic = 'force-dynamic';
 // chaude avec mises à jour successives. Cf. cahier des charges §2 (format
 // Live) et §3 (badge "DIRECT" en Une).
 export default async function DirectPage() {
-  const { articles } = await getArticles({ format: 'LIVE', pageSize: 20 });
+  const { articles } = await getArticles({ format: 'LIVE', pageSize: 20, portail: 'INFO_DIRECT' });
 
   return (
     <section className="max-w-[820px] mx-auto px-4 sm:px-8 py-10">

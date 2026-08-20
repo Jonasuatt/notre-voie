@@ -18,7 +18,7 @@ export default async function RubriquePage({ params }) {
   if (!rubrique) notFound();
 
   const [{ articles, total }, campagnes] = await Promise.all([
-    getArticles({ rubrique: params.slug, pageSize: 30 }),
+    getArticles({ rubrique: params.slug, pageSize: 30, portail: 'QUOTIDIEN' }),
     getCampagnesActives({ rubrique: params.slug, format: 'NATIVE_CARTE' }),
   ]);
   const pub = campagnes?.[0];

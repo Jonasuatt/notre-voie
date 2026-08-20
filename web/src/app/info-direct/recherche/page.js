@@ -18,7 +18,7 @@ export default async function RecherchePage({ searchParams }) {
 
   const [rubriques, resultats] = await Promise.all([
     getRubriques(),
-    aUneRecherche ? getArticles({ q: q || undefined, rubrique: rubrique || undefined, date: date || undefined, pageSize: 40 }) : Promise.resolve({ articles: [], total: 0 }),
+    aUneRecherche ? getArticles({ q: q || undefined, rubrique: rubrique || undefined, date: date || undefined, pageSize: 40, portail: 'INFO_DIRECT' }) : Promise.resolve({ articles: [], total: 0 }),
   ]);
 
   return (

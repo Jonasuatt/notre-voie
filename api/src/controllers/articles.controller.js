@@ -35,7 +35,7 @@ async function applyPaywall(article, reader) {
 
 // GET /api/articles — flux public (Une, rubriques, recherche)
 const listPublic = asyncHandler(async (req, res) => {
-  const { rubrique, format, tag, q, date, dateDebut, dateFin, page = 1, pageSize = 20 } = req.query;
+  const { rubrique, format, tag, q, date, dateDebut, dateFin, portail, page = 1, pageSize = 20 } = req.query;
   const take = Math.min(Number(pageSize) || 20, 50);
   const skip = (Math.max(Number(page) || 1, 1) - 1) * take;
 
@@ -59,6 +59,7 @@ const listPublic = asyncHandler(async (req, res) => {
     ...(rubrique ? { rubrique: { slug: rubrique } } : { rubrique: { type: 'EDITORIALE' } }), // fil général = rubriques éditoriales uniquement ; les rubriques de service (Nécrologie, Test…) ne doivent jamais concurrencer l'actualité en Une, seulement accessibles via leur propre page
     ...(format ? { format } : {}),
     ...(tag ? { tags: { has: tag } } : {}),
+    ...(portail ? { portails: { has: portail } } : {}), // "QUOTIDIEN" ou "INFO_DIRECT" — cf. cahier des charges, deux rédactions/portails distincts
     ...(publieLeFiltre ? { publieLe: publieLeFiltre } : {}),
     ...(q ? { OR: [{ titre: { contains: q, mode: 'insensitive' } }, { chapo: { contains: q, mode: 'insensitive' } }, { contenuHtml: { contains: q, mode: 'insensitive' } }] } : {}),
   };

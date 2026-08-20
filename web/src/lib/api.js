@@ -25,7 +25,7 @@ export async function getRubriques() {
   return data.rubriques;
 }
 
-export async function getArticles({ rubrique, format, q, date, dateDebut, dateFin, page = 1, pageSize = 20 } = {}) {
+export async function getArticles({ rubrique, format, q, date, dateDebut, dateFin, portail, page = 1, pageSize = 20 } = {}) {
   const params = new URLSearchParams();
   if (rubrique) params.set('rubrique', rubrique);
   if (format) params.set('format', format);
@@ -33,6 +33,7 @@ export async function getArticles({ rubrique, format, q, date, dateDebut, dateFi
   if (date) params.set('date', date);
   if (dateDebut) params.set('dateDebut', dateDebut);
   if (dateFin) params.set('dateFin', dateFin);
+  if (portail) params.set('portail', portail);
   params.set('page', page);
   params.set('pageSize', pageSize);
 
