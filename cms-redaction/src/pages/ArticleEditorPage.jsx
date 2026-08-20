@@ -14,7 +14,10 @@ import MediaManager from '../components/MediaManager';
 const EMPTY_FORM = {
   titre: '', chapo: '', contenuHtml: '', format: 'EDITION', rubriqueId: '',
   rubriquesSecondairesIds: [], paywall: 'LIBRE', tags: '', imageUneUrl: '', datePublicationPrevue: '',
+  portails: ['QUOTIDIEN'],
 };
+
+const PORTAIL_LABELS = { QUOTIDIEN: 'Le Quotidien', INFO_DIRECT: 'Info en direct' };
 
 export default function ArticleEditorPage() {
   const { id } = useParams();
@@ -28,6 +31,16 @@ export default function ArticleEditorPage() {
   const [saving, setSaving] = useState(false);
 
   const set = (key) => (e) => setForm((f) => ({ ...f, [key]: e.target.value }));
+
+  // Deux rédactions, deux portails : un article peut alimenter Le Quotidien,
+  // Info en direct, ou les deux à la fois.
+  const togglePortail = (portail) => {
+    setForm((f) => {
+      const deja = f.portails.includes(portail);
+      const suivant = deja ? f.portails.filter((p) => p !== portail) : [...f.portails, portail];
+      return { ...f, portails: suivant.length ? suivant : f.portails }; // au moins un portail
+    });
+  };
 
   const loadArticle = useCallback(() => {
     if (!id) return;
@@ -44,6 +57,7 @@ export default function ArticleEditorPage() {
         tags: (data.article.tags || []).join(', '),
         imageUneUrl: data.article.imageUneUrl || '',
         datePublicationPrevue: data.article.datePublicationPrevue ? data.article.datePublicationPrevue.slice(0, 16) : '',
+        portails: data.article.portails?.length ? data.article.portails : ['QUOTIDIEN'],
       });
     });
   }, [id]);
@@ -158,6 +172,24 @@ export default function ArticleEditorPage() {
               {Object.entries(PAYWALL_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
             </select>
           </div>
+        </div>
+
+        <div>
+          <label className="label">Portail(s) de diffusion</label>
+          <div className="flex gap-4 mt-1">
+            {Object.entries(PORTAIL_LABELS).map(([valeur, libelle]) => (
+              <label key={valeur} className="flex items-center gap-2 text-sm">
+                <input
+                  type="checkbox"
+                  checked={form.portails.includes(valeur)}
+                  onChange={() => togglePortail(valeur)}
+                  disabled={!canEditContent}
+                />
+                {libelle}
+              </label>
+            ))}
+          </div>
+          <p className="text-xs text-gray-400 mt-1">Le Quotidien reprend le contenu du journal papier ; Info en direct est animé au quotidien par la rédaction web.</p>
         </div>
 
         <div className="grid sm:grid-cols-2 gap-5">

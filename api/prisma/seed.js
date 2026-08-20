@@ -1011,6 +1011,50 @@ async function seedNecrologie() {
   console.log('✔ Rubrique Nécrologie prête.');
 }
 
+// Rubrique de service "Photos légendées" — comme la Nécrologie et le
+// Kiosque, un service commun aux deux rédactions plutôt qu'un contenu
+// éditorial du seul Quotidien. La galerie reprend de vraies photos déjà
+// publiées ailleurs sur le site (mêmes légendes, mêmes crédits) : aucune
+// image ni légende n'est inventée pour l'occasion.
+async function seedPhotosLegendees() {
+  const rubrique = await prisma.rubrique.findUniqueOrThrow({ where: { slug: 'photos-legendees' } });
+  const redacteurEnChef = await prisma.staff.findUniqueOrThrow({ where: { email: 'redacteur-en-chef@notrevoienews.com' } });
+
+  const imageUne = "https://res.cloudinary.com/ataat5bs/image/upload/v1787175396/notre-voie/photo-v2/tncsn2jrke3xko1jfmeh.jpg";
+
+  const article = await prisma.article.upsert({
+    where: { slug: 'photos-legendees-nos-evenements-en-images' },
+    update: { portails: ['QUOTIDIEN', 'INFO_DIRECT'] },
+    create: {
+      slug: 'photos-legendees-nos-evenements-en-images',
+      titre: 'Photos légendées : nos événements en images',
+      chapo: "Une sélection de photos déjà publiées dans nos articles, réunies ici — chaque image légendée et créditée, comme dans le journal.",
+      contenuHtml: `<p>Cette rubrique réunit une sélection de photos de reportage déjà publiées dans nos articles — cérémonies, distinctions, rassemblements — chacune avec sa légende et son crédit d'origine, comme dans le journal papier.</p>`,
+      tags: ['photos', 'reportage', 'service'],
+      format: 'EDITION', statut: 'PUBLIE', paywall: 'LIBRE',
+      rubriqueId: rubrique.id, auteurId: redacteurEnChef.id, valideParId: redacteurEnChef.id,
+      imageUneUrl: imageUne,
+      portails: ['QUOTIDIEN', 'INFO_DIRECT'],
+      publieLe: new Date(), createdAt: new Date(), updatedAt: new Date(), vuesTotal: 1,
+    },
+  });
+
+  const medias = [
+    { type: 'PHOTO', url: imageUne, legende: "80 lauréats du 13e Prix national d'Excellence, avec le président Alassane Ouattara et son épouse.", credit: 'DR', ordre: 0 },
+    { type: 'PHOTO', url: "https://res.cloudinary.com/ataat5bs/image/upload/v1787175416/notre-voie/photo-v2/rbfcqlod3busk7vqwzt2.jpg", legende: 'Gaha Carine, reine Awoulaba 2026.', credit: 'DR', ordre: 1 },
+    { type: 'PHOTO', url: "https://res.cloudinary.com/ataat5bs/image/upload/v1787177142/notre-voie/photo-v2/oibcyv8k3qvuuwy8oozq.jpg", legende: "L'édition 2026 de la fête de Yorokloi, à Ouragahio.", credit: 'DR', ordre: 2 },
+    { type: 'PHOTO', url: "https://res.cloudinary.com/ataat5bs/image/upload/v1787177149/notre-voie/photo-v2/ohlaekkosqtiiqcyr5vd.jpg", legende: 'Forum sous-régional de la Jeunesse, à Bouaké.', credit: 'DR', ordre: 3 },
+    { type: 'PHOTO', url: "https://res.cloudinary.com/ataat5bs/image/upload/v1787192157/notre-voie/photo-v2/ee5zzcdigjjsuv9y9z61.jpg", legende: "Amah Hélène en concert au Palais de la Culture de Treichville.", credit: 'DR', ordre: 4 },
+    { type: 'PHOTO', url: "https://res.cloudinary.com/ataat5bs/image/upload/v1787192159/notre-voie/photo-v2/eosvjkzoc5yfj4wwuwj7.jpg", legende: 'Sonia N\'Guessan, reine Awoulaba Afrique du Moronou.', credit: 'DR', ordre: 5 },
+  ];
+  for (const m of medias) {
+    const existant = await prisma.media.findFirst({ where: { url: m.url, articleId: article.id } });
+    if (existant) continue;
+    await prisma.media.create({ data: { ...m, articleId: article.id } });
+  }
+  console.log('✔ Rubrique Photos légendées prête (galerie + deux portails).');
+}
+
 // Espace publicitaire — en l'absence de vrai annonceur en régie, un encart
 // "maison" fait la promotion de l'abonnement Notre Voie (pratique standard
 // de la presse quand un emplacement pub n'est pas vendu), pour que le
@@ -1436,6 +1480,7 @@ async function main() {
   const testExiste = await prisma.article.findUnique({ where: { slug: 'article-vitrine-tous-les-formats' } });
   if (!testExiste) await seedTestShowcase();
   await seedNecrologie();
+  await seedPhotosLegendees();
   await seedRegieDemo();
   await seedMediaGap1();
   await seedMediaGap2();

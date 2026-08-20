@@ -148,7 +148,7 @@ const getOneCms = asyncHandler(async (req, res) => {
 
 // POST /api/articles — création d'un brouillon (CMS 2, tout rôle rédaction)
 const create = asyncHandler(async (req, res) => {
-  const { titre, chapo, contenuHtml, format, rubriqueId, rubriquesSecondairesIds, paywall, tags, imageUneUrl } = req.body;
+  const { titre, chapo, contenuHtml, format, rubriqueId, rubriquesSecondairesIds, paywall, tags, imageUneUrl, portails } = req.body;
   if (!titre || !rubriqueId) {
     return res.status(422).json({ error: 'Titre et rubrique sont requis.' });
   }
@@ -165,6 +165,10 @@ const create = asyncHandler(async (req, res) => {
       imageUneUrl,
       rubriqueId,
       auteurId: req.staff.id,
+      // Portail(s) de diffusion — Le Quotidien et/ou Info en direct (cf. §
+      // "deux rédactions"). Par défaut QUOTIDIEN seul (cf. schema.prisma) si
+      // la rédaction ne précise rien.
+      ...(portails && portails.length ? { portails } : {}),
       ...(rubriquesSecondairesIds && rubriquesSecondairesIds.length
         ? { rubriquesSecondaires: { connect: rubriquesSecondairesIds.map((id) => ({ id })) } }
         : {}),
@@ -201,7 +205,7 @@ const update = asyncHandler(async (req, res) => {
     return res.status(403).json({ error: 'Un article publié ne peut être modifié que par la hiérarchie éditoriale.' });
   }
 
-  const { titre, chapo, contenuHtml, format, rubriqueId, rubriquesSecondairesIds, paywall, tags, imageUneUrl, datePublicationPrevue } = req.body;
+  const { titre, chapo, contenuHtml, format, rubriqueId, rubriquesSecondairesIds, paywall, tags, imageUneUrl, datePublicationPrevue, portails } = req.body;
 
   const article = await prisma.article.update({
     where: { id: req.params.id },
@@ -214,6 +218,7 @@ const update = asyncHandler(async (req, res) => {
       tags,
       imageUneUrl,
       rubriqueId,
+      portails,
       datePublicationPrevue: datePublicationPrevue ? new Date(datePublicationPrevue) : undefined,
       ...(rubriquesSecondairesIds
         ? { rubriquesSecondaires: { set: rubriquesSecondairesIds.map((id) => ({ id })) } }

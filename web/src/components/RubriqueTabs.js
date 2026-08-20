@@ -1,6 +1,11 @@
 import Link from 'next/link';
 
+// Vérité ou Intox est un format propre à la rédaction web (pas de matière
+// première dans les PDF du journal papier) — masqué des onglets du
+// Quotidien, cf. Header.js.
 export default function RubriqueTabs({ rubriques, active, basePath = '' }) {
+  const estQuotidien = basePath === '/quotidien';
+  const visibles = estQuotidien ? rubriques.filter((r) => r.slug !== 'verite-ou-intox') : rubriques;
   return (
     <div className="flex flex-wrap gap-2 mb-6">
       <Link
@@ -11,7 +16,7 @@ export default function RubriqueTabs({ rubriques, active, basePath = '' }) {
       >
         Toutes
       </Link>
-      {rubriques.filter((r) => r.type === 'EDITORIALE').map((rub) => (
+      {visibles.filter((r) => r.type === 'EDITORIALE').map((rub) => (
         <Link
           key={rub.id}
           href={`${basePath}/rubrique/${rub.slug}`}

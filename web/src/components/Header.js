@@ -1,14 +1,25 @@
 import Link from 'next/link';
 import LogoPill from './Logo';
 
-const NAV = [
+const NAV_COMMUNE = [
   { href: '', label: 'Accueil' },
   { href: '/rubrique/politique', label: 'Politique' },
   { href: '/rubrique/economie', label: 'Économie' },
   { href: '/rubrique/vie-chere', label: 'Vie chère' },
   { href: '/rubrique/sport', label: 'Sport' },
+];
+
+// Vérité ou Intox et Direct sont des formats propres à la rédaction web —
+// pas de matière première dans les PDF du journal papier. Le Quotidien
+// reste donc un miroir fidèle de l'imprimé (cf. demande explicite de
+// cohérence avec les données PDF) ; ces deux rubriques restent réservées à
+// Info en direct.
+const NAV_INFO_DIRECT_UNIQUEMENT = [
   { href: '/verite-ou-intox', label: 'Vérité ou Intox' },
   { href: '/direct', label: 'Direct' },
+];
+
+const NAV_FIN = [
   { href: '/kiosque', label: 'Kiosque' },
   { href: '/rubrique/necrologie', label: 'Nécrologie' },
 ];
@@ -18,6 +29,7 @@ const NAV = [
 // le code (cf. §"deux rédactions" — Le Quotidien / Info en direct).
 export default function Header({ basePath = '' }) {
   const estInfoDirect = basePath === '/info-direct';
+  const NAV = [...NAV_COMMUNE, ...(estInfoDirect ? NAV_INFO_DIRECT_UNIQUEMENT : []), ...NAV_FIN];
   return (
     <header className="bg-white border-b border-line sticky top-0 z-30">
       <div className="max-w-[1180px] mx-auto px-4 sm:px-8 h-[72px] flex items-center justify-between gap-6">

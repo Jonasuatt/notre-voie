@@ -20,6 +20,14 @@ body {
   line-height: 1.75;
 }
 
+/* Pastille de logo — couleurs fixes, volontairement en dehors de la
+   réécriture .theme-direct ci-dessous (qui neutralise bg-navy/bg-white)
+   pour que le logo garde son contraste bicolore sur fond sombre. */
+.logo-pill-a { background-color: #0B6FA8; }
+.logo-pill-b { background-color: #FFFFFF; color: #E6008C; }
+.theme-direct .logo-pill-a { background-color: #22D3EE; color: #0a0e1a; }
+.theme-direct .logo-pill-b { background-color: #FFFFFF; color: #0a0e1a; }
+
 /* Thème « Info en direct » — identité visuelle distincte du Quotidien
    (fond sombre, accent cyan façon direct TV, au lieu du blanc/crème et du
    corail « presse papier »). Un seul wrapper `.theme-direct` en tête de

@@ -34,8 +34,8 @@ export default async function ArticlePage({ params }) {
   const medias = article.medias || [];
   const imagePrincipale = article.imageUneUrl ? medias.find((m) => m.url === article.imageUneUrl) : null;
   const galerie = medias.filter((m) => m.type === 'PHOTO' && m.url !== article.imageUneUrl).sort((a, b) => a.ordre - b.ordre);
-  const video = medias.find((m) => m.type === 'VIDEO');
-  const audio = medias.find((m) => m.type === 'AUDIO');
+  // Le Quotidien reprend le contenu du journal papier tel quel : pas de
+  // vidéo ni d'audio (formats propres à la rédaction web, cf. Header.js).
 
   return (
     <article className="max-w-[720px] mx-auto px-4 sm:px-8 py-10">
@@ -57,11 +57,6 @@ export default async function ArticlePage({ params }) {
       <div className="flex flex-wrap items-center gap-4 mt-5 py-4 border-t border-b border-line font-mono text-[11px] text-muted">
         {article.auteur && <span>{article.auteur.prenom} {article.auteur.nom}</span>}
         <span>{formatDate(article.publieLe)} · {timeAgo(article.publieLe)}</span>
-        {article.dureeEcouteSec && (
-          <button className="flex items-center gap-1.5 text-navy font-bold">
-            🎧 Écouter ({Math.round(article.dureeEcouteSec / 60)} min)
-          </button>
-        )}
         <span>👁 {article.vuesTotal?.toLocaleString('fr-FR')} lectures</span>
       </div>
 
@@ -78,33 +73,6 @@ export default async function ArticlePage({ params }) {
           </figcaption>
         )}
       </figure>
-
-      {video && (
-        <figure className="mt-6">
-          {/^https?:\/\/(www\.)?(youtube\.com|youtu\.be)/.test(video.url) ? (
-            <div className="relative aspect-video rounded-[10px] overflow-hidden bg-ink">
-              <iframe
-                src={video.url.replace('watch?v=', 'embed/').replace('youtu.be/', 'youtube.com/embed/')}
-                className="absolute inset-0 w-full h-full" allowFullScreen title={video.legende || 'Vidéo'}
-              />
-            </div>
-          ) : (
-            <video src={video.url} controls className="w-full rounded-[10px] bg-ink" />
-          )}
-          {video.legende && (
-            <figcaption className="text-[12px] text-muted mt-2 leading-snug">
-              {video.legende}{video.credit && <span className="text-muted/70"> — {video.credit}</span>}
-            </figcaption>
-          )}
-        </figure>
-      )}
-
-      {audio && (
-        <div className="mt-6 bg-cream border border-line rounded-[10px] p-4">
-          <p className="font-mono text-[10.5px] uppercase tracking-wide text-muted mb-2">🎧 {audio.legende || 'Version audio'}</p>
-          <audio src={audio.url} controls className="w-full" />
-        </div>
-      )}
 
       {article.factCheck && (
         <div className="mt-6 border-l-4 rounded-r-lg bg-[#FBF3E4] p-5" style={{ borderColor: verdict.color }}>
