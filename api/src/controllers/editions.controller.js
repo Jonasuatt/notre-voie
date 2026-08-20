@@ -14,14 +14,23 @@ const list = asyncHandler(async (req, res) => {
   res.json({ editions, total, page: Number(page), pageSize: take });
 });
 
-// POST /api/editions — CMS 2, mise en ligne du PDF de l'édition papier
+// POST /api/editions — CMS 2, mise en ligne du PDF de l'édition papier.
+// `dateFin` optionnelle : numéro couvrant plusieurs jours (week-end, jour
+// férié), ex. "du vendredi au dimanche".
 const create = asyncHandler(async (req, res) => {
-  const { numero, dateParution, pdfUrl, couvertureUrl, prix } = req.body;
+  const { numero, dateParution, dateFin, pdfUrl, couvertureUrl, prix } = req.body;
   if (!numero || !dateParution || !pdfUrl) {
     return res.status(422).json({ error: 'Numéro, date de parution et PDF sont requis.' });
   }
   const edition = await prisma.edition.create({
-    data: { numero: Number(numero), dateParution: new Date(dateParution), pdfUrl, couvertureUrl, prix: prix ? Number(prix) : undefined },
+    data: {
+      numero: Number(numero),
+      dateParution: new Date(dateParution),
+      dateFin: dateFin ? new Date(dateFin) : null,
+      pdfUrl,
+      couvertureUrl,
+      prix: prix ? Number(prix) : undefined,
+    },
   });
   res.status(201).json({ edition });
 });

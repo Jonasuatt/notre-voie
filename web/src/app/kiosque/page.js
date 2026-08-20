@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { getEditions } from '@/lib/api';
-import { formatDate } from '@/lib/format';
+import { formatDateRange } from '@/lib/format';
 
 // Contenu qui change chaque jour (nouvelle édition quotidienne) : jamais
 // figé au build, toujours interrogé à la demande.
@@ -37,7 +37,7 @@ export default async function KiosquePage() {
                   </div>
                 </a>
                 <span className="font-mono text-[10.5px] text-ink font-bold block mt-2.5">N°{e.numero}</span>
-                <span className="font-mono text-[10px] text-muted block">{formatDate(e.dateParution)}</span>
+                <span className="font-mono text-[10px] text-muted block">{formatDateRange(e.dateParution, e.dateFin)}</span>
                 <Link href={`/recherche?date=${dateISO}`} className="text-[11px] text-navy font-semibold hover:text-coral transition-colors block mt-1">
                   Voir les articles du jour →
                 </Link>

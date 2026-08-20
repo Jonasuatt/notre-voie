@@ -336,12 +336,13 @@ model ChecklistItem {
 // =====================================================================
 
 model Edition {
-  id            String   @id @default(uuid())
-  numero        Int      @unique // ex : 7970
-  dateParution  DateTime
-  pdfUrl        String
+  id           String   @id @default(uuid())
+  numero       Int      @unique // ex : 7970
+  dateParution DateTime // premier jour couvert par le numéro
+  dateFin      DateTime? // dernier jour couvert, uniquement si le numéro s'étale sur plusieurs jours (week-end, jour férié) — ex : "du vendredi au dimanche"
+  pdfUrl       String
   couvertureUrl String?
-  prix          Int      @default(300) // FCFA
+  prix         Int      @default(300) // FCFA
 
   createdAt DateTime @default(now())
 

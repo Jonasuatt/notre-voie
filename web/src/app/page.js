@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { getArticles, getRubriques, getTicker, getFactChecks, getCampagnesActives } from '@/lib/api';
+import { getArticles, getRubriques, getTicker, getFactChecks, getCampagnesActives, getEditions } from '@/lib/api';
 import FlashBar from '@/components/FlashBar';
 import TickerVieChere from '@/components/TickerVieChere';
 import RubriqueTabs from '@/components/RubriqueTabs';
@@ -8,19 +8,21 @@ import ArticleCard from '@/components/ArticleCard';
 import FactCheckBlock from '@/components/FactCheckBlock';
 import FormatBadge from '@/components/FormatBadge';
 import PubCard from '@/components/PubCard';
-import { timeAgo } from '@/lib/format';
+import { timeAgo, formatDateRange } from '@/lib/format';
 
 // Quotidien : la Une et le fil changent chaque jour, jamais figés au build.
 export const dynamic = 'force-dynamic';
 
 export default async function AccueilPage() {
-  const [{ articles }, rubriques, prix, factChecks, campagnes] = await Promise.all([
+  const [{ articles }, rubriques, prix, factChecks, campagnes, editions] = await Promise.all([
     getArticles({ pageSize: 24 }),
     getRubriques(),
     getTicker(),
     getFactChecks(),
     getCampagnesActives({ format: 'NATIVE_CARTE' }),
+    getEditions({ pageSize: 1 }),
   ]);
+  const uneDuJour = editions?.[0];
 
   const flashEtLive = articles.filter((a) => a.format === 'FLASH' || a.format === 'LIVE').slice(0, 8);
   const une = articles[0];
@@ -71,6 +73,20 @@ export default async function AccueilPage() {
             </Link>
 
             <div className="flex flex-col gap-[18px]">
+              {uneDuJour?.couvertureUrl && (
+                <a href={uneDuJour.pdfUrl} target="_blank" rel="noreferrer" className="flex gap-3 bg-white border border-line rounded-[10px] p-3 group">
+                  <div className="relative w-[64px] shrink-0 aspect-[3/4] rounded overflow-hidden bg-navy2">
+                    <Image src={uneDuJour.couvertureUrl} alt={`Une n°${uneDuJour.numero}`} fill sizes="64px" className="object-cover" />
+                  </div>
+                  <div className="min-w-0">
+                    <span className="font-mono text-[9.5px] uppercase tracking-wide text-coral">La Une du jour</span>
+                    <p className="font-serif text-[14px] leading-snug mt-1 group-hover:text-coral transition-colors">
+                      N°{uneDuJour.numero} — {formatDateRange(uneDuJour.dateParution, uneDuJour.dateFin)}
+                    </p>
+                    <span className="text-[11px] font-semibold text-navy mt-1 inline-block">Lire le journal (PDF) →</span>
+                  </div>
+                </a>
+              )}
               <div className="bg-navy rounded-[10px] p-5 text-white">
                 <h3 className="font-serif text-[16px] mb-3">5 choses à retenir aujourd&apos;hui</h3>
                 <ol className="list-decimal pl-[18px] space-y-2.5 text-[12.5px] text-[#D8DCEA]">

@@ -20,6 +20,20 @@ export function timeAgo(dateLike) {
   return formatDate(dateLike);
 }
 
+// Numéro couvrant plusieurs jours (week-end, jour férié) : "14 - 16 août
+// 2026" plutôt que deux dates complètes redondantes ; si les mois diffèrent,
+// affiche les deux en entier.
+export function formatDateRange(debut, fin) {
+  if (!fin) return formatDate(debut);
+  const d1 = new Date(debut);
+  const d2 = new Date(fin);
+  if (Number.isNaN(d1.getTime()) || Number.isNaN(d2.getTime())) return formatDate(debut);
+  if (d1.getMonth() === d2.getMonth() && d1.getFullYear() === d2.getFullYear()) {
+    return `${d1.getDate()} - ${d2.getDate()} ${MOIS[d1.getMonth()]} ${d1.getFullYear()}`;
+  }
+  return `${formatDate(debut)} - ${formatDate(fin)}`;
+}
+
 export function formatFCFA(montant) {
   if (montant === null || montant === undefined) return '';
   return `${Number(montant).toLocaleString('fr-FR')} FCFA`;
