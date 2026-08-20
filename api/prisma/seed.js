@@ -1371,6 +1371,46 @@ async function seedInfoDirectFlashs() {
   console.log(`✔ ${crees} article(s) "Info en direct" créé(s) (portail INFO_DIRECT).`);
 }
 
+// Illustration des articles "Info en direct" — chaque flash étant la
+// réécriture condensée d'un fait déjà couvert (et déjà illustré) côté
+// Quotidien, on réutilise la vraie photo de l'événement plutôt que d'en
+// générer une nouvelle : même fait, même image, deux formats d'écriture.
+async function seedInfoDirectImages() {
+  const mapping = {
+    'flash-carburant-hausse-3-5-pourcent-subvention-200-milliards':
+      'https://res.cloudinary.com/ataat5bs/image/upload/v1787175428/notre-voie/photo-v2/wulefnmjkrevkkry2yuu.jpg',
+    'flash-gafi-liste-grise-pole-penal-economique-financier':
+      'https://res.cloudinary.com/ataat5bs/image/upload/v1787175376/notre-voie/photo-v2/dwsbiacxnelx2b99wmuv.jpg',
+    'flash-cacao-2800-a-1200-fcfa-effondrement-cours-mondiaux':
+      'https://res.cloudinary.com/ataat5bs/image/upload/v1787175413/notre-voie/photo-v2/gijgjidchndsjvktfkat.jpg',
+    'flash-catholique-98-pourcent-reussite-cepe-2026':
+      'https://res.cloudinary.com/ataat5bs/image/upload/v1787175404/notre-voie/photo-v2/b45oinabwnzizgjj7if0.jpg',
+    'flash-jeunesse-trois-priorites-drogues-reseaux-sociaux-ia':
+      'https://res.cloudinary.com/ataat5bs/image/upload/v1787177146/notre-voie/photo-v2/orvf8n9u7l4ypt075zqn.jpg',
+    'flash-toulepleu-cinq-morts-naufrage-pirogue-cavally':
+      'https://res.cloudinary.com/ataat5bs/image/upload/v1787177147/notre-voie/photo-v2/nkep87wnm2bsmqxlv2zc.jpg',
+    'flash-alepe-kossandji-six-morts-conflit-foncier':
+      'https://res.cloudinary.com/ataat5bs/image/upload/v1787175426/notre-voie/photo-v2/fmsqrrv9srmithgw2nlm.jpg',
+    'flash-amah-helene-palais-culture-treichville-4000-places':
+      'https://res.cloudinary.com/ataat5bs/image/upload/v1787192157/notre-voie/photo-v2/ee5zzcdigjjsuv9y9z61.jpg',
+    'flash-diomande-nottingham-forest-540-millions-osa':
+      'https://res.cloudinary.com/ataat5bs/image/upload/v1787177153/notre-voie/photo-v2/xmp8ibbb2gs2acm8ooac.jpg',
+    'flash-fif-clubs-300-millions-avant-de-voter':
+      'https://res.cloudinary.com/ataat5bs/image/upload/v1787177151/notre-voie/photo-v2/xagmdfzfemfjuxwus0ht.jpg',
+    'flash-verif-pasteur-jeremie-koffi-rumeur-deces':
+      'https://res.cloudinary.com/ataat5bs/image/upload/v1787177133/notre-voie/photo-v2/ydy6z4intaheufl8yijb.jpg',
+  };
+
+  let illustres = 0;
+  for (const [slug, imageUneUrl] of Object.entries(mapping)) {
+    const article = await prisma.article.findUnique({ where: { slug } });
+    if (!article || article.imageUneUrl) continue;
+    await prisma.article.update({ where: { slug }, data: { imageUneUrl } });
+    illustres++;
+  }
+  console.log(`✔ ${illustres} article(s) "Info en direct" illustré(s).`);
+}
+
 async function main() {
   await seedRubriques();
   await seedStaff();
@@ -1399,6 +1439,7 @@ async function main() {
   if (dejaDesEditions === 0) await seedEditions();
   await fixArticleDates();
   await seedInfoDirectFlashs();
+  await seedInfoDirectImages();
 }
 
 main()
