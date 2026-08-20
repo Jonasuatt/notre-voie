@@ -21,6 +21,7 @@ const NAV_INFO_DIRECT_UNIQUEMENT = [
 
 const NAV_FIN = [
   { href: '/kiosque', label: 'Kiosque' },
+  { href: '/rubrique/photos-legendees', label: 'Photos légendées' },
   { href: '/rubrique/necrologie', label: 'Nécrologie' },
 ];
 
