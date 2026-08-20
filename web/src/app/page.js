@@ -6,7 +6,6 @@ import TickerVieChere from '@/components/TickerVieChere';
 import RubriqueTabs from '@/components/RubriqueTabs';
 import ArticleCard from '@/components/ArticleCard';
 import FactCheckBlock from '@/components/FactCheckBlock';
-import FormatBadge from '@/components/FormatBadge';
 import PubCard from '@/components/PubCard';
 import { timeAgo, formatDateRange } from '@/lib/format';
 
@@ -33,7 +32,6 @@ export default async function AccueilPage() {
 
   return (
     <>
-      <FlashBar articles={flashEtLive} />
       <TickerVieChere prix={prix} />
 
       {directEnCours && (
@@ -48,46 +46,44 @@ export default async function AccueilPage() {
       )}
 
       <section className="max-w-[1180px] mx-auto px-4 sm:px-8 pt-8">
-        {une && (
-          <div className="grid lg:grid-cols-[1.55fr_1fr] gap-7">
-            <Link href={`/article/${une.slug}`} className="group">
-              <div className="relative h-[220px] sm:h-[300px] rounded-[10px] bg-gradient-to-br from-navy2 to-navy overflow-hidden">
-                {une.imageUneUrl && (
-                  <Image src={une.imageUneUrl} alt="" fill sizes="(max-width: 1024px) 100vw, 60vw" priority className="object-cover" />
-                )}
-                <FormatBadge format={une.format} />
-              </div>
-              <div className="pt-4">
-                <span className="font-mono text-[11px] uppercase tracking-wide" style={{ color: une.rubrique?.couleur }}>
-                  {une.rubrique?.nom}
-                </span>
-                <h2 className="font-serif text-[26px] sm:text-[28px] leading-tight mt-2 group-hover:text-coral transition-colors">
-                  {une.titre}
-                </h2>
-                {une.chapo && <p className="text-muted text-[14.5px] mt-2.5 leading-relaxed">{une.chapo}</p>}
-                <div className="flex gap-3 items-center mt-3.5 font-mono text-[11px] text-muted">
-                  <span>{timeAgo(une.publieLe)}</span>
-                  {une.auteur && <span>· {une.auteur.prenom} {une.auteur.nom}</span>}
-                </div>
-              </div>
-            </Link>
-
-            <div className="flex flex-col gap-[18px]">
-              {uneDuJour?.couvertureUrl && (
-                <a href={uneDuJour.pdfUrl} target="_blank" rel="noreferrer" className="flex gap-3 bg-white border border-line rounded-[10px] p-3 group">
-                  <div className="relative w-[64px] shrink-0 aspect-[3/4] rounded overflow-hidden bg-navy2">
-                    <Image src={uneDuJour.couvertureUrl} alt={`Une n°${uneDuJour.numero}`} fill sizes="64px" className="object-cover" />
-                  </div>
-                  <div className="min-w-0">
-                    <span className="font-mono text-[9.5px] uppercase tracking-wide text-coral">La Une du jour</span>
-                    <p className="font-serif text-[14px] leading-snug mt-1 group-hover:text-coral transition-colors">
-                      N°{uneDuJour.numero} — {formatDateRange(uneDuJour.dateParution, uneDuJour.dateFin)}
-                    </p>
-                    <span className="text-[11px] font-semibold text-navy mt-1 inline-block">Lire le journal (PDF) →</span>
+        {(uneDuJour?.couvertureUrl || une) && (
+          <div className="grid lg:grid-cols-[minmax(0,380px)_1fr] gap-8">
+            {uneDuJour?.couvertureUrl && (
+              <div>
+                <a href={uneDuJour.pdfUrl} target="_blank" rel="noreferrer" className="block group">
+                  <div className="relative aspect-[3/4] rounded-[10px] overflow-hidden shadow-xl border border-line">
+                    <Image src={uneDuJour.couvertureUrl} alt={`Une n°${uneDuJour.numero}`} fill sizes="(max-width: 1024px) 100vw, 380px" priority className="object-cover" />
                   </div>
                 </a>
+                <div className="flex items-center justify-between mt-3">
+                  <span className="font-mono text-[11px] text-muted">
+                    N°{uneDuJour.numero} — {formatDateRange(uneDuJour.dateParution, uneDuJour.dateFin)}
+                  </span>
+                  <a href={uneDuJour.pdfUrl} target="_blank" rel="noreferrer" className="text-[11.5px] font-bold text-coral hover:underline shrink-0 ml-3">
+                    Lire le journal (PDF) →
+                  </a>
+                </div>
+              </div>
+            )}
+
+            <div className="flex flex-col gap-6">
+              {une && (
+                <Link href={`/article/${une.slug}`} className="group">
+                  <span className="font-mono text-[11px] uppercase tracking-wide" style={{ color: une.rubrique?.couleur }}>
+                    {une.rubrique?.nom}
+                  </span>
+                  <h2 className="font-serif text-[24px] sm:text-[27px] leading-tight mt-1.5 group-hover:text-coral transition-colors">
+                    {une.titre}
+                  </h2>
+                  {une.chapo && <p className="text-muted text-[14px] mt-2 leading-relaxed">{une.chapo}</p>}
+                  <div className="flex gap-3 items-center mt-3 font-mono text-[11px] text-muted">
+                    <span>{timeAgo(une.publieLe)}</span>
+                    {une.auteur && <span>· {une.auteur.prenom} {une.auteur.nom}</span>}
+                  </div>
+                </Link>
               )}
-              <div className="bg-navy rounded-[10px] p-5 text-white">
+
+              <div className="bg-navy rounded-[10px] p-5 text-white flex-1">
                 <h3 className="font-serif text-[16px] mb-3">5 choses à retenir aujourd&apos;hui</h3>
                 <ol className="list-decimal pl-[18px] space-y-2.5 text-[12.5px] text-[#D8DCEA]">
                   {resumeDuJour.map((a) => (
@@ -100,7 +96,11 @@ export default async function AccueilPage() {
             </div>
           </div>
         )}
+      </section>
 
+      <FlashBar articles={flashEtLive} />
+
+      <section className="max-w-[1180px] mx-auto px-4 sm:px-8 pt-8">
         <FactCheckBlock factChecks={factChecks} />
       </section>
 
