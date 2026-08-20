@@ -1,9 +1,7 @@
 import Link from 'next/link';
-import Image from 'next/image';
 import { getArticles, getTicker, getEditions } from '@/lib/api';
 import TickerVieChere from '@/components/TickerVieChere';
 import PagesDuJournal from '@/components/PagesDuJournal';
-import { formatDateRange } from '@/lib/format';
 
 const BASE_PATH = '/quotidien';
 
@@ -28,27 +26,10 @@ export default async function QuotidienAccueilPage() {
       <TickerVieChere prix={prix} />
 
       <section className="max-w-[1180px] mx-auto px-4 sm:px-8 pt-8">
-        {uneDuJour?.couvertureUrl && (
-          <div className="max-w-[300px]">
-            <a href={uneDuJour.pdfUrl} target="_blank" rel="noreferrer" className="block group">
-              <div className="relative aspect-[3/4] rounded-[10px] overflow-hidden shadow-xl border border-line">
-                <Image src={uneDuJour.couvertureUrl} alt={`Une n°${uneDuJour.numero}`} fill sizes="(max-width: 1024px) 100vw, 300px" priority className="object-cover" />
-              </div>
-            </a>
-            <div className="flex items-center justify-between mt-3">
-              <span className="font-mono text-[11px] text-muted">
-                N°{uneDuJour.numero} — {formatDateRange(uneDuJour.dateParution, uneDuJour.dateFin)}
-              </span>
-              <a href={uneDuJour.pdfUrl} target="_blank" rel="noreferrer" className="text-[11.5px] font-bold text-coral hover:underline shrink-0 ml-3">
-                Lire le journal (PDF) →
-              </a>
-            </div>
-          </div>
-        )}
-
-        {/* Les pages du journal — reprise fidèle de la maquette papier, chaque
-            page renvoie vers la rubrique qui y est réellement traitée. */}
-        <PagesDuJournal pages={uneDuJour?.pages} basePath={BASE_PATH} />
+        {/* Les pages du journal — la Une en tête, puis 2 pages auprès d'elle,
+            3 en dessous, 2 par la suite. Chaque page renvoie vers la
+            rubrique qui y est réellement traitée. */}
+        <PagesDuJournal edition={uneDuJour} basePath={BASE_PATH} />
 
         {/* Flash (à gauche) et 5 choses à retenir (en face) — deux façons
             complémentaires de rejoindre l'actualité du jour. */}
