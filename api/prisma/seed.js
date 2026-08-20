@@ -1050,6 +1050,31 @@ async function seedMediaGap1() {
   console.log('✔ Photo ajoutée pour "retour-herve-renard-elephants-pari-progression".');
 }
 
+// Complète les 6 derniers articles sans image. Faute d'avoir pu retracer
+// avec certitude leur photo d'origine dans les PDF, ces images sont choisies
+// pour leur pertinence thématique (secteur, ambiance, décor) plutôt que
+// pour une correspondance exacte avec la scène décrite — à remplacer par la
+// rédaction si une photo plus précise est disponible.
+async function seedMediaGap2() {
+  const remplissages = [
+    { slug: 'vrai-tresor-afrique-pas-sous-la-terre-eco-2027', url: "https://res.cloudinary.com/ataat5bs/image/upload/v1787191902/notre-voie/photo-v2/wyj5nugyi7hhm332mlru.jpg", legende: "La puissance d'une monnaie dépend de la force de l'économie qui la porte." },
+    { slug: 'abondance-petroliere-ne-profite-pas-aux-ivoiriens', url: "https://res.cloudinary.com/ataat5bs/image/upload/v1787192154/notre-voie/photo-v2/d2conipswybgl8igutt9.jpg", legende: "Infrastructures énergétiques et portuaires à Abidjan (photo d'illustration)." },
+    { slug: 'bin-sin-bin-mourir-un-luxe-en-cote-ivoire', url: "https://res.cloudinary.com/ataat5bs/image/upload/v1787190429/notre-voie/photo-v2/yo11nf5kxkoo9ix5tgqr.jpg", legende: "Photo d'illustration." },
+    { slug: 'amah-helene-enflamme-palais-culture-identite-agni', url: "https://res.cloudinary.com/ataat5bs/image/upload/v1787192157/notre-voie/photo-v2/ee5zzcdigjjsuv9y9z61.jpg", legende: "Événement culturel (photo d'illustration)." },
+    { slug: 'finale-awoulaba-reines-afrique-sonia-nguessan-moronou', url: "https://res.cloudinary.com/ataat5bs/image/upload/v1787192159/notre-voie/photo-v2/eosvjkzoc5yfj4wwuwj7.jpg", legende: "Photo d'illustration." },
+    { slug: 'bangolo-brule-essence-incendie-domicile', url: "https://res.cloudinary.com/ataat5bs/image/upload/v1787192162/notre-voie/photo-v2/ganvdd34ku37dacokewp.jpg", legende: "Vie quotidienne en région (photo d'illustration)." },
+  ];
+  let crees = 0;
+  for (const r of remplissages) {
+    const article = await prisma.article.findUnique({ where: { slug: r.slug } });
+    if (!article || article.imageUneUrl) continue;
+    await prisma.media.create({ data: { type: 'PHOTO', url: r.url, legende: r.legende, credit: 'DR', articleId: article.id } });
+    await prisma.article.update({ where: { id: article.id }, data: { imageUneUrl: r.url } });
+    crees++;
+  }
+  console.log(`✔ ${crees} photo(s) de remplissage ajoutée(s) (${remplissages.length - crees} déjà pourvue(s)).`);
+}
+
 async function main() {
   await seedRubriques();
   await seedStaff();
@@ -1073,6 +1098,7 @@ async function main() {
   if (!necroExiste) await seedNecrologie();
   await seedRegieDemo();
   await seedMediaGap1();
+  await seedMediaGap2();
 }
 
 main()
