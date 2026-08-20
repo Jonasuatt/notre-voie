@@ -354,9 +354,28 @@ model Edition {
   couvertureUrl String?
   prix         Int      @default(300) // FCFA
 
+  pages EditionPage[]
+
   createdAt DateTime @default(now())
 
   @@map("editions")
+}
+
+// Page individuelle d'un numéro, telle qu'imprimée — image de la page +
+// rubrique(s) qui y sont traitées (déduites du texte réellement présent en
+// haut de la page, pas d'association inventée). Sert à afficher "les pages
+// du journal" sur l'accueil du Quotidien et la page correspondante dans
+// chaque rubrique, en miroir fidèle de la maquette papier.
+model EditionPage {
+  id          String   @id @default(uuid())
+  edition     Edition  @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  editionId   String
+  numeroPage  Int // position dans le numéro (1 = première page)
+  imageUrl    String
+  rubriques   String[] // slugs des rubriques identifiées sur cette page (peut être vide ou en couvrir plusieurs)
+
+  @@unique([editionId, numeroPage])
+  @@map("edition_pages")
 }
 
 // =====================================================================

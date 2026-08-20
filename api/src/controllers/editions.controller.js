@@ -8,7 +8,15 @@ const list = asyncHandler(async (req, res) => {
   const skip = (Math.max(Number(page) || 1, 1) - 1) * take;
 
   const [editions, total] = await Promise.all([
-    prisma.edition.findMany({ orderBy: { dateParution: 'desc' }, take, skip }),
+    prisma.edition.findMany({
+      orderBy: { dateParution: 'desc' },
+      take,
+      skip,
+      // Pages du numéro (image + rubrique réellement traitée sur cette
+      // page) — affichées sur l'accueil du Quotidien et dans chaque
+      // rubrique, cf. §"pages du journal".
+      include: { pages: { orderBy: { numeroPage: 'asc' } } },
+    }),
     prisma.edition.count(),
   ]);
   res.json({ editions, total, page: Number(page), pageSize: take });

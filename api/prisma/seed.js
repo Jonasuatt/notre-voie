@@ -1128,6 +1128,134 @@ async function seedMediaGap2() {
 // déjà exploités pour le contenu éditorial. Chaque parution devient
 // consultable et téléchargeable, jour après jour — cf. demande explicite
 // de l'utilisateur (archivage par numéro et par jour de parution).
+// Généré depuis l'extraction réelle des PDF (api/prisma/journal-pages/) —
+// numéro d'édition, numéro de page, rubrique(s) détectée(s) sur cette page,
+// URL Cloudinary de la page. Aucune donnée inventée.
+const EDITION_PAGES = {
+  7961: [
+    { numeroPage: 1, rubriques: [], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787248733/notre-voie/journal-pages/7961-p1.jpg" },
+    { numeroPage: 2, rubriques: ["politique"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787248736/notre-voie/journal-pages/7961-p2.jpg" },
+    { numeroPage: 3, rubriques: ["politique"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787248739/notre-voie/journal-pages/7961-p3.jpg" },
+    { numeroPage: 4, rubriques: [], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787248742/notre-voie/journal-pages/7961-p4.jpg" },
+    { numeroPage: 5, rubriques: ["economie", "societe"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787248745/notre-voie/journal-pages/7961-p5.jpg" },
+    { numeroPage: 6, rubriques: ["societe", "culture"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787248747/notre-voie/journal-pages/7961-p6.jpg" },
+    { numeroPage: 7, rubriques: ["regions"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787248750/notre-voie/journal-pages/7961-p7.jpg" },
+    { numeroPage: 8, rubriques: ["sport"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787248754/notre-voie/journal-pages/7961-p8.jpg" },
+  ],
+  7962: [
+    { numeroPage: 1, rubriques: [], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787248757/notre-voie/journal-pages/7962-p1.jpg" },
+    { numeroPage: 2, rubriques: ["politique"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787248760/notre-voie/journal-pages/7962-p2.jpg" },
+    { numeroPage: 3, rubriques: ["politique"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787248762/notre-voie/journal-pages/7962-p3.jpg" },
+    { numeroPage: 4, rubriques: ["economie"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787248765/notre-voie/journal-pages/7962-p4.jpg" },
+    { numeroPage: 5, rubriques: ["culture"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787248768/notre-voie/journal-pages/7962-p5.jpg" },
+    { numeroPage: 6, rubriques: ["societe"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787248770/notre-voie/journal-pages/7962-p6.jpg" },
+    { numeroPage: 7, rubriques: ["regions"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787248774/notre-voie/journal-pages/7962-p7.jpg" },
+    { numeroPage: 8, rubriques: ["sport"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787248776/notre-voie/journal-pages/7962-p8.jpg" },
+  ],
+  7963: [
+    { numeroPage: 1, rubriques: [], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787248779/notre-voie/journal-pages/7963-p1.jpg" },
+    { numeroPage: 2, rubriques: ["politique"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787248782/notre-voie/journal-pages/7963-p2.jpg" },
+    { numeroPage: 3, rubriques: ["politique"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787248784/notre-voie/journal-pages/7963-p3.jpg" },
+    { numeroPage: 4, rubriques: ["economie"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787248787/notre-voie/journal-pages/7963-p4.jpg" },
+    { numeroPage: 5, rubriques: ["culture"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787248790/notre-voie/journal-pages/7963-p5.jpg" },
+    { numeroPage: 6, rubriques: ["societe"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787248793/notre-voie/journal-pages/7963-p6.jpg" },
+    { numeroPage: 7, rubriques: ["regions"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787248796/notre-voie/journal-pages/7963-p7.jpg" },
+    { numeroPage: 8, rubriques: ["sport"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787248798/notre-voie/journal-pages/7963-p8.jpg" },
+  ],
+  7964: [
+    { numeroPage: 1, rubriques: [], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787248801/notre-voie/journal-pages/7964-p1.jpg" },
+    { numeroPage: 2, rubriques: ["politique"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787248804/notre-voie/journal-pages/7964-p2.jpg" },
+    { numeroPage: 3, rubriques: ["politique"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787248807/notre-voie/journal-pages/7964-p3.jpg" },
+    { numeroPage: 4, rubriques: ["economie"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787248813/notre-voie/journal-pages/7964-p4.jpg" },
+    { numeroPage: 5, rubriques: ["culture"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787248815/notre-voie/journal-pages/7964-p5.jpg" },
+    { numeroPage: 6, rubriques: ["societe"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787248818/notre-voie/journal-pages/7964-p6.jpg" },
+    { numeroPage: 7, rubriques: ["regions"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787248821/notre-voie/journal-pages/7964-p7.jpg" },
+    { numeroPage: 8, rubriques: ["sport"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787248824/notre-voie/journal-pages/7964-p8.jpg" },
+  ],
+  7965: [
+    { numeroPage: 1, rubriques: [], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787248827/notre-voie/journal-pages/7965-p1.jpg" },
+    { numeroPage: 2, rubriques: ["politique"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787248831/notre-voie/journal-pages/7965-p2.jpg" },
+    { numeroPage: 3, rubriques: ["politique"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787248834/notre-voie/journal-pages/7965-p3.jpg" },
+    { numeroPage: 4, rubriques: ["economie"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787249049/notre-voie/journal-pages/7965-p4.jpg" },
+    { numeroPage: 5, rubriques: ["culture"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787249051/notre-voie/journal-pages/7965-p5.jpg" },
+    { numeroPage: 6, rubriques: ["societe"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787249054/notre-voie/journal-pages/7965-p6.jpg" },
+    { numeroPage: 7, rubriques: ["regions"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787249057/notre-voie/journal-pages/7965-p7.jpg" },
+    { numeroPage: 8, rubriques: ["sport"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787249061/notre-voie/journal-pages/7965-p8.jpg" },
+  ],
+  7966: [
+    { numeroPage: 1, rubriques: [], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787249070/notre-voie/journal-pages/7966-p1.jpg" },
+    { numeroPage: 2, rubriques: ["politique"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787249075/notre-voie/journal-pages/7966-p2.jpg" },
+    { numeroPage: 3, rubriques: ["politique"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787249081/notre-voie/journal-pages/7966-p3.jpg" },
+    { numeroPage: 4, rubriques: ["economie"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787249087/notre-voie/journal-pages/7966-p4.jpg" },
+    { numeroPage: 5, rubriques: ["culture"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787249107/notre-voie/journal-pages/7966-p5.jpg" },
+    { numeroPage: 6, rubriques: ["societe"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787249110/notre-voie/journal-pages/7966-p6.jpg" },
+    { numeroPage: 7, rubriques: ["regions"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787249114/notre-voie/journal-pages/7966-p7.jpg" },
+    { numeroPage: 8, rubriques: ["sport"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787249134/notre-voie/journal-pages/7966-p8.jpg" },
+  ],
+  7967: [
+    { numeroPage: 1, rubriques: [], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787249137/notre-voie/journal-pages/7967-p1.jpg" },
+    { numeroPage: 2, rubriques: ["politique"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787249141/notre-voie/journal-pages/7967-p2.jpg" },
+    { numeroPage: 3, rubriques: ["politique"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787249143/notre-voie/journal-pages/7967-p3.jpg" },
+    { numeroPage: 4, rubriques: ["economie"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787249146/notre-voie/journal-pages/7967-p4.jpg" },
+    { numeroPage: 5, rubriques: ["culture"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787249149/notre-voie/journal-pages/7967-p5.jpg" },
+    { numeroPage: 6, rubriques: ["societe"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787249153/notre-voie/journal-pages/7967-p6.jpg" },
+    { numeroPage: 7, rubriques: ["regions"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787249157/notre-voie/journal-pages/7967-p7.jpg" },
+    { numeroPage: 8, rubriques: ["sport"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787249162/notre-voie/journal-pages/7967-p8.jpg" },
+  ],
+  7968: [
+    { numeroPage: 1, rubriques: [], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787249165/notre-voie/journal-pages/7968-p1.jpg" },
+    { numeroPage: 2, rubriques: ["politique"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787249168/notre-voie/journal-pages/7968-p2.jpg" },
+    { numeroPage: 3, rubriques: ["politique"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787249170/notre-voie/journal-pages/7968-p3.jpg" },
+    { numeroPage: 4, rubriques: ["economie"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787249174/notre-voie/journal-pages/7968-p4.jpg" },
+    { numeroPage: 5, rubriques: ["culture"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787249192/notre-voie/journal-pages/7968-p5.jpg" },
+    { numeroPage: 6, rubriques: ["societe"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787249195/notre-voie/journal-pages/7968-p6.jpg" },
+    { numeroPage: 7, rubriques: ["regions"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787249198/notre-voie/journal-pages/7968-p7.jpg" },
+    { numeroPage: 8, rubriques: ["sport"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787249202/notre-voie/journal-pages/7968-p8.jpg" },
+  ],
+  7969: [
+    { numeroPage: 1, rubriques: [], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787249205/notre-voie/journal-pages/7969-p1.jpg" },
+    { numeroPage: 2, rubriques: ["politique"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787249218/notre-voie/journal-pages/7969-p2.jpg" },
+    { numeroPage: 3, rubriques: ["politique"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787249221/notre-voie/journal-pages/7969-p3.jpg" },
+    { numeroPage: 4, rubriques: ["economie"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787249224/notre-voie/journal-pages/7969-p4.jpg" },
+    { numeroPage: 5, rubriques: ["culture"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787249228/notre-voie/journal-pages/7969-p5.jpg" },
+    { numeroPage: 6, rubriques: ["societe"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787249231/notre-voie/journal-pages/7969-p6.jpg" },
+    { numeroPage: 7, rubriques: ["regions"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787249235/notre-voie/journal-pages/7969-p7.jpg" },
+    { numeroPage: 8, rubriques: ["sport"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787249239/notre-voie/journal-pages/7969-p8.jpg" },
+  ],
+  7970: [
+    { numeroPage: 1, rubriques: [], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787249242/notre-voie/journal-pages/7970-p1.jpg" },
+    { numeroPage: 2, rubriques: ["politique"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787249246/notre-voie/journal-pages/7970-p2.jpg" },
+    { numeroPage: 3, rubriques: ["politique"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787249249/notre-voie/journal-pages/7970-p3.jpg" },
+    { numeroPage: 4, rubriques: ["economie"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787249255/notre-voie/journal-pages/7970-p4.jpg" },
+    { numeroPage: 5, rubriques: ["culture"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787249260/notre-voie/journal-pages/7970-p5.jpg" },
+    { numeroPage: 6, rubriques: ["societe"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787249266/notre-voie/journal-pages/7970-p6.jpg" },
+    { numeroPage: 7, rubriques: ["regions"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787249269/notre-voie/journal-pages/7970-p7.jpg" },
+    { numeroPage: 8, rubriques: ["sport"], imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787249272/notre-voie/journal-pages/7970-p8.jpg" },
+  ],
+};
+
+// Insère les pages réelles de chaque numéro (image + rubrique détectée sur
+// la page elle-même) — idempotent : upsert par (editionId, numeroPage).
+async function seedEditionPages() {
+  let inserees = 0;
+  for (const [numeroStr, pages] of Object.entries(EDITION_PAGES)) {
+    const numero = Number(numeroStr);
+    const edition = await prisma.edition.findUnique({ where: { numero } });
+    if (!edition) continue;
+    for (const p of pages) {
+      const existant = await prisma.editionPage.findUnique({
+        where: { editionId_numeroPage: { editionId: edition.id, numeroPage: p.numeroPage } },
+      });
+      if (existant) continue;
+      await prisma.editionPage.create({
+        data: { editionId: edition.id, numeroPage: p.numeroPage, rubriques: p.rubriques, imageUrl: p.imageUrl },
+      });
+      inserees++;
+    }
+  }
+  console.log(`✔ ${inserees} page(s) de journal insérée(s).`);
+}
+
 async function seedEditions() {
   const editions = [
     { numero: 7961, dateParution: "2026-07-30", pdfUrl: "https://res.cloudinary.com/ataat5bs/raw/upload/v1787194110/notre-voie/edition/nv5erwj7eoplvj4f7i5q.pdf", couvertureUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787194106/notre-voie/une/elo8nuazwzz1vboa9oma.jpg" },
@@ -1486,6 +1614,7 @@ async function main() {
   await seedMediaGap2();
   const dejaDesEditions = await prisma.edition.count();
   if (dejaDesEditions === 0) await seedEditions();
+  await seedEditionPages();
   await fixArticleDates();
   await seedInfoDirectFlashs();
   await seedInfoDirectImages();
