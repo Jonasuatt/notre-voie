@@ -9,6 +9,7 @@ import ArticleCard from '@/components/ArticleCard';
 import FactCheckBlock from '@/components/FactCheckBlock';
 import FormatBadge from '@/components/FormatBadge';
 import PubCard from '@/components/PubCard';
+import DeverrouillerPdf from '@/components/DeverrouillerPdf';
 import { timeAgo, formatDateRange } from '@/lib/format';
 
 const BASE_PATH = '/info-direct';
@@ -61,6 +62,7 @@ export default async function QuotidienAccueilPage() {
                 <span className="font-mono text-[11px] text-muted mt-3 block">
                   N°{uneDuJour.numero} — {formatDateRange(uneDuJour.dateParution, uneDuJour.dateFin)}
                 </span>
+                <DeverrouillerPdf editionId={uneDuJour.id} verrouille={uneDuJour.verrouille} />
               </div>
             )}
 

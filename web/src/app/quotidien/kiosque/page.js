@@ -2,6 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { getEditions } from '@/lib/api';
 import { formatDateRange } from '@/lib/format';
+import DeverrouillerPdf from '@/components/DeverrouillerPdf';
 
 const BASE_PATH = '/quotidien';
 
@@ -42,6 +43,7 @@ export default async function KiosquePage() {
                 <Link href={`${BASE_PATH}/recherche?date=${dateISO}`} className="text-[11px] text-navy font-semibold hover:text-coral transition-colors block mt-1">
                   Voir les articles du jour →
                 </Link>
+                <DeverrouillerPdf editionId={e.id} verrouille={e.verrouille} />
               </div>
             );
           })}

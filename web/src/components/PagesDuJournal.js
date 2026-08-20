@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { formatDateRange } from '@/lib/format';
+import DeverrouillerPdf from './DeverrouillerPdf';
 
 // Empêche le clic droit "Enregistrer l'image sous…" et le glisser-déposer —
 // un frein réel mais pas une protection totale : rien ne peut empêcher une
@@ -34,6 +35,9 @@ export default function PagesDuJournal({ edition, basePath = '' }) {
           <span className="block text-center font-mono text-[11px] text-muted mt-2">
             N°{edition.numero} — {formatDateRange(edition.dateParution, edition.dateFin)}
           </span>
+          <div className="text-center">
+            <DeverrouillerPdf editionId={edition.id} verrouille={edition.verrouille} />
+          </div>
         </div>
 
         {pages.map((p) => {

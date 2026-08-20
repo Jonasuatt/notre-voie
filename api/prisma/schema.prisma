@@ -353,6 +353,13 @@ model Edition {
   pdfUrl       String
   couvertureUrl String?
   prix         Int      @default(300) // FCFA
+  // Code d'accès réservé aux abonnés — le PDF complet n'est plus lié
+  // directement depuis le site (cf. §"pages du journal" en image) ; ce
+  // code, communiqué aux abonnés par la rédaction/régie, débloque le
+  // téléchargement via POST /api/editions/:id/deverrouiller. Laisser vide
+  // = PDF non déblocable pour ce numéro (rétro-compatibilité des numéros
+  // déjà archivés).
+  codeAcces    String?
 
   pages EditionPage[]
 

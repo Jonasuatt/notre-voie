@@ -4,7 +4,7 @@ import { editionsAPI, mediaAPI } from '../services/api';
 import { format as formatDate } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
-const EMPTY = { numero: '', dateParution: '', dateFin: '', pdfUrl: '', couvertureUrl: '', prix: '300' };
+const EMPTY = { numero: '', dateParution: '', dateFin: '', pdfUrl: '', couvertureUrl: '', prix: '300', codeAcces: '' };
 
 function formatPlage(dateParution, dateFin) {
   const d1 = new Date(dateParution);
@@ -143,6 +143,19 @@ export default function EditionsPage() {
               <input type="file" accept="application/pdf" className="hidden" onChange={handleUploadPdf} disabled={uploadingPdf} />
             </label>
           )}
+        </div>
+
+        <div className="sm:col-span-2">
+          <label className="label">Code d&apos;accès abonnés (PDF verrouillé)</label>
+          <input
+            className="input font-mono uppercase"
+            value={form.codeAcces}
+            onChange={(e) => setForm((f) => ({ ...f, codeAcces: e.target.value.toUpperCase() }))}
+            placeholder="ex. NV7971-AOUT"
+          />
+          <p className="text-xs text-gray-400 mt-1">
+            Communiqué aux abonnés (SMS, email…). Sans code, le PDF de ce numéro reste indisponible en téléchargement sur le site.
+          </p>
         </div>
 
         <div className="sm:col-span-2">

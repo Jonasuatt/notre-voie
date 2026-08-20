@@ -45,7 +45,10 @@ async function archiverPagesDuNumero(edition, pdfUrl) {
   }
 }
 
-// GET /api/editions — kiosque numérique (public)
+// GET /api/editions — kiosque numérique (public). `pdfUrl` et `codeAcces`
+// sont volontairement exclus : le PDF n'est plus accessible qu'après avoir
+// saisi le code abonné, via POST /:id/deverrouiller (cf. plus bas) — sinon
+// n'importe qui pourrait lire l'URL directement dans la réponse de l'API.
 const list = asyncHandler(async (req, res) => {
   const { page = 1, pageSize = 20 } = req.query;
   const take = Math.min(Number(pageSize) || 20, 50);
@@ -56,21 +59,48 @@ const list = asyncHandler(async (req, res) => {
       orderBy: { dateParution: 'desc' },
       take,
       skip,
-      // Pages du numéro (image + rubrique réellement traitée sur cette
-      // page) — affichées sur l'accueil du Quotidien et dans chaque
-      // rubrique, cf. §"pages du journal".
-      include: { pages: { orderBy: { numeroPage: 'asc' } } },
+      select: {
+        id: true, numero: true, dateParution: true, dateFin: true, couvertureUrl: true, prix: true, createdAt: true,
+        // A-t-elle un code configuré ? (booléen dérivé, sans révéler le PDF)
+        codeAcces: true,
+        // Pages du numéro (image + rubrique réellement traitée sur cette
+        // page) — affichées sur l'accueil du Quotidien et dans chaque
+        // rubrique, cf. §"pages du journal".
+        pages: { orderBy: { numeroPage: 'asc' } },
+      },
     }),
     prisma.edition.count(),
   ]);
-  res.json({ editions, total, page: Number(page), pageSize: take });
+  // On ne renvoie qu'un booléen "verrouillable", jamais le code lui-même.
+  const editionsPublic = editions.map(({ codeAcces, ...e }) => ({ ...e, verrouille: Boolean(codeAcces) }));
+  res.json({ editions: editionsPublic, total, page: Number(page), pageSize: take });
+});
+
+// POST /api/editions/:id/deverrouiller — saisie du code abonné pour
+// débloquer le PDF complet d'un numéro. Pas de compte lecteur requis pour
+// l'instant (le code, communiqué aux abonnés par la rédaction/régie, est
+// la seule clé) — cf. note à l'utilisateur sur l'étape suivante possible
+// (rattacher ce contrôle à un vrai compte abonné une fois l'authentification
+// lecteur branchée côté site public).
+const deverrouiller = asyncHandler(async (req, res) => {
+  const { code } = req.body;
+  const edition = await prisma.edition.findUnique({ where: { id: req.params.id } });
+  if (!edition) return res.status(404).json({ error: 'Édition introuvable.' });
+
+  if (!edition.codeAcces) {
+    return res.status(403).json({ error: "Le PDF de ce numéro n'est pas disponible en téléchargement." });
+  }
+  if (!code || code.trim().toUpperCase() !== edition.codeAcces.trim().toUpperCase()) {
+    return res.status(403).json({ error: 'Code invalide.' });
+  }
+  res.json({ pdfUrl: edition.pdfUrl });
 });
 
 // POST /api/editions — CMS 2, mise en ligne du PDF de l'édition papier.
 // `dateFin` optionnelle : numéro couvrant plusieurs jours (week-end, jour
 // férié), ex. "du vendredi au dimanche".
 const create = asyncHandler(async (req, res) => {
-  const { numero, dateParution, dateFin, pdfUrl, couvertureUrl, prix } = req.body;
+  const { numero, dateParution, dateFin, pdfUrl, couvertureUrl, prix, codeAcces } = req.body;
   if (!numero || !dateParution || !pdfUrl) {
     return res.status(422).json({ error: 'Numéro, date de parution et PDF sont requis.' });
   }
@@ -82,6 +112,7 @@ const create = asyncHandler(async (req, res) => {
       pdfUrl,
       couvertureUrl,
       prix: prix ? Number(prix) : undefined,
+      codeAcces: codeAcces || null,
     },
   });
 
@@ -93,4 +124,4 @@ const create = asyncHandler(async (req, res) => {
   res.status(201).json({ edition });
 });
 
-module.exports = { list, create };
+module.exports = { list, create, deverrouiller };
