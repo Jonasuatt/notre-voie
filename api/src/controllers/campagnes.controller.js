@@ -14,7 +14,7 @@ const list = asyncHandler(async (req, res) => {
 
 // POST /api/campagnes — création d'une campagne (ciblage rubrique/région/format)
 const create = asyncHandler(async (req, res) => {
-  const { nom, formatPub, annonceurId, rubriqueIds, regionsCiblees, dateDebut, dateFin, budget } = req.body;
+  const { nom, formatPub, annonceurId, rubriqueIds, regionsCiblees, dateDebut, dateFin, budget, titre, imageUrl, lienUrl, texteCTA } = req.body;
   if (!nom || !formatPub || !annonceurId || !dateDebut || !dateFin || !budget) {
     return res.status(422).json({ error: 'Champs requis manquants pour créer la campagne.' });
   }
@@ -29,12 +29,41 @@ const create = asyncHandler(async (req, res) => {
       dateFin: new Date(dateFin),
       budget: Number(budget),
       gereParId: req.staff.id,
+      titre: titre || null,
+      imageUrl: imageUrl || null,
+      lienUrl: lienUrl || null,
+      ...(texteCTA ? { texteCTA } : {}),
       ...(rubriqueIds && rubriqueIds.length ? { rubriquesCiblees: { connect: rubriqueIds.map((id) => ({ id })) } } : {}),
     },
     include: { annonceur: true, rubriquesCiblees: true },
   });
 
   res.status(201).json({ campagne });
+});
+
+// GET /api/campagnes/actives — public, sans authentification. Consommé par
+// le site/l'app pour afficher un encart natif. `?rubrique=slug` restreint
+// aux campagnes ciblant cette rubrique (ou sans ciblage, donc diffusées
+// partout) ; `?format=NATIVE_CARTE|BANNIERE|TICKER_SPONSOR` filtre le format.
+const listActivesPubliques = asyncHandler(async (req, res) => {
+  const { rubrique, format } = req.query;
+  const maintenant = new Date();
+  const campagnes = await prisma.campagnePub.findMany({
+    where: {
+      statut: 'ACTIVE',
+      dateDebut: { lte: maintenant },
+      dateFin: { gte: maintenant },
+      ...(format ? { formatPub: format } : {}),
+      ...(rubrique ? { OR: [{ rubriquesCiblees: { none: {} } }, { rubriquesCiblees: { some: { slug: rubrique } } }] } : {}),
+    },
+    orderBy: { createdAt: 'desc' },
+    take: 5,
+    select: {
+      id: true, formatPub: true, titre: true, imageUrl: true, lienUrl: true, texteCTA: true,
+      annonceur: { select: { nom: true } },
+    },
+  });
+  res.json({ campagnes });
 });
 
 // GET /api/campagnes/:id — détail complet (fiche campagne)
@@ -99,6 +128,7 @@ module.exports = {
   list,
   getOne,
   create,
+  listActivesPubliques,
   changerStatut,
   enregistrerImpression,
   enregistrerClic,

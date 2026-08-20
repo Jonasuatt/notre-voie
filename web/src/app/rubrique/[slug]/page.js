@@ -1,7 +1,8 @@
 import { notFound } from 'next/navigation';
-import { getArticles, getRubriques } from '@/lib/api';
+import { getArticles, getRubriques, getCampagnesActives } from '@/lib/api';
 import RubriqueTabs from '@/components/RubriqueTabs';
 import ArticleCard from '@/components/ArticleCard';
+import PubCard from '@/components/PubCard';
 
 export async function generateMetadata({ params }) {
   const rubriques = await getRubriques();
@@ -14,7 +15,11 @@ export default async function RubriquePage({ params }) {
   const rubrique = rubriques.find((r) => r.slug === params.slug);
   if (!rubrique) notFound();
 
-  const { articles, total } = await getArticles({ rubrique: params.slug, pageSize: 30 });
+  const [{ articles, total }, campagnes] = await Promise.all([
+    getArticles({ rubrique: params.slug, pageSize: 30 }),
+    getCampagnesActives({ rubrique: params.slug, format: 'NATIVE_CARTE' }),
+  ]);
+  const pub = campagnes?.[0];
 
   return (
     <section className="max-w-[1180px] mx-auto px-4 sm:px-8 py-10">
@@ -32,7 +37,11 @@ export default async function RubriquePage({ params }) {
         <>
           <p className="text-muted text-[12.5px] font-mono mb-4">{total} article{total > 1 ? 's' : ''}</p>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-[22px]">
-            {articles.map((a) => (
+            {articles.slice(0, 5).map((a) => (
+              <ArticleCard key={a.id} article={a} />
+            ))}
+            {pub && <PubCard campagne={pub} />}
+            {articles.slice(5).map((a) => (
               <ArticleCard key={a.id} article={a} />
             ))}
           </div>

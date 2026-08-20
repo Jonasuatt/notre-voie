@@ -8,6 +8,9 @@ const REGIE = requireRole('REGIE', 'ADMIN');
 router.get('/annonceurs', authStaff, REGIE, ctrl.listAnnonceurs);
 router.post('/annonceurs', authStaff, REGIE, ctrl.creerAnnonceur);
 
+// Public — routes fixes avant /:id pour ne pas être capturées par la route paramétrée.
+router.get('/actives', ctrl.listActivesPubliques);
+
 router.get('/', authStaff, REGIE, ctrl.list);
 router.post('/', authStaff, REGIE, ctrl.create);
 router.get('/:id', authStaff, REGIE, ctrl.getOne);

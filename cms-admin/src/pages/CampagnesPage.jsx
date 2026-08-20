@@ -7,7 +7,7 @@ import { FORMAT_PUB_LABELS, formatFCFA } from '../utils/constants';
 
 const EMPTY = {
   nom: '', formatPub: 'NATIVE_CARTE', annonceurId: '', rubriqueIds: [], regionsCiblees: '',
-  dateDebut: '', dateFin: '', budget: '',
+  dateDebut: '', dateFin: '', budget: '', titre: '', imageUrl: '', lienUrl: '', texteCTA: 'En savoir plus',
 };
 
 export default function CampagnesPage() {
@@ -132,6 +132,28 @@ export default function CampagnesPage() {
           <div>
             <label className="label">Régions ciblées (séparées par une virgule)</label>
             <input className="input" value={form.regionsCiblees} onChange={set('regionsCiblees')} placeholder="Abidjan, Bouaké, Diaspora France" />
+          </div>
+
+          <div className="border-t border-gray-100 pt-5">
+            <p className="label mb-3">Créatif affiché sur le site public</p>
+            <div className="grid sm:grid-cols-2 gap-4">
+              <div className="sm:col-span-2">
+                <label className="label">Accroche</label>
+                <input className="input" value={form.titre} onChange={set('titre')} placeholder="Ex : Envoyez de l'argent en Côte d'Ivoire en 30 secondes" />
+              </div>
+              <div className="sm:col-span-2">
+                <label className="label">Image (URL)</label>
+                <input className="input" value={form.imageUrl} onChange={set('imageUrl')} placeholder="https://res.cloudinary.com/…" />
+              </div>
+              <div>
+                <label className="label">Lien de destination</label>
+                <input className="input" value={form.lienUrl} onChange={set('lienUrl')} placeholder="https://…" />
+              </div>
+              <div>
+                <label className="label">Texte du bouton</label>
+                <input className="input" value={form.texteCTA} onChange={set('texteCTA')} />
+              </div>
+            </div>
           </div>
 
           <div className="flex justify-end">

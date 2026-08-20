@@ -28,6 +28,8 @@ const RUBRIQUES_SERVICE = [
   { nom: 'Vidéos', angleEditorial: "Toutes les vidéos courtes et les directs regroupés dans un seul flux dédié" },
   { nom: 'Audio / Podcasts', angleEditorial: "Articles écoutés, interviews, journal parlé quotidien" },
   { nom: 'Archives / Kiosque numérique', angleEditorial: "Éditions précédentes du journal consultables en PDF, articles archivés par date et par rubrique" },
+  { nom: 'Nécrologie', angleEditorial: "Avis de décès, communiqués et messages de remerciement aux familles" },
+  { nom: 'Test', angleEditorial: "Article vitrine de démonstration — n'apparaît pas dans la navigation principale" },
 ];
 
 function slugify(str) {
@@ -924,6 +926,130 @@ async function seedMediaBatch7970() {
   console.log(`✔ ${crees} photo(s) du n°7970 importée(s) (${medias.length - crees} déjà existante(s)).`);
 }
 
+// Rubrique "Test" — article vitrine réunissant tous les formats de contenu
+// pris en charge par la plateforme (image légendée, galerie/album photo,
+// vidéo, audio), pour démonstration. La vidéo et l'audio sont des fichiers
+// de démonstration générés (pas de contenu éditorial réel associé).
+async function seedTestShowcase() {
+  const testRubrique = await prisma.rubrique.findUniqueOrThrow({ where: { slug: 'test' } });
+  const redacteurEnChef = await prisma.staff.findUniqueOrThrow({ where: { email: 'redacteur-en-chef@notrevoienews.com' } });
+
+  const imageUne = "https://res.cloudinary.com/ataat5bs/image/upload/v1787175396/notre-voie/photo-v2/tncsn2jrke3xko1jfmeh.jpg";
+
+  const article = await prisma.article.upsert({
+    where: { slug: 'article-vitrine-tous-les-formats' },
+    update: {},
+    create: {
+      slug: 'article-vitrine-tous-les-formats',
+      titre: 'Article vitrine : tous les formats de Notre Voie réunis',
+      chapo: "Une image principale légendée, un album photo d'un événement, une vidéo intégrée et une version audio — la démonstration de ce que la plateforme sait produire pour un seul et même article.",
+      contenuHtml: `<p>Cet article n'est pas une actualité : c'est une démonstration technique, pensée pour présenter en un seul endroit tous les formats de contenu pris en charge par la plateforme Notre Voie.</p>
+<p><strong>Image principale légendée</strong> — visible en haut de cette page, avec sa légende et son crédit photographe, exactement comme pour un article éditorial classique.</p>
+<p><strong>Galerie photo</strong> — en bas de cet article, une sélection de photos réelles déjà publiées dans d'autres articles, réunies ici pour illustrer le module "album photo d'un événement".</p>
+<p><strong>Vidéo et audio</strong> — un fichier de démonstration de chaque type, pour vérifier l'intégration technique (lecteur vidéo, lecteur audio) avant qu'un vrai reportage vidéo ou qu'un vrai journal parlé ne soit produit par la rédaction.</p>
+<p>Cette rubrique "Test" n'apparaît pas dans le menu principal du site — elle reste accessible uniquement par lien direct, pour ne pas être confondue avec du contenu éditorial réel.</p>`,
+      tags: ['démonstration', 'vitrine'],
+      format: 'EDITION', statut: 'PUBLIE', paywall: 'LIBRE',
+      rubriqueId: testRubrique.id, auteurId: redacteurEnChef.id, valideParId: redacteurEnChef.id,
+      imageUneUrl: imageUne, dureeEcouteSec: 90,
+      publieLe: new Date(), createdAt: new Date(), updatedAt: new Date(), vuesTotal: 1,
+    },
+  });
+
+  const medias = [
+    { type: 'PHOTO', url: imageUne, legende: "80 lauréats du 13e Prix national d'Excellence, avec le président Alassane Ouattara et son épouse.", credit: 'DR', ordre: 0 },
+    { type: 'PHOTO', url: "https://res.cloudinary.com/ataat5bs/image/upload/v1787175416/notre-voie/photo-v2/rbfcqlod3busk7vqwzt2.jpg", legende: 'Gaha Carine, reine Awoulaba 2026.', credit: 'DR', ordre: 1 },
+    { type: 'PHOTO', url: "https://res.cloudinary.com/ataat5bs/image/upload/v1787177142/notre-voie/photo-v2/oibcyv8k3qvuuwy8oozq.jpg", legende: "L'édition 2026 de la fête de Yorokloi, à Ouragahio.", credit: 'DR', ordre: 2 },
+    { type: 'PHOTO', url: "https://res.cloudinary.com/ataat5bs/image/upload/v1787177149/notre-voie/photo-v2/ohlaekkosqtiiqcyr5vd.jpg", legende: 'Forum sous-régional de la Jeunesse, à Bouaké.', credit: 'DR', ordre: 3 },
+    { type: 'VIDEO', url: "https://res.cloudinary.com/ataat5bs/video/upload/v1787188801/notre-voie/video/tewr9l19qvn9hlkoiomx.mp4", legende: 'Vidéo de démonstration — intégration du lecteur vidéo.', credit: 'Notre Voie', dureeSec: 6, ordre: 0 },
+    { type: 'AUDIO', url: "https://res.cloudinary.com/ataat5bs/video/upload/v1787188805/notre-voie/audio/nqsc7oe1ydqvvw2iwafk.mp3", legende: 'Audio de démonstration — intégration du lecteur audio.', credit: 'Notre Voie', dureeSec: 8, ordre: 0 },
+  ];
+  for (const m of medias) {
+    const existant = await prisma.media.findFirst({ where: { url: m.url, articleId: article.id } });
+    if (existant) continue;
+    await prisma.media.create({ data: { ...m, articleId: article.id } });
+  }
+  console.log('✔ Article vitrine "Test" prêt (galerie + vidéo + audio de démonstration).');
+}
+
+// Rubrique de service "Nécrologie" — article d'accueil expliquant comment
+// publier un avis (contenu réel repris de l'encart du journal papier).
+// Aucune fausse annonce de décès n'est générée : seule la description du
+// service, avec les vraies coordonnées publiées par la rédaction.
+async function seedNecrologie() {
+  const rubrique = await prisma.rubrique.findUniqueOrThrow({ where: { slug: 'necrologie' } });
+  const redacteurEnChef = await prisma.staff.findUniqueOrThrow({ where: { email: 'redacteur-en-chef@notrevoienews.com' } });
+
+  await prisma.article.upsert({
+    where: { slug: 'notre-service-de-necrologie-avis-et-communiques' },
+    update: {},
+    create: {
+      slug: 'notre-service-de-necrologie-avis-et-communiques',
+      titre: 'Notre service de Nécrologie : avis et communiqués',
+      chapo: "Publication de communiqués, avis de décès avec photo et messages de remerciement aux familles — Notre Voie vous accompagne.",
+      contenuHtml: `<p>Vous souhaitez faire publier un communiqué ou rendre un dernier hommage à un être cher disparu ? Notre Voie vous accompagne :</p>
+<ul>
+<li>Publication de communiqués de tout genre</li>
+<li>Publication d'avis de décès avec photo</li>
+<li>Messages de remerciement aux familles</li>
+<li>Formats adaptés à votre budget</li>
+</ul>
+<p>Contactez notre service des annonces au <strong>05 05 99 00 03</strong>, ou rendez-vous directement à nos bureaux, sis à la Riviera Palmeraie, en face de la station Ola Énergie.</p>
+<p><em>Honorer leur mémoire, c'est perpétuer leur histoire.</em></p>`,
+      tags: ['nécrologie', 'communiqué', 'service'],
+      format: 'EDITION', statut: 'PUBLIE', paywall: 'LIBRE',
+      rubriqueId: rubrique.id, auteurId: redacteurEnChef.id, valideParId: redacteurEnChef.id,
+      imageUneUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787190429/notre-voie/photo-v2/yo11nf5kxkoo9ix5tgqr.jpg",
+      publieLe: new Date(), createdAt: new Date(), updatedAt: new Date(), vuesTotal: 1,
+    },
+  });
+  console.log('✔ Rubrique Nécrologie prête.');
+}
+
+// Espace publicitaire — en l'absence de vrai annonceur en régie, un encart
+// "maison" fait la promotion de l'abonnement Notre Voie (pratique standard
+// de la presse quand un emplacement pub n'est pas vendu), pour que le
+// module natif soit visible et testable sur le site public.
+async function seedRegieDemo() {
+  const dejaCree = await prisma.campagnePub.findFirst({ where: { imageUrl: { contains: 'notre-voie/pub' } } });
+  if (dejaCree) return;
+
+  let annonceur = await prisma.annonceur.findFirst({ where: { nom: 'Notre Voie (encart maison)' } });
+  if (!annonceur) {
+    annonceur = await prisma.annonceur.create({ data: { nom: 'Notre Voie (encart maison)', contact: 'Régie interne' } });
+  }
+
+  const dansUnAn = new Date(Date.now() + 365 * 24 * 3600 * 1000);
+  await prisma.campagnePub.create({
+    data: {
+      nom: 'Encart maison — Abonnement',
+      formatPub: 'NATIVE_CARTE',
+      statut: 'ACTIVE',
+      annonceurId: annonceur.id,
+      regionsCiblees: [],
+      dateDebut: new Date(),
+      dateFin: dansUnAn,
+      budget: 0,
+      titre: "Notre Voie — Chaque jour, l'info vérifiée",
+      imageUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787190269/notre-voie/pub/p2nfdsb6gyforb0gds2t.jpg",
+      lienUrl: '/abonnement',
+      texteCTA: "S'abonner",
+    },
+  });
+  console.log('✔ Encart publicitaire maison créé (espace pub visible tant qu\'aucun vrai annonceur n\'est en régie).');
+}
+
+// Photo manquante ponctuelle — l'article "retour d'Hervé Renard" (n°7965)
+// n'avait pas reçu de photo lors du lot précédent.
+async function seedMediaGap1() {
+  const article = await prisma.article.findUnique({ where: { slug: 'retour-herve-renard-elephants-pari-progression' } });
+  if (!article || article.imageUneUrl) return;
+  const url = "https://res.cloudinary.com/ataat5bs/image/upload/v1787190154/notre-voie/photo-v2/pjtz5gqbzim0foua8k1c.jpg";
+  await prisma.media.create({ data: { type: 'PHOTO', url, legende: "Hervé Renard en conférence de presse.", credit: 'DR', articleId: article.id } });
+  await prisma.article.update({ where: { id: article.id }, data: { imageUneUrl: url } });
+  console.log('✔ Photo ajoutée pour "retour-herve-renard-elephants-pari-progression".');
+}
+
 async function main() {
   await seedRubriques();
   await seedStaff();
@@ -941,6 +1067,12 @@ async function main() {
   if (rotationAFaireExiste) await fixMediaBatch1Rotation();
   const mediaBatch7970Existe = await prisma.media.findFirst({ where: { url: { contains: 'notre-voie/photo-v2/ydy6z4intaheufl8yijb' } } });
   if (!mediaBatch7970Existe) await seedMediaBatch7970();
+  const testExiste = await prisma.article.findUnique({ where: { slug: 'article-vitrine-tous-les-formats' } });
+  if (!testExiste) await seedTestShowcase();
+  const necroExiste = await prisma.article.findUnique({ where: { slug: 'notre-service-de-necrologie-avis-et-communiques' } });
+  if (!necroExiste) await seedNecrologie();
+  await seedRegieDemo();
+  await seedMediaGap1();
 }
 
 main()

@@ -478,6 +478,14 @@ model CampagnePub {
   annonceur   Annonceur @relation(fields: [annonceurId], references: [id])
   annonceurId String
 
+  // Créatif affiché côté site public — absent tant que la campagne n'est
+  // qu'en préparation ; le format natif (carte) réutilise le gabarit d'une
+  // carte d'article, cf. cahier des charges §5 (formats publicitaires natifs).
+  titre     String? // accroche affichée sur le site (distincte de `nom`, le nom interne de la campagne)
+  imageUrl  String?
+  lienUrl   String?
+  texteCTA  String? @default("En savoir plus")
+
   rubriquesCiblees Rubrique[] @relation("CampagneCiblageRubrique")
   regionsCiblees   String[] // ciblage géographique (ex : "Abidjan", "Bouaké", "Diaspora France")
 

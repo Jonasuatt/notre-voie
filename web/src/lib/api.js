@@ -68,6 +68,14 @@ export async function getFactChecks() {
   return data.factChecks;
 }
 
+export async function getCampagnesActives({ rubrique, format } = {}) {
+  const params = new URLSearchParams();
+  if (rubrique) params.set('rubrique', rubrique);
+  if (format) params.set('format', format);
+  const data = await apiFetch(`/api/campagnes/actives?${params.toString()}`, { revalidate: 120, fallback: { campagnes: [] } });
+  return data.campagnes;
+}
+
 export async function getEditions({ page = 1, pageSize = 12 } = {}) {
   const data = await apiFetch(`/api/editions?page=${page}&pageSize=${pageSize}`, {
     revalidate: 3600,

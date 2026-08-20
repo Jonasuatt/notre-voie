@@ -8,7 +8,9 @@ const NAV = [
   { href: '/rubrique/vie-chere', label: 'Vie chère' },
   { href: '/rubrique/sport', label: 'Sport' },
   { href: '/verite-ou-intox', label: 'Vérité ou Intox' },
+  { href: '/direct', label: 'Direct' },
   { href: '/kiosque', label: 'Kiosque' },
+  { href: '/rubrique/necrologie', label: 'Nécrologie' },
 ];
 
 export default function Header() {
