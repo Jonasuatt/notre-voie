@@ -6,11 +6,19 @@ import DerniereMinute from '@/components/DerniereMinute';
 import TickerVieChere from '@/components/TickerVieChere';
 import RubriqueTabs from '@/components/RubriqueTabs';
 import ArticleCard from '@/components/ArticleCard';
+import ClusterArticles from '@/components/ClusterArticles';
 import FactCheckBlock from '@/components/FactCheckBlock';
 import FormatBadge from '@/components/FormatBadge';
 import PubCard from '@/components/PubCard';
 import UneVerrouillee from '@/components/UneVerrouillee';
 import { timeAgo, formatDateRange } from '@/lib/format';
+
+// Fine ligne de séparation entre les blocs — signature visuelle du New York
+// Times (nytimes.com), demandée explicitement pour distinguer Info en
+// direct du Quotidien.
+function Separateur() {
+  return <hr className="max-w-[1180px] mx-auto my-10" style={{ borderColor: '#232B45' }} />;
+}
 
 const BASE_PATH = '/info-direct';
 
@@ -30,10 +38,25 @@ export default async function QuotidienAccueilPage() {
 
   const flashEtLive = articles.filter((a) => a.format === 'FLASH' || a.format === 'LIVE').slice(0, 8);
   const une = articles[0];
-  const resumeDuJour = articles.slice(1, 6);
-  const grille = articles.slice(0, 9);
+  const lecturesGratuites = articles.slice(1, 5);
+  const resumeDuJour = articles.slice(0, 5);
   const directEnCours = articles.find((a) => a.format === 'LIVE');
   const pub = campagnes?.[0];
+
+  // Dossiers façon NYT — les articles restants regroupés par rubrique
+  // (thème), 2 dossiers de 3 titres plutôt qu'une grille indifférenciée.
+  const parRubrique = new Map();
+  for (const a of articles.slice(5)) {
+    const nom = a.rubrique?.nom || 'Autres';
+    if (!parRubrique.has(nom)) parRubrique.set(nom, { couleur: a.rubrique?.couleur, articles: [] });
+    const groupe = parRubrique.get(nom);
+    if (groupe.articles.length < 3) groupe.articles.push(a);
+  }
+  const dossiers = [...parRubrique.entries()].filter(([, g]) => g.articles.length >= 2).slice(0, 2);
+
+  // Ce qui reste après lead + cluster + dossiers, pour la grille de fin.
+  const dejaUtilises = new Set([une?.id, ...lecturesGratuites.map((a) => a.id), ...dossiers.flatMap(([, g]) => g.articles.map((a) => a.id))]);
+  const grille = articles.filter((a) => !dejaUtilises.has(a.id)).slice(0, 6);
 
   return (
     <>
@@ -51,15 +74,50 @@ export default async function QuotidienAccueilPage() {
         </Link>
       )}
 
+      {/* Bloc principal façon NYT : article vedette à gauche, "Plus de
+          lectures gratuites" (fil resserré, fines séparations) à droite. */}
       <section className="max-w-[1180px] mx-auto px-4 sm:px-8 pt-8">
-        {(uneDuJour?.couvertureUrl || resumeDuJour.length > 0) && (
+        <div className="grid lg:grid-cols-[1fr_320px] gap-10">
+          {une && (
+            <Link href={`${BASE_PATH}/article/${une.slug}`} className="group block">
+              <div className="relative h-[260px] sm:h-[340px] rounded-[10px] bg-gradient-to-br from-navy2 to-navy overflow-hidden">
+                {une.imageUneUrl && (
+                  <Image src={une.imageUneUrl} alt="" fill sizes="(max-width: 1024px) 100vw, 820px" priority className="object-cover" />
+                )}
+                <FormatBadge format={une.format} />
+              </div>
+              <div className="pt-4">
+                <span className="font-mono text-[11px] uppercase tracking-wide" style={{ color: une.rubrique?.couleur }}>
+                  {une.rubrique?.nom}
+                </span>
+                <h1 className="font-serif text-[28px] sm:text-[32px] leading-tight mt-2 group-hover:text-[#22D3EE] transition-colors">
+                  {une.titre}
+                </h1>
+                {une.chapo && <p className="text-muted text-[14.5px] mt-2.5 leading-relaxed max-w-2xl">{une.chapo}</p>}
+                <div className="flex gap-3 items-center mt-3.5 font-mono text-[11px] text-muted">
+                  <span>{timeAgo(une.publieLe)}</span>
+                  {une.auteur && <span>· {une.auteur.prenom} {une.auteur.nom}</span>}
+                </div>
+              </div>
+            </Link>
+          )}
+
+          <ClusterArticles titre="Plus de lectures gratuites" articles={lecturesGratuites} basePath={BASE_PATH} avecVignette />
+        </div>
+      </section>
+
+      <Separateur />
+
+      {/* Une + 5 choses à retenir — insérées après le bloc principal, comme demandé. */}
+      {(uneDuJour?.couvertureUrl || resumeDuJour.length > 0) && (
+        <section className="max-w-[1180px] mx-auto px-4 sm:px-8">
           <div className="grid lg:grid-cols-[minmax(0,380px)_1fr] gap-8">
             {uneDuJour?.couvertureUrl && (
               <div>
                 <div className="relative aspect-[3/4] rounded-[10px] overflow-hidden shadow-xl border border-line">
                   <UneVerrouillee
                     editionId={uneDuJour.id} verrouille={uneDuJour.verrouille} couvertureUrl={uneDuJour.couvertureUrl}
-                    numero={uneDuJour.numero} sizes="(max-width: 1024px) 100vw, 380px" priority basePath={BASE_PATH}
+                    numero={uneDuJour.numero} sizes="(max-width: 1024px) 100vw, 380px" basePath={BASE_PATH}
                   />
                 </div>
                 <span className="font-mono text-[11px] text-muted mt-3 block">
@@ -80,35 +138,25 @@ export default async function QuotidienAccueilPage() {
               </ol>
             </div>
           </div>
-        )}
+        </section>
+      )}
 
-        {/* Article vedette — tiré du numéro du jour, en pleine taille, juste après le bloc Une + 5 choses. */}
-        {une && (
-          <Link href={`${BASE_PATH}/article/${une.slug}`} className="group block mt-8">
-            <div className="relative h-[220px] sm:h-[300px] rounded-[10px] bg-gradient-to-br from-navy2 to-navy overflow-hidden">
-              {une.imageUneUrl && (
-                <Image src={une.imageUneUrl} alt="" fill sizes="(max-width: 1024px) 100vw, 1180px" className="object-cover" />
-              )}
-              <FormatBadge format={une.format} />
-            </div>
-            <div className="pt-4">
-              <span className="font-mono text-[11px] uppercase tracking-wide" style={{ color: une.rubrique?.couleur }}>
-                {une.rubrique?.nom}
-              </span>
-              <h2 className="font-serif text-[26px] sm:text-[28px] leading-tight mt-2 group-hover:text-coral transition-colors">
-                {une.titre}
-              </h2>
-              {une.chapo && <p className="text-muted text-[14.5px] mt-2.5 leading-relaxed max-w-2xl">{une.chapo}</p>}
-              <div className="flex gap-3 items-center mt-3.5 font-mono text-[11px] text-muted">
-                <span>{timeAgo(une.publieLe)}</span>
-                {une.auteur && <span>· {une.auteur.prenom} {une.auteur.nom}</span>}
-              </div>
-            </div>
-          </Link>
-        )}
+      <Separateur />
 
-        <FactCheckBlock factChecks={factChecks} basePath={BASE_PATH} />
-      </section>
+      {/* Dossiers — actualité regroupée par rubrique, façon "Guerre au
+          Moyen-Orient" du New York Times, plutôt qu'une grille uniforme. */}
+      {dossiers.length > 0 && (
+        <section className="max-w-[1180px] mx-auto px-4 sm:px-8">
+          <div className="grid sm:grid-cols-2 gap-10">
+            {dossiers.map(([nom, g]) => (
+              <ClusterArticles key={nom} titre={nom} couleur={g.couleur} articles={g.articles} basePath={BASE_PATH} />
+            ))}
+          </div>
+          <FactCheckBlock factChecks={factChecks} basePath={BASE_PATH} />
+        </section>
+      )}
+
+      <Separateur />
 
       <FlashBar articles={flashEtLive} basePath={BASE_PATH} />
 
