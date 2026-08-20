@@ -1075,6 +1075,33 @@ async function seedMediaGap2() {
   console.log(`✔ ${crees} photo(s) de remplissage ajoutée(s) (${remplissages.length - crees} déjà pourvue(s)).`);
 }
 
+// Kiosque numérique — les 10 Unes réelles (PDF + couverture) des numéros
+// déjà exploités pour le contenu éditorial. Chaque parution devient
+// consultable et téléchargeable, jour après jour — cf. demande explicite
+// de l'utilisateur (archivage par numéro et par jour de parution).
+async function seedEditions() {
+  const editions = [
+    { numero: 7961, dateParution: "2026-07-30", pdfUrl: "https://res.cloudinary.com/ataat5bs/raw/upload/v1787194110/notre-voie/edition/nv5erwj7eoplvj4f7i5q.pdf", couvertureUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787194106/notre-voie/une/elo8nuazwzz1vboa9oma.jpg" },
+    { numero: 7962, dateParution: "2026-08-02", pdfUrl: "https://res.cloudinary.com/ataat5bs/raw/upload/v1787194134/notre-voie/edition/bgiv3jjdh52xrtgsxvly.pdf", couvertureUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787194116/notre-voie/une/ayoxfemzpk5zzr3j9v61.jpg" },
+    { numero: 7963, dateParution: "2026-08-03", pdfUrl: "https://res.cloudinary.com/ataat5bs/raw/upload/v1787194145/notre-voie/edition/ydxvowlmmlu3khqyywai.pdf", couvertureUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787194142/notre-voie/une/fbowe4pxmh89zfmstizk.jpg" },
+    { numero: 7964, dateParution: "2026-08-04", pdfUrl: "https://res.cloudinary.com/ataat5bs/raw/upload/v1787194156/notre-voie/edition/zwajzjdktdf7tdnekou0.pdf", couvertureUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787194152/notre-voie/une/u1sgqhh2iluhnvkvrlfu.jpg" },
+    { numero: 7965, dateParution: "2026-08-05", pdfUrl: "https://res.cloudinary.com/ataat5bs/raw/upload/v1787194183/notre-voie/edition/lfxr5dvcozufmreyajnp.pdf", couvertureUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787194180/notre-voie/une/slfbemm2o4wqfbrvpf0g.jpg" },
+    { numero: 7966, dateParution: "2026-08-09", pdfUrl: "https://res.cloudinary.com/ataat5bs/raw/upload/v1787194205/notre-voie/edition/oh05g5ivqyb3ymxpxxu1.pdf", couvertureUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787194189/notre-voie/une/lz6sev48w7dzammn19a5.jpg" },
+    { numero: 7967, dateParution: "2026-08-10", pdfUrl: "https://res.cloudinary.com/ataat5bs/raw/upload/v1787194230/notre-voie/edition/zdlvjayaluxvvslxl1pk.pdf", couvertureUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787194226/notre-voie/une/hypvqkegvqltbzhdsg2h.jpg" },
+    { numero: 7968, dateParution: "2026-08-11", pdfUrl: "https://res.cloudinary.com/ataat5bs/raw/upload/v1787194252/notre-voie/edition/fvcoevdjb0p7yqoeedun.pdf", couvertureUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787194248/notre-voie/une/syaogsrh5tpfrkcifb4l.jpg" },
+    { numero: 7969, dateParution: "2026-08-12", pdfUrl: "https://res.cloudinary.com/ataat5bs/raw/upload/v1787194273/notre-voie/edition/pflgks5n2g8prebaqpwo.pdf", couvertureUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787194258/notre-voie/une/vvlasul5jauvrzzzfbn8.jpg" },
+    { numero: 7970, dateParution: "2026-08-13", pdfUrl: "https://res.cloudinary.com/ataat5bs/raw/upload/v1787194281/notre-voie/edition/b1tqrmwkyfoogt6l4cra.pdf", couvertureUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787194278/notre-voie/une/d6hdl8ejmd9fgmjlhplf.jpg" },
+  ];
+  let crees = 0;
+  for (const e of editions) {
+    const existant = await prisma.edition.findUnique({ where: { numero: e.numero } });
+    if (existant) continue;
+    await prisma.edition.create({ data: { ...e, dateParution: new Date(e.dateParution) } });
+    crees++;
+  }
+  console.log(`✔ ${crees} édition(s) ajoutée(s) au kiosque (${editions.length - crees} déjà présente(s)).`);
+}
+
 async function main() {
   await seedRubriques();
   await seedStaff();
@@ -1099,6 +1126,8 @@ async function main() {
   await seedRegieDemo();
   await seedMediaGap1();
   await seedMediaGap2();
+  const dejaDesEditions = await prisma.edition.count();
+  if (dejaDesEditions === 0) await seedEditions();
 }
 
 main()

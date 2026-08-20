@@ -25,16 +25,22 @@ export async function getRubriques() {
   return data.rubriques;
 }
 
-export async function getArticles({ rubrique, format, page = 1, pageSize = 20 } = {}) {
+export async function getArticles({ rubrique, format, q, date, dateDebut, dateFin, page = 1, pageSize = 20 } = {}) {
   const params = new URLSearchParams();
   if (rubrique) params.set('rubrique', rubrique);
   if (format) params.set('format', format);
+  if (q) params.set('q', q);
+  if (date) params.set('date', date);
+  if (dateDebut) params.set('dateDebut', dateDebut);
+  if (dateFin) params.set('dateFin', dateFin);
   params.set('page', page);
   params.set('pageSize', pageSize);
 
   let filtered = fixtures.ARTICLES;
   if (rubrique) filtered = filtered.filter((a) => a.rubrique.slug === rubrique);
   if (format) filtered = filtered.filter((a) => a.format === format);
+  if (q) filtered = filtered.filter((a) => a.titre.toLowerCase().includes(q.toLowerCase()));
+  if (date) filtered = filtered.filter((a) => a.publieLe?.slice(0, 10) === date);
 
   const data = await apiFetch(`/api/articles?${params.toString()}`, {
     fallback: { articles: filtered, total: filtered.length },

@@ -35,16 +35,32 @@ async function applyPaywall(article, reader) {
 
 // GET /api/articles — flux public (Une, rubriques, recherche)
 const listPublic = asyncHandler(async (req, res) => {
-  const { rubrique, format, tag, q, page = 1, pageSize = 20 } = req.query;
+  const { rubrique, format, tag, q, date, dateDebut, dateFin, page = 1, pageSize = 20 } = req.query;
   const take = Math.min(Number(pageSize) || 20, 50);
   const skip = (Math.max(Number(page) || 1, 1) - 1) * take;
+
+  // Archivage par jour de parution — soit une journée précise (?date=2026-08-13),
+  // soit une plage (?dateDebut=…&dateFin=…), cf. cahier des charges "recherche
+  // par jour, titre/sujet ou rubrique".
+  let publieLeFiltre;
+  if (date) {
+    const debut = new Date(`${date}T00:00:00.000Z`);
+    const fin = new Date(`${date}T23:59:59.999Z`);
+    publieLeFiltre = { gte: debut, lte: fin };
+  } else if (dateDebut || dateFin) {
+    publieLeFiltre = {
+      ...(dateDebut ? { gte: new Date(`${dateDebut}T00:00:00.000Z`) } : {}),
+      ...(dateFin ? { lte: new Date(`${dateFin}T23:59:59.999Z`) } : {}),
+    };
+  }
 
   const where = {
     statut: 'PUBLIE',
     ...(rubrique ? { rubrique: { slug: rubrique } } : { rubrique: { type: 'EDITORIALE' } }), // fil général = rubriques éditoriales uniquement ; les rubriques de service (Nécrologie, Test…) ne doivent jamais concurrencer l'actualité en Une, seulement accessibles via leur propre page
     ...(format ? { format } : {}),
     ...(tag ? { tags: { has: tag } } : {}),
-    ...(q ? { OR: [{ titre: { contains: q, mode: 'insensitive' } }, { chapo: { contains: q, mode: 'insensitive' } }] } : {}),
+    ...(publieLeFiltre ? { publieLe: publieLeFiltre } : {}),
+    ...(q ? { OR: [{ titre: { contains: q, mode: 'insensitive' } }, { chapo: { contains: q, mode: 'insensitive' } }, { contenuHtml: { contains: q, mode: 'insensitive' } }] } : {}),
   };
 
   const [articles, total] = await Promise.all([
