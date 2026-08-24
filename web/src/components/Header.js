@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import LogoPill from './Logo';
+import MegaMenu from './MegaMenu';
 
 const NAV_COMMUNE = [
   { href: '', label: 'Accueil' },
@@ -30,7 +31,11 @@ const NAV_FIN = [
 // `basePath` — préfixe de section ("/quotidien" ou "/info-direct"), pour
 // que ce composant partagé fonctionne dans les deux portails sans dupliquer
 // le code (cf. §"deux rédactions" — Le Quotidien / Info en direct).
-export default function Header({ basePath = '' }) {
+// `megaMenu` — piliers pré-calculés (cf. lib/megaMenu.js), fournis
+// uniquement par le layout Info en direct. Absent → menu plat classique
+// (Le Quotidien n'est pas concerné par cette présentation, cf. demande
+// explicite).
+export default function Header({ basePath = '', megaMenu }) {
   const estInfoDirect = basePath === '/info-direct';
   const NAV = [...NAV_COMMUNE, ...(estInfoDirect ? NAV_INFO_DIRECT_UNIQUEMENT : []), ...NAV_FIN];
   return (
@@ -44,13 +49,20 @@ export default function Header({ basePath = '' }) {
             </span>
           )}
         </div>
-        <nav className="hidden lg:flex items-center gap-6 text-[13.5px] font-semibold">
-          {NAV.map((item) => (
-            <Link key={item.href || 'accueil'} href={`${basePath}${item.href}` || '/'} className="hover:text-coral transition-colors">
-              {item.label}
-            </Link>
-          ))}
-        </nav>
+        {megaMenu?.length > 0 ? (
+          <div className="hidden lg:flex items-center gap-6 text-[13.5px] font-semibold">
+            <Link href={basePath || '/'} className="hover:text-[#22D3EE] transition-colors">Accueil</Link>
+            <MegaMenu piliers={megaMenu} basePath={basePath} />
+          </div>
+        ) : (
+          <nav className="hidden lg:flex items-center gap-6 text-[13.5px] font-semibold">
+            {NAV.map((item) => (
+              <Link key={item.href || 'accueil'} href={`${basePath}${item.href}` || '/'} className="hover:text-coral transition-colors">
+                {item.label}
+              </Link>
+            ))}
+          </nav>
+        )}
         <div className="flex items-center gap-3 shrink-0">
           <Link href={`${basePath}/recherche`} aria-label="Rechercher" className="p-2 text-ink hover:text-coral transition-colors">
             <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
