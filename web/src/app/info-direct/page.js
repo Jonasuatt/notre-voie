@@ -153,14 +153,11 @@ export default async function QuotidienAccueilPage() {
       <Separateur />
 
       {/* Dossiers — actualité regroupée par rubrique, façon "Guerre au
-          Moyen-Orient" du New York Times, plutôt qu'une grille uniforme. */}
+          Moyen-Orient" du New York Times : même disposition en colonnes
+          (article en tête + titres courts) que le bloc Actualités final. */}
       {dossiers.length > 0 && (
         <section className="max-w-[1180px] mx-auto px-4 sm:px-8">
-          <div className="grid sm:grid-cols-2 gap-10">
-            {dossiers.map(([nom, g]) => (
-              <ClusterArticles key={nom} titre={nom} couleur={g.couleur} articles={g.articles} basePath={BASE_PATH} />
-            ))}
-          </div>
+          <ColonneActualites colonnes={dossiers} basePath={BASE_PATH} titre="Dossiers" />
           <FactCheckBlock factChecks={factChecks} basePath={BASE_PATH} />
         </section>
       )}

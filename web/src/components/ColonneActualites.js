@@ -5,13 +5,13 @@ import Image from 'next/image';
 // rubrique, chacune avec un article en tête (photo + titre + accroche) et
 // 2-3 titres courts en dessous, séparées par de fines lignes verticales.
 // Remplace la grille uniforme de cartes identiques.
-export default function ColonneActualites({ colonnes, basePath = '' }) {
+export default function ColonneActualites({ colonnes, basePath = '', titre = 'Actualités' }) {
   if (!colonnes?.length) return null;
 
   return (
     <div>
       <h3 className="font-mono text-[11px] font-bold uppercase tracking-widest pb-3 mb-6 border-b" style={{ borderColor: '#232B45', color: '#8993B0' }}>
-        Actualités
+        {titre}
       </h3>
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-x-8 gap-y-10">
         {colonnes.map(([nom, g], i) => {
