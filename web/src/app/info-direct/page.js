@@ -1,12 +1,11 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { getArticles, getRubriques, getTicker, getFactChecks, getCampagnesActives, getEditions } from '@/lib/api';
+import { getArticles, getTicker, getFactChecks, getCampagnesActives, getEditions } from '@/lib/api';
 import FlashBar from '@/components/FlashBar';
 import DerniereMinute from '@/components/DerniereMinute';
 import TickerVieChere from '@/components/TickerVieChere';
-import RubriqueTabs from '@/components/RubriqueTabs';
-import ArticleCard from '@/components/ArticleCard';
 import ClusterArticles from '@/components/ClusterArticles';
+import ColonneActualites from '@/components/ColonneActualites';
 import FactCheckBlock from '@/components/FactCheckBlock';
 import FormatBadge from '@/components/FormatBadge';
 import PubCard from '@/components/PubCard';
@@ -26,9 +25,8 @@ const BASE_PATH = '/info-direct';
 export const dynamic = 'force-dynamic';
 
 export default async function QuotidienAccueilPage() {
-  const [{ articles }, rubriques, prix, factChecks, campagnes, editions] = await Promise.all([
+  const [{ articles }, prix, factChecks, campagnes, editions] = await Promise.all([
     getArticles({ pageSize: 24, portail: 'INFO_DIRECT' }),
-    getRubriques(),
     getTicker(),
     getFactChecks(),
     getCampagnesActives({ format: 'NATIVE_CARTE' }),
@@ -54,9 +52,20 @@ export default async function QuotidienAccueilPage() {
   }
   const dossiers = [...parRubrique.entries()].filter(([, g]) => g.articles.length >= 2).slice(0, 2);
 
-  // Ce qui reste après lead + cluster + dossiers, pour la grille de fin.
+  // Bloc "Actualités" final façon bas de page nytimes.com : ce qui reste
+  // après lead + cluster + dossiers, regroupé en colonnes par rubrique
+  // (jusqu'à 5, comme le bas de nytimes.com) plutôt qu'une grille uniforme
+  // de cartes identiques.
   const dejaUtilises = new Set([une?.id, ...lecturesGratuites.map((a) => a.id), ...dossiers.flatMap(([, g]) => g.articles.map((a) => a.id))]);
-  const grille = articles.filter((a) => !dejaUtilises.has(a.id)).slice(0, 6);
+  const restants = articles.filter((a) => !dejaUtilises.has(a.id));
+  const parRubriqueFin = new Map();
+  for (const a of restants) {
+    const nom = a.rubrique?.nom || 'Autres';
+    if (!parRubriqueFin.has(nom)) parRubriqueFin.set(nom, { couleur: a.rubrique?.couleur, articles: [] });
+    const groupe = parRubriqueFin.get(nom);
+    if (groupe.articles.length < 4) groupe.articles.push(a);
+  }
+  const colonnesActualites = [...parRubriqueFin.entries()].slice(0, 5);
 
   return (
     <>
@@ -161,16 +170,12 @@ export default async function QuotidienAccueilPage() {
       <FlashBar articles={flashEtLive} basePath={BASE_PATH} />
 
       <section className="max-w-[1180px] mx-auto px-4 sm:px-8 py-10">
-        <RubriqueTabs rubriques={rubriques} basePath={BASE_PATH} />
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-[22px]">
-          {grille.slice(0, 5).map((a) => (
-            <ArticleCard key={a.id} article={a} basePath={BASE_PATH} />
-          ))}
-          {pub && <PubCard campagne={pub} />}
-          {grille.slice(5).map((a) => (
-            <ArticleCard key={a.id} article={a} basePath={BASE_PATH} />
-          ))}
-        </div>
+        <ColonneActualites colonnes={colonnesActualites} basePath={BASE_PATH} />
+        {pub && (
+          <div className="mt-10 max-w-[380px]">
+            <PubCard campagne={pub} />
+          </div>
+        )}
       </section>
     </>
   );
