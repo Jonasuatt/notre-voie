@@ -26,7 +26,7 @@ export default function ClusterArticles({ titre, couleur, articles, basePath = '
               </Link>
             )}
             <div className="min-w-0">
-              <Link href={`${basePath}/article/${a.slug}`} className="font-serif text-[14.5px] leading-snug hover:text-[#22D3EE] transition-colors">
+              <Link href={`${basePath}/article/${a.slug}`} className="font-serif text-[14.5px] leading-snug text-[#E7EBF7] hover:text-[#22D3EE] transition-colors">
                 {a.titre}
               </Link>
             </div>

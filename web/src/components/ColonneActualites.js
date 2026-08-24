@@ -25,7 +25,7 @@ export default function ColonneActualites({ colonnes, basePath = '', titre = 'Ac
               {tete && (
                 <Link href={`${basePath}/article/${tete.slug}`} className="group block mb-4">
                   {tete.imageUneUrl && (
-                    <div className="relative aspect-[4/3] rounded-[6px] overflow-hidden mb-2.5 bg-[#171d30]">
+                    <div className="relative aspect-video rounded-[6px] overflow-hidden mb-2.5 bg-[#171d30]">
                       <Image src={tete.imageUneUrl} alt="" fill sizes="220px" className="object-cover transition-transform duration-300 group-hover:scale-105" />
                       {(tete.format === 'VIDEO_COURTE' || tete.format === 'LIVE') && (
                         <div className="absolute inset-0 flex items-center justify-center bg-black/10 group-hover:bg-black/25 transition-colors">
@@ -50,7 +50,7 @@ export default function ColonneActualites({ colonnes, basePath = '', titre = 'Ac
                 <ul>
                   {reste.map((a) => (
                     <li key={a.id} className="border-t py-2.5 first:border-t-0" style={{ borderColor: '#232B45' }}>
-                      <Link href={`${basePath}/article/${a.slug}`} className="text-[13px] leading-snug hover:text-[#22D3EE] transition-colors">
+                      <Link href={`${basePath}/article/${a.slug}`} className="text-[13px] leading-snug text-[#E7EBF7] hover:text-[#22D3EE] transition-colors">
                         {a.titre}
                       </Link>
                     </li>

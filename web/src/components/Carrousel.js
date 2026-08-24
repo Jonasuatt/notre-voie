@@ -52,7 +52,7 @@ export default function Carrousel({ titre, articles, basePath = '' }) {
             className="group block shrink-0 w-[260px] snap-start"
           >
             {a.imageUneUrl && (
-              <div className="relative aspect-[4/3] rounded-[8px] overflow-hidden mb-2.5 bg-[#171d30]">
+              <div className="relative aspect-video rounded-[8px] overflow-hidden mb-2.5 bg-[#171d30]">
                 <Image src={a.imageUneUrl} alt="" fill sizes="260px" className="object-cover transition-transform duration-300 group-hover:scale-105" />
               </div>
             )}

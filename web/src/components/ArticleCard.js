@@ -6,7 +6,7 @@ import { timeAgo } from '@/lib/format';
 export default function ArticleCard({ article, basePath = '' }) {
   return (
     <Link href={`${basePath}/article/${article.slug}`} className="block bg-white rounded-[10px] border border-line overflow-hidden group">
-      <div className="relative h-[150px] bg-gradient-to-br from-navy2 to-navy overflow-hidden">
+      <div className="relative aspect-video bg-gradient-to-br from-navy2 to-navy overflow-hidden">
         {article.imageUneUrl && (
           <Image
             src={article.imageUneUrl} alt="" fill sizes="(max-width: 640px) 100vw, 33vw"
