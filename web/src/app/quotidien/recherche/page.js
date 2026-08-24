@@ -1,5 +1,6 @@
 import { getArticles, getRubriques } from '@/lib/api';
 import ArticleCard from '@/components/ArticleCard';
+import { RUBRIQUES_WEB_UNIQUEMENT } from '@/lib/rubriques';
 
 const BASE_PATH = '/quotidien';
 
@@ -38,7 +39,7 @@ export default async function RecherchePage({ searchParams }) {
           <label className="block text-[11px] font-mono uppercase tracking-wide text-muted mb-1.5">Rubrique</label>
           <select name="rubrique" defaultValue={rubrique} className="w-full border border-line rounded-md px-3 py-2 text-[14px] bg-white">
             <option value="">Toutes</option>
-            {rubriques.filter((r) => r.type === 'EDITORIALE').map((r) => (
+            {rubriques.filter((r) => r.type === 'EDITORIALE' && !RUBRIQUES_WEB_UNIQUEMENT.includes(r.slug)).map((r) => (
               <option key={r.id} value={r.slug}>{r.nom}</option>
             ))}
           </select>

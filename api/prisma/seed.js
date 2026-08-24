@@ -22,6 +22,19 @@ const RUBRIQUES_EDITORIALES = [
   { nom: 'Vérité ou Intox', angleEditorial: "Vérification des rumeurs et vidéos virales identifiées sur les réseaux sociaux", couleur: '#E8B84B' },
 ];
 
+// Rubriques propres à la rédaction web (Info en direct) — pas de matière
+// première dans les PDF du journal imprimé, donc absentes du Quotidien (cf.
+// RubriqueTabs.js et Header.js). Retenues après synthèse de propositions
+// Gemini/DeepSeek soumises par l'utilisateur : les 4 manques les plus
+// consensuels entre les deux, sans redondance avec les rubriques existantes.
+// Créées vides : aucun article n'est inventé pour les peupler.
+const RUBRIQUES_INFO_DIRECT = [
+  { nom: 'Éducation', angleEditorial: "Examens, bourses, universités, grèves scolaires — la vie étudiante et scolaire ivoirienne", couleur: '#0E8FD6' },
+  { nom: 'Santé', angleEditorial: "Alertes sanitaires, prévention, système de santé, nutrition", couleur: '#E6008C' },
+  { nom: 'Environnement', angleEditorial: "Cadre de vie, inondations, gestion des déchets, développement durable", couleur: '#0B6FA8' },
+  { nom: 'Numérique', angleEditorial: "Fintech (Orange Money, Wave), arnaques en ligne, intelligence artificielle, startups tech", couleur: '#E8B84B' },
+];
+
 // Rubriques de service — cf. cahier des charges §3.2
 const RUBRIQUES_SERVICE = [
   { nom: 'Photos légendées', angleEditorial: "Reportages et événements racontés en images, chaque photo légendée et créditée" },
@@ -50,6 +63,13 @@ async function seedRubriques() {
       create: { ...r, slug: slugify(r.nom), type: 'EDITORIALE', ordre: ordre++ },
     });
   }
+  for (const r of RUBRIQUES_INFO_DIRECT) {
+    await prisma.rubrique.upsert({
+      where: { slug: slugify(r.nom) },
+      update: {},
+      create: { ...r, slug: slugify(r.nom), type: 'EDITORIALE', ordre: ordre++ },
+    });
+  }
   ordre = 0;
   for (const r of RUBRIQUES_SERVICE) {
     await prisma.rubrique.upsert({
@@ -58,7 +78,7 @@ async function seedRubriques() {
       create: { ...r, slug: slugify(r.nom), type: 'SERVICE', ordre: ordre++ },
     });
   }
-  console.log(`✔ ${RUBRIQUES_EDITORIALES.length + RUBRIQUES_SERVICE.length} rubriques créées/à jour.`);
+  console.log(`✔ ${RUBRIQUES_EDITORIALES.length + RUBRIQUES_INFO_DIRECT.length + RUBRIQUES_SERVICE.length} rubriques créées/à jour.`);
 }
 
 // Comptes rédaction/administration — cf. organigramme rédactionnel réel

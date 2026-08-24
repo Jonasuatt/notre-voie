@@ -2,6 +2,7 @@ import LogoPill from './Logo';
 
 // `basePath` — même mécanisme que Header, cf. le commentaire là-bas.
 export default function Footer({ basePath = '' }) {
+  const estInfoDirect = basePath === '/info-direct';
   return (
     <footer className="bg-ink text-white mt-16">
       <div className="max-w-[1180px] mx-auto px-4 sm:px-8 py-12 grid gap-10 sm:grid-cols-3">
@@ -19,7 +20,7 @@ export default function Footer({ basePath = '' }) {
             <li><a href={`${basePath}/rubrique/economie`} className="hover:text-white">Économie</a></li>
             <li><a href={`${basePath}/rubrique/vie-chere`} className="hover:text-white">Vie chère</a></li>
             <li><a href={`${basePath}/rubrique/diaspora`} className="hover:text-white">Diaspora</a></li>
-            <li><a href={`${basePath}/verite-ou-intox`} className="hover:text-white">Vérité ou Intox</a></li>
+            {estInfoDirect && <li><a href={`${basePath}/verite-ou-intox`} className="hover:text-white">Vérité ou Intox</a></li>}
           </ul>
         </div>
         <div>
