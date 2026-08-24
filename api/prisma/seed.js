@@ -1735,6 +1735,101 @@ async function seedApercuInterne() {
   console.log(`✔ ${crees} article(s) d'aperçu interne créé(s) + galerie Rétro Photo.`);
 }
 
+// Vidéos (YouTube, embarquées telles quelles) et interviews audio (fichiers
+// réels uploadés sur Cloudinary) — rubriques service "Vidéos" et
+// "Audio / Podcasts". Étiquetés apercu-interne : la rédaction doit encore
+// les remplacer par des articles/reportages définitifs après validation de
+// la présentation (cf. demande explicite). Deux vidéos partagées par
+// l'utilisateur (danse TikTok, extrait Masaka Kids Afrikana) sont
+// volontairement exclues : elles appartiennent à d'autres créateurs.
+async function seedVideosEtAudios() {
+  const [videos, audio] = await Promise.all([
+    prisma.rubrique.findUniqueOrThrow({ where: { slug: 'videos' } }),
+    prisma.rubrique.findUniqueOrThrow({ where: { slug: 'audio-podcasts' } }),
+  ]);
+  const redacteurEnChef = await prisma.staff.findUniqueOrThrow({ where: { email: 'redacteur-en-chef@notrevoienews.com' } });
+
+  const VIDEOS = [
+    {
+      slug: 'apercu-video-traitement-distribution-eau',
+      titre: "Reportage vidéo : le traitement et la distribution de l'eau",
+      chapo: "Un reportage filmé sur les châteaux d'eau et les étapes de traitement de l'eau de surface avant sa distribution.",
+      youtubeUrl: 'https://youtu.be/E399t7JsY2w',
+    },
+    {
+      slug: 'apercu-video-interview-notre-voie-tv',
+      titre: 'Interview filmée — Notre Voie TV',
+      chapo: "Un entretien réalisé par Notre Voie TV.",
+      youtubeUrl: 'https://youtu.be/UzYtP-KA9o4',
+    },
+    {
+      slug: 'apercu-video-synacvtcci-patente-vtc',
+      titre: 'Chauffeurs VTC : ce que précise le SYNACVTCCI sur la patente transport',
+      chapo: "Dans un communiqué, le Syndicat national des chauffeurs VTC de Côte d'Ivoire indique que ses adhérents ne sont pas concernés par les contrôles de patente transport actuellement en cours dans le District Autonome d'Abidjan.",
+      youtubeUrl: 'https://youtu.be/-URzktf2f2w',
+    },
+    {
+      slug: 'apercu-video-temoignage-filme',
+      titre: 'Vidéo : un témoignage filmé',
+      chapo: 'Une vidéo courte, sans contexte éditorial vérifié pour le moment.',
+      youtubeUrl: 'https://youtu.be/cDm2_WSX_UM',
+    },
+  ];
+
+  let videosCrees = 0;
+  for (const v of VIDEOS) {
+    const existe = await prisma.article.findUnique({ where: { slug: v.slug } });
+    if (existe) continue;
+    const idYoutube = v.youtubeUrl.split('/').pop();
+    const vignette = `https://img.youtube.com/vi/${idYoutube}/hqdefault.jpg`;
+    const maintenant = new Date();
+    const article = await prisma.article.create({
+      data: {
+        slug: v.slug, titre: v.titre, chapo: v.chapo, contenuHtml: null,
+        tags: ['apercu-interne'], format: 'VIDEO_COURTE', statut: 'PUBLIE', paywall: 'LIBRE',
+        rubriqueId: videos.id, auteurId: redacteurEnChef.id, valideParId: redacteurEnChef.id,
+        imageUneUrl: vignette, portails: ['INFO_DIRECT'],
+        publieLe: maintenant, createdAt: maintenant, updatedAt: maintenant, vuesTotal: 1,
+      },
+    });
+    await prisma.media.create({ data: { type: 'VIDEO', url: v.youtubeUrl, articleId: article.id } });
+    videosCrees++;
+  }
+
+  // Interviews audio réelles (fichiers uploadés vers Cloudinary).
+  // .mp3 : format de livraison demandé à Cloudinary à la volée (transcodage
+  // depuis le .3gp stocké), pour une compatibilité audio HTML5 maximale.
+  const AUDIOS = [
+    { slug: 'apercu-audio-cardinal-bessi', nom: 'Cardinal Bessi', url: 'https://res.cloudinary.com/ataat5bs/video/upload/v1787580448/audio-interviews/cardinal-bessi.mp3', duree: 2301 },
+    { slug: 'apercu-audio-dakouri-benson', nom: 'Dakouri Benson', url: 'https://res.cloudinary.com/ataat5bs/video/upload/v1787580736/audio-interviews/dakouri-benson.mp3', duree: 1411 },
+    { slug: 'apercu-audio-dion-yaye-robert', nom: 'Dion Yayé Robert', url: 'https://res.cloudinary.com/ataat5bs/video/upload/v1787580844/audio-interviews/dion-yaye-robert.mp3', duree: 2604 },
+    { slug: 'apercu-audio-fondation-dakoury-marus-tresor', nom: 'Fondation Dakoury Marus Trésor', url: 'https://res.cloudinary.com/ataat5bs/video/upload/v1787580882/audio-interviews/fondation-dakoury-marus-tresor.mp3', duree: 678 },
+    { slug: 'apercu-audio-gnanzi-guela-anicet', nom: 'Gnanzi Guéla Anicet', url: 'https://res.cloudinary.com/ataat5bs/video/upload/v1787580962/audio-interviews/gnanzi-guela-anicet.mp3', duree: 1162 },
+    { slug: 'apercu-audio-jean-louis-billon', nom: 'Jean Louis Billon', url: 'https://res.cloudinary.com/ataat5bs/video/upload/v1787581116/audio-interviews/jean-louis-billon.mp3', duree: 2442 },
+    { slug: 'apercu-audio-rugby-andrea', nom: 'Rugby Andrea', url: 'https://res.cloudinary.com/ataat5bs/video/upload/v1787581191/audio-interviews/rugby-andrea.mp3', duree: 2986 },
+  ];
+
+  let audiosCrees = 0;
+  for (const a of AUDIOS) {
+    const existe = await prisma.article.findUnique({ where: { slug: a.slug } });
+    if (existe) continue;
+    const maintenant = new Date();
+    const article = await prisma.article.create({
+      data: {
+        slug: a.slug, titre: `Entretien avec ${a.nom}`, chapo: `Interview audio réalisée par la rédaction.`, contenuHtml: null,
+        tags: ['apercu-interne'], format: 'AUDIO', statut: 'PUBLIE', paywall: 'LIBRE',
+        rubriqueId: audio.id, auteurId: redacteurEnChef.id, valideParId: redacteurEnChef.id,
+        imageUneUrl: null, portails: ['INFO_DIRECT'], dureeEcouteSec: a.duree,
+        publieLe: maintenant, createdAt: maintenant, updatedAt: maintenant, vuesTotal: 1,
+      },
+    });
+    await prisma.media.create({ data: { type: 'AUDIO', url: a.url, dureeSec: a.duree, legende: `Entretien avec ${a.nom}`, articleId: article.id } });
+    audiosCrees++;
+  }
+
+  console.log(`✔ ${videosCrees} vidéo(s) + ${audiosCrees} audio(s) d'aperçu interne créé(s).`);
+}
+
 async function main() {
   await seedRubriques();
   await seedStaff();
@@ -1767,6 +1862,7 @@ async function main() {
   await seedInfoDirectFlashs();
   await seedInfoDirectImages();
   await seedApercuInterne();
+  await seedVideosEtAudios();
 }
 
 main()
