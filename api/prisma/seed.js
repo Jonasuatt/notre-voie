@@ -1619,6 +1619,122 @@ async function seedInfoDirectImages() {
   console.log(`✔ ${illustres} article(s) "Info en direct" illustré(s).`);
 }
 
+// Lot de PRÉVISUALISATION INTERNE, à la demande explicite de l'utilisateur —
+// pour tester la disposition réelle des nouvelles rubriques avant validation
+// par les responsables de la Refondation. Texte de base issu d'une
+// proposition Gemini soumise par l'utilisateur (sujets plausibles, style
+// générique, pas de citation attribuée à une personne réelle nommée) ;
+// photos réelles de l'utilisateur (Gragbalilié, événement communautaire),
+// réutilisées comme illustration même hors-contexte, avec son accord
+// explicite. Repérable et supprimable via le tag "apercu-interne".
+// Exclu volontairement : le lot Deepseek (trop de faits institutionnels
+// précis inventés) et toute nécrologie fictive (jamais, sous aucun prétexte).
+async function seedApercuInterne() {
+  const [education, sante, environnement, numerique] = await Promise.all([
+    prisma.rubrique.findUniqueOrThrow({ where: { slug: 'education' } }),
+    prisma.rubrique.findUniqueOrThrow({ where: { slug: 'sante' } }),
+    prisma.rubrique.findUniqueOrThrow({ where: { slug: 'environnement' } }),
+    prisma.rubrique.findUniqueOrThrow({ where: { slug: 'numerique' } }),
+  ]);
+  const redacteurEnChef = await prisma.staff.findUniqueOrThrow({ where: { email: 'redacteur-en-chef@notrevoienews.com' } });
+
+  const PHOTOS = {
+    action: 'https://res.cloudinary.com/ataat5bs/image/upload/v1787572373/notre-voie/preview-gragbalilie/1-action.jpg',
+    accueil: 'https://res.cloudinary.com/ataat5bs/image/upload/v1787572377/notre-voie/preview-gragbalilie/2-accueil.jpg',
+    huddle: 'https://res.cloudinary.com/ataat5bs/image/upload/v1787572381/notre-voie/preview-gragbalilie/3-huddle.jpg',
+    doyenne: 'https://res.cloudinary.com/ataat5bs/image/upload/v1787572385/notre-voie/preview-gragbalilie/4-doyenne.jpg',
+    riviere: 'https://res.cloudinary.com/ataat5bs/image/upload/v1787572389/notre-voie/preview-gragbalilie/5-riviere.jpg',
+    chateauEau: 'https://res.cloudinary.com/ataat5bs/image/upload/v1787572393/notre-voie/preview-gragbalilie/6-chateau-eau.jpg',
+  };
+
+  const items = [
+    {
+      slug: 'apercu-rentree-scolaire-2026-2027-mesures-lycees',
+      titre: "Rentrée scolaire 2026-2027 : de nouvelles mesures pour désengorger les lycées publics",
+      chapo: "À l'approche de la nouvelle année scolaire, le ministère de l'Éducation nationale a dévoilé un train de réformes visant à améliorer les conditions d'apprentissage et à réduire les effectifs pléthoriques dans les grandes villes.",
+      contenuHtml: `<p>Abidjan, Bouaké, San-Pédro… Les grands centres urbains font face chaque année au même défi : l'afflux massif d'élèves dans les établissements secondaires publics. Pour y remédier, les autorités ont confirmé la mise en service de dix nouveaux collèges de proximité dès ce mois de septembre.</p>
+<p>Par ailleurs, la plateforme d'orientation en ligne est optimisée pour éviter les tracasseries administratives aux parents d'élèves. Les syndicats d'enseignants saluent ces avancées tout en appelant à un suivi rigoureux de la dotation en kits scolaires.</p>`,
+      rubriqueId: education.id, imageUneUrl: PHOTOS.huddle,
+    },
+    {
+      slug: 'apercu-campagne-vaccination-paludisme-zones-rurales',
+      titre: "Campagne nationale : lutte renforcée contre le paludisme dans les zones rurales",
+      chapo: "Une vaste opération de sensibilisation et de distribution de moustiquaires imprégnées a débuté ce week-end dans le Grand Nord, avec l'implication des agents de santé communautaires.",
+      contenuHtml: `<p>Le paludisme demeure l'un des premiers motifs de consultation médicale dans les centres de santé de première catégorie. Pour inverser la tendance, le Programme national de lutte contre le paludisme déploie une stratégie de proximité ciblée sur les mères et les jeunes enfants.</p>
+<p>Dans les villages visités, des équipes mobiles procèdent à des dépistages gratuits et distribuent des traitements préventifs. Les autorités sanitaires rappellent que la salubrité autour des habitations et l'utilisation systématique des moustiquaires restent les barrières les plus efficaces contre la transmission du parasite.</p>`,
+      rubriqueId: sante.id, imageUneUrl: PHOTOS.doyenne,
+    },
+    {
+      slug: 'apercu-abidjan-gestion-dechets-plastiques',
+      titre: "Abidjan : vers une gestion plus intelligente des déchets plastiques",
+      chapo: "Entre initiatives citoyennes et innovations, les municipalités tentent de transformer le problème des sachets plastiques en opportunité économique pour la jeunesse.",
+      contenuHtml: `<p>Se promener dans certains quartiers d'Abidjan après une forte pluie rappelle l'urgence de la question environnementale. Face à l'accumulation des déchets plastiques, de jeunes entrepreneurs ivoiriens développent des solutions de collecte sélective et de recyclage en pavés autobloquants ou en mobilier urbain.</p>
+<p>Des campagnes de ramassage citoyen sont programmées le dernier samedi de chaque mois pour encourager un changement durable des comportements.</p>`,
+      rubriqueId: environnement.id, imageUneUrl: PHOTOS.chateauEau,
+    },
+    {
+      slug: 'apercu-startups-ia-agriculture-locale',
+      titre: "Startups ivoiriennes : quand l'intelligence artificielle s'invite dans l'agriculture locale",
+      chapo: "De jeunes ingénieurs d'Abidjan conçoivent des applications mobiles et des capteurs connectés pour aider les producteurs de cacao et d'anacarde à optimiser leurs rendements.",
+      contenuHtml: `<p>L'innovation technologique n'est plus l'exclusivité des grandes métropoles occidentales. En Côte d'Ivoire, l'écosystème tech s'empare des défis du secteur agricole. Grâce à des outils de vision par ordinateur et des algorithmes d'analyse météo, des plateformes locales permettent désormais aux agriculteurs de détecter les maladies des cultures avant qu'elles ne ravagent les plantations.</p>
+<p>Cette transition numérique, couplée au développement de la formation aux métiers du code, positionne le pays comme l'un des hubs technologiques d'Afrique de l'Ouest.</p>`,
+      rubriqueId: numerique.id, imageUneUrl: PHOTOS.accueil,
+    },
+  ];
+
+  let crees = 0;
+  for (const item of items) {
+    const existe = await prisma.article.findUnique({ where: { slug: item.slug } });
+    if (existe) continue;
+    const maintenant = new Date();
+    await prisma.article.create({
+      data: {
+        slug: item.slug, titre: item.titre, chapo: item.chapo, contenuHtml: item.contenuHtml,
+        tags: ['apercu-interne'], format: 'EDITION', statut: 'PUBLIE', paywall: 'LIBRE',
+        rubriqueId: item.rubriqueId, auteurId: redacteurEnChef.id, valideParId: redacteurEnChef.id,
+        imageUneUrl: item.imageUneUrl, portails: ['INFO_DIRECT'],
+        publieLe: maintenant, createdAt: maintenant, updatedAt: maintenant, vuesTotal: 1,
+      },
+    });
+    crees++;
+  }
+
+  // Galerie "Rétro Photo" — pour tester le module photothèque/album, avec de
+  // vraies légendes décrivant réellement ce que montrent les photos (un
+  // événement communautaire à Gragbalilié), même si elles illustrent ici une
+  // rubrique différente de leur contenu réel.
+  const galerieSlug = 'apercu-retro-photo-semaine';
+  let galerie = await prisma.article.findUnique({ where: { slug: galerieSlug } });
+  if (!galerie) {
+    const maintenant = new Date();
+    galerie = await prisma.article.create({
+      data: {
+        slug: galerieSlug,
+        titre: "Rétro Photo : la semaine en images",
+        chapo: "Plongée en images dans un événement communautaire — ici, un rassemblement villageois à Gragbalilié.",
+        contenuHtml: `<p>Cette rubrique réunit chaque semaine une sélection de photos de reportage. Aperçu de test : rassemblement communautaire à Gragbalilié, 21-23 août 2026.</p>`,
+        tags: ['apercu-interne'], format: 'EDITION', statut: 'PUBLIE', paywall: 'LIBRE',
+        rubriqueId: (await prisma.rubrique.findUniqueOrThrow({ where: { slug: 'photos-legendees' } })).id,
+        auteurId: redacteurEnChef.id, valideParId: redacteurEnChef.id,
+        imageUneUrl: PHOTOS.riviere, portails: ['INFO_DIRECT'],
+        publieLe: maintenant, createdAt: maintenant, updatedAt: maintenant, vuesTotal: 1,
+      },
+    });
+    const photosGalerie = [
+      { url: PHOTOS.riviere, legende: "Rassemblement au bord de la rivière, Gragbalilié.", credit: 'DR', ordre: 0 },
+      { url: PHOTOS.action, legende: "Match de football communautaire, Gragbalilié.", credit: 'DR', ordre: 1 },
+      { url: PHOTOS.accueil, legende: "Accueil des équipes par les autorités villageoises, Gragbalilié.", credit: 'DR', ordre: 2 },
+      { url: PHOTOS.huddle, legende: "Les jeunes joueurs rassemblés avant la rencontre, Gragbalilié.", credit: 'DR', ordre: 3 },
+      { url: PHOTOS.doyenne, legende: "Une doyenne du village, Gragbalilié.", credit: 'DR', ordre: 4 },
+    ];
+    for (const p of photosGalerie) {
+      await prisma.media.create({ data: { type: 'PHOTO', articleId: galerie.id, ...p } });
+    }
+  }
+
+  console.log(`✔ ${crees} article(s) d'aperçu interne créé(s) + galerie Rétro Photo.`);
+}
+
 async function main() {
   await seedRubriques();
   await seedStaff();
@@ -1650,6 +1766,7 @@ async function main() {
   await fixArticleDates();
   await seedInfoDirectFlashs();
   await seedInfoDirectImages();
+  await seedApercuInterne();
 }
 
 main()
