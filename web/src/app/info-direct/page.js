@@ -263,7 +263,7 @@ export default async function QuotidienAccueilPage() {
         <>
           <Separateur />
           <section className="max-w-[1180px] mx-auto px-4 sm:px-8 pb-10">
-            <ColonneActualites colonnes={colonnesService} basePath={BASE_PATH} titre="Aussi sur Info en direct" />
+            <ColonneActualites colonnes={colonnesService} basePath={BASE_PATH} titre="Aussi sur Info en direct" styleCartes />
           </section>
         </>
       )}

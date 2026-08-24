@@ -27,7 +27,7 @@ export default function GrillePiliers({ colonnes, basePath = '', titre = 'Actual
           {cartesPrincipales.map(({ nom, couleur, article }) => (
             <Link key={article.id} href={`${basePath}/article/${article.slug}`} className="group block">
               {article.imageUneUrl && (
-                <div className="relative aspect-video rounded-[8px] overflow-hidden mb-3 bg-[#171d30]">
+                <div className={`relative rounded-[8px] overflow-hidden mb-3 bg-[#171d30] ${nom === 'Formats Verticaux' ? 'aspect-[9/16] max-h-64 mx-auto max-w-[220px]' : 'aspect-video'}`}>
                   <Image src={article.imageUneUrl} alt="" fill sizes="(max-width: 1024px) 100vw, 380px" className="object-cover transition-transform duration-300 group-hover:scale-105" />
                   {(article.format === 'VIDEO_COURTE' || article.format === 'LIVE') && (
                     <div className="absolute inset-0 flex items-center justify-center bg-black/10 group-hover:bg-black/25 transition-colors">
@@ -45,7 +45,7 @@ export default function GrillePiliers({ colonnes, basePath = '', titre = 'Actual
               )}
               <span className="font-mono text-[10.5px] font-bold uppercase tracking-widest" style={{ color: couleur || '#22D3EE' }}>{nom}</span>
               <h4 className="font-serif text-[17px] leading-snug mt-1.5 group-hover:text-[#22D3EE] transition-colors">{article.titre}</h4>
-              {article.chapo && <p className="text-[12.5px] mt-1.5 leading-snug line-clamp-2" style={{ color: '#8993B0' }}>{article.chapo}</p>}
+              {article.chapo && <p className="text-[12.5px] mt-1.5 leading-snug line-clamp-2" style={{ color: '#B8C0D9' }}>{article.chapo}</p>}
               <span className="font-mono text-[10.5px] mt-2 block" style={{ color: '#8993B0' }}>{timeAgo(article.publieLe)}</span>
             </Link>
           ))}
