@@ -1,11 +1,15 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { getArticles, getTicker, getFactChecks, getCampagnesActives, getEditions } from '@/lib/api';
+import { getArticles, getRubriques, getTicker, getFactChecks, getCampagnesActives, getEditions } from '@/lib/api';
+import { construireOnglets, getArticlesRubriqueEtEnfants } from '@/lib/onglets';
 import FlashBar from '@/components/FlashBar';
 import DerniereMinute from '@/components/DerniereMinute';
 import TickerVieChere from '@/components/TickerVieChere';
+import TickerFlashInfo from '@/components/TickerFlashInfo';
 import ClusterArticles from '@/components/ClusterArticles';
 import ColonneActualites from '@/components/ColonneActualites';
+import OngletsPilier from '@/components/OngletsPilier';
+import Carrousel from '@/components/Carrousel';
 import FactCheckBlock from '@/components/FactCheckBlock';
 import FormatBadge from '@/components/FormatBadge';
 import PubCard from '@/components/PubCard';
@@ -31,16 +35,45 @@ export const dynamic = 'force-dynamic';
 // contenu publié reste accessible depuis l'accueil (cf. demande explicite).
 const RUBRIQUES_SERVICE_ACCUEIL = ['videos', 'audio-podcasts', 'photos-legendees', 'necrologie'];
 
+// Définition des onglets par pilier (cf. lib/megaMenu.js pour la même
+// arborescence pilier → rubriques) — chaque onglet agrège la rubrique
+// choisie et ses sous-rubriques réelles (getArticlesRubriqueEtEnfants).
+const ONGLETS_ACTUALITES_POLITIQUE = [
+  { label: 'Politique', slug: 'politique' },
+  { label: 'Régions', slug: 'regions' },
+  { label: 'Diaspora', slug: 'diaspora' },
+];
+const ONGLETS_ECONOMIE_SOCIETE = [
+  { label: 'Économie', slug: 'economie' },
+  { label: 'Vie chère', slug: 'vie-chere' },
+  { label: 'Numérique', slug: 'numerique' },
+];
+
 export default async function QuotidienAccueilPage() {
-  const [{ articles }, prix, factChecks, campagnes, editions, ...serviceGroupes] = await Promise.all([
+  const [{ articles }, prix, factChecks, campagnes, editions, rubriques, ...serviceGroupes] = await Promise.all([
     getArticles({ pageSize: 24, portail: 'INFO_DIRECT' }),
     getTicker(),
     getFactChecks(),
     getCampagnesActives({ format: 'NATIVE_CARTE' }),
     getEditions({ pageSize: 1 }),
+    getRubriques(),
     ...RUBRIQUES_SERVICE_ACCUEIL.map((slug) => getArticles({ rubrique: slug, portail: 'INFO_DIRECT', pageSize: 4 })),
   ]);
   const uneDuJour = editions?.[0];
+
+  const [ongletsActualites, ongletsEconomie, verite, opinionsTribunes, histoireCI] = await Promise.all([
+    construireOnglets(rubriques, ONGLETS_ACTUALITES_POLITIQUE, 'INFO_DIRECT'),
+    construireOnglets(rubriques, ONGLETS_ECONOMIE_SOCIETE, 'INFO_DIRECT'),
+    getArticlesRubriqueEtEnfants(rubriques, 'verite-ou-intox', 'INFO_DIRECT', 8),
+    getArticles({ rubrique: 'opinions-tribunes', portail: 'INFO_DIRECT', pageSize: 8 }),
+    getArticles({ rubrique: 'histoire-de-cote-d-ivoire', portail: 'INFO_DIRECT', pageSize: 8 }),
+  ]);
+  // Carrousel "Enquêtes & Décryptage" — uniquement les formats longs
+  // (DECRYPTAGE), toutes rubriques du pilier confondues.
+  const enquetes = [...verite, ...opinionsTribunes.articles, ...histoireCI.articles]
+    .filter((a) => a.format === 'DECRYPTAGE')
+    .sort((a, b) => new Date(b.publieLe) - new Date(a.publieLe))
+    .slice(0, 8);
 
   // Une colonne par rubrique de service ayant du contenu, au même format
   // que les blocs "Dossiers" / "Actualités" (ColonneActualites).
@@ -85,6 +118,7 @@ export default async function QuotidienAccueilPage() {
 
   return (
     <>
+      <TickerFlashInfo articles={articles.slice(0, 10)} basePath={BASE_PATH} />
       <TickerVieChere prix={prix} />
       <DerniereMinute articles={articles.slice(0, 6)} basePath={BASE_PATH} />
 
@@ -177,6 +211,25 @@ export default async function QuotidienAccueilPage() {
 
       <Separateur />
 
+      {/* Modules à onglets — basculent entre 3 sous-thèmes par pilier sans
+          rechargement de page, pour exposer davantage d'articles dans le
+          même espace. */}
+      {ongletsActualites.length > 0 && (
+        <section className="max-w-[1180px] mx-auto px-4 sm:px-8">
+          <OngletsPilier titre="Actualités & Politique" onglets={ongletsActualites} basePath={BASE_PATH} />
+        </section>
+      )}
+
+      {ongletsActualites.length > 0 && ongletsEconomie.length > 0 && <Separateur />}
+
+      {ongletsEconomie.length > 0 && (
+        <section className="max-w-[1180px] mx-auto px-4 sm:px-8">
+          <OngletsPilier titre="Économie & Société" onglets={ongletsEconomie} basePath={BASE_PATH} />
+        </section>
+      )}
+
+      <Separateur />
+
       {/* Dossiers — actualité regroupée par rubrique, façon "Guerre au
           Moyen-Orient" du New York Times : même disposition en colonnes
           (article en tête + titres courts) que le bloc Actualités final. */}
@@ -188,6 +241,17 @@ export default async function QuotidienAccueilPage() {
       )}
 
       <Separateur />
+
+      {/* Carrousel horizontal — met en mouvement les formats longs
+          (enquêtes/dossiers DECRYPTAGE) plutôt qu'une grille figée. */}
+      {enquetes.length > 0 && (
+        <>
+          <section className="max-w-[1180px] mx-auto px-4 sm:px-8">
+            <Carrousel titre="Enquêtes & Décryptage" articles={enquetes} basePath={BASE_PATH} />
+          </section>
+          <Separateur />
+        </>
+      )}
 
       <FlashBar articles={flashEtLive} basePath={BASE_PATH} />
 

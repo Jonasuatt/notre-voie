@@ -15,6 +15,35 @@ body {
   animation: pulse-live 1.4s infinite;
 }
 
+/* Bandeau "Flash Info" (TickerFlashInfo.js) — défilement continu, contenu
+   dupliqué une fois dans le DOM donc la boucle repart pile à mi-parcours
+   (translateX(-50%)) sans coupure visible ; pause au survol pour la
+   lecture. Durée proportionnelle au nombre d'articles via --ticker-duree
+   (posée en style inline par le composant). */
+@keyframes ticker-defiler-anim {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.ticker-defiler {
+  animation: ticker-defiler-anim var(--ticker-duree, 40s) linear infinite;
+}
+.ticker-piste:hover .ticker-defiler {
+  animation-play-state: paused;
+}
+
+/* Ascenseur discret pour le carrousel horizontal (Carrousel.js). */
+.scrollbar-fine {
+  scrollbar-width: thin;
+  scrollbar-color: #232B45 transparent;
+}
+.scrollbar-fine::-webkit-scrollbar {
+  height: 6px;
+}
+.scrollbar-fine::-webkit-scrollbar-thumb {
+  background: #232B45;
+  border-radius: 3px;
+}
+
 .prose-article :is(p) {
   margin-bottom: 1.1em;
   line-height: 1.75;
