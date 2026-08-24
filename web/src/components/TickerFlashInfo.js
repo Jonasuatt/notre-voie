@@ -15,7 +15,7 @@ export default function TickerFlashInfo({ articles, basePath = '' }) {
           <span className="w-1.5 h-1.5 rounded-full bg-white dot-live" /> Flash Info
         </span>
         <div className="ticker-piste flex-1 overflow-hidden">
-          <div className="ticker-defiler flex items-center gap-10 py-2 pl-6 w-max" style={{ '--ticker-duree': `${Math.max(articles.length * 4, 20)}s` }}>
+          <div className="ticker-defiler flex items-center gap-10 py-2 pl-6 w-max" style={{ '--ticker-duree': `${Math.max(articles.length * 14, 60)}s` }}>
             {boucle.map((a, i) => (
               <Link
                 key={`${a.id}-${i}`}
