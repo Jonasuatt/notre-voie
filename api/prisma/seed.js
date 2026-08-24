@@ -52,9 +52,10 @@ const RUBRIQUES_SERVICE = [
 // pour "Opinions & Tribunes" et "Histoire de Côte d'Ivoire", qui n'ont pas
 // de rubrique parente naturelle et deviennent des rubriques Info en direct
 // de premier niveau (comme Éducation/Santé/Environnement/Numérique).
-// Volontairement omis (redondants avec une fonctionnalité déjà existante,
-// pas un thème éditorial classable) : "Direct & Flashs" (= la page /direct
-// existante) et "Le Kiosque PDF" (= la page /kiosque existante).
+// Volontairement omis (confirmé explicitement par l'utilisateur : "Ne pas
+// changer") : "Direct & Flashs" (= la page /direct existante) et "Le
+// Kiosque PDF" (= la page /kiosque existante) — pas de vraie rubrique de
+// classification, redites de fonctionnalités déjà présentes sur le site.
 // Créées vides : aucun article n'est inventé pour les peupler.
 const SOUS_RUBRIQUES = [
   { parentSlug: 'politique', nom: 'Élections & Partis', angleEditorial: 'Actu RHDP, PPA-CI, PDCI-RDA, partis indépendants' },
@@ -2085,6 +2086,213 @@ async function seedApercuEnquetesDossiersReportages() {
   console.log(`✔ ${crees} enquête(s)/dossier(s)/reportage(s) d'aperçu créé(s).`);
 }
 
+// Troisième lot : un trio Enquête/Dossier/Reportage par sous-rubrique
+// (texte intégralement fourni par l'utilisateur). Format dérivé du préfixe
+// du titre : Enquête/Dossier → DECRYPTAGE, Reportage → EDITION (même
+// convention que seedApercuEnquetesDossiersReportages). "Direct & Flashs"
+// et "Le Kiosque PDF" restent volontairement exclus comme rubriques (cf.
+// SOUS_RUBRIQUES : "Ne pas changer", confirmé explicitement par
+// l'utilisateur) — leurs 6 articles sont rattachés à la sous-rubrique
+// existante la plus proche (Abidjan & Communes, Grands Format, Histoire de
+// Côte d'Ivoire) plutôt qu'à une nouvelle rubrique.
+async function seedApercuTriosSousRubriques() {
+  const redacteurEnChef = await prisma.staff.findUniqueOrThrow({ where: { email: 'redacteur-en-chef@notrevoienews.com' } });
+  const PHOTOS = [
+    'https://res.cloudinary.com/ataat5bs/image/upload/v1787572373/notre-voie/preview-gragbalilie/1-action.jpg',
+    'https://res.cloudinary.com/ataat5bs/image/upload/v1787572377/notre-voie/preview-gragbalilie/2-accueil.jpg',
+    'https://res.cloudinary.com/ataat5bs/image/upload/v1787572381/notre-voie/preview-gragbalilie/3-huddle.jpg',
+    'https://res.cloudinary.com/ataat5bs/image/upload/v1787572385/notre-voie/preview-gragbalilie/4-doyenne.jpg',
+    'https://res.cloudinary.com/ataat5bs/image/upload/v1787572389/notre-voie/preview-gragbalilie/5-riviere.jpg',
+    'https://res.cloudinary.com/ataat5bs/image/upload/v1787572393/notre-voie/preview-gragbalilie/6-chateau-eau.jpg',
+  ];
+
+  const LOTS = [
+    { rubrique: 'elections-partis', items: [
+      ["Enquête : Les budgets de pré-campagne : d'où viennent les fonds des états-majors ?", "Enquête exclusive sur le circuit de financement des partis politiques, la traçabilité des dons de partisans et le rôle des clubs de soutien privés."],
+      ["Dossier : Cartographie des forces politiques dans les 31 régions du pays", "Analyse détaillée région par région du poids électoral des grandes formations et des candidats indépendants."],
+      ["Reportage : Nuit de tension au siège d'un parti lors du choix des candidats", "Immersion de 12 heures au cœur des négociations fermées pour l'obtention des investitures officielles."],
+    ] },
+    { rubrique: 'institutions-lois', items: [
+      ["Enquête : Lois sur le foncier rural : pourquoi leur application piétine sur le terrain", "Investigation sur les blocages administratifs et coutumiers qui freinent la délivrance des certificats fonciers."],
+      ["Dossier : La dématérialisation des services publics : le bilan des réformes", "État des lieux des démarches administratives numérisées, de l'état civil aux passeports."],
+      ["Reportage : Dans les coulisses d'une séance à huis clos à l'Assemblée Nationale", "Reportage au plus près des députés pendant le vote crucial d'un projet de loi budgétaire."],
+    ] },
+    { rubrique: 'abidjan-communes', items: [
+      ["Enquête : Marchés publics municipaux : opacité ou transparence dans l'attribution ?", "Révélations sur les procédures de passation de marchés pour les chantiers de voirie dans les mairies abidjanaises."],
+      ["Dossier : Le grand comparatif des budgets des 10 communes d'Abidjan", "Analyse chiffrée des ressources financières, des dépenses d'investissement et des priorités de chaque municipalité."],
+      ["Reportage : 24 heures avec la brigade de salubrité de la mairie d'Abobo", "Suivi nocturne et diurne des agents municipaux luttant contre les dépôts sauvages d'ordures."],
+      // Direct & Flashs, rattaché ici (pas de rubrique dédiée — cf. commentaire de fonction).
+      ["Enquête : Comment les fausses alertes perturbent le traitement de l'information d'urgence", "Analyse des mécanismes de vérification au sein de la rédaction pour valider une alerte en moins de 3 minutes."],
+      ["Dossier : Dispositifs d'urgence nationale : la chaîne de commandement en cas de crise", "Présentation des protocoles d'alerte des sapeurs-pompiers, du Samu et de la police nationale."],
+      ["Reportage : Au cœur de la centrale d'information trafic lors d'une alerte météo à Abidjan", "Reportage en direct avec les régulateurs du trafic routier pendant une pluie diluvienne."],
+    ] },
+    { rubrique: 'vie-des-regions', items: [
+      ["Enquête : Conflits communautaires dans le Poro : les vraies causes de la pression foncière", "Enquête de terrain auprès des éleveurs et agriculteurs pour comprendre la résurgence des litiges pastoraux."],
+      ["Dossier : Désenclavement du Tonkpi : l'impact des nouvelles pistes rurales sur le commerce", "Bilan des infrastructures routières livrées dans l'Ouest et leur effet direct sur l'évacuation des produits agricoles."],
+      ["Reportage : Jour de grand marché transfrontalier à Pogo", "Carnet de route au cœur des échanges commerciaux et du contrôle douanier à la frontière du septentrion."],
+    ] },
+    { rubrique: 'diplomatie-cedeao', items: [
+      ["Enquête : Les réseaux d'influence de la diplomatie ivoirienne en Afrique de l'Ouest", "Investigation sur les canaux d'amitié et de médiation utilisés pour préserver la stabilité sous-régionale."],
+      ["Dossier : La libre circulation des marchandises en zone CEDEAO à l'épreuve des tracas routiers", "Étude comparative des coûts et délais de transport de marchandises entre Abidjan, Bamako et Ouagadougou."],
+      ["Reportage : Dans les pas des délégations lors du Sommet diplomatique d'Abidjan", "Chronique des coulisses, du protocole d'État et des négociations informelles entre diplomates."],
+    ] },
+    { rubrique: 'diaspora-ivoire', items: [
+      ["Enquête : Transferts d'argent de la diaspora : la guerre des frais cachés des opérateurs", "Décryptage des commissions prélevées sur les envois de fonds depuis l'Europe et l'Amérique vers Abidjan."],
+      ["Dossier : Le retour des diplômés de la diaspora : opportunités et réalités du marché local", "Enquête sur les repats ivoiriens, les secteurs qui recrutent et les freins à l'intégration professionnelle."],
+      ["Reportage : Immersion au Forum des investisseurs de la diaspora ivoirienne à Paris", "Rencontre avec des entrepreneurs expatriés désireux de lancer des projets industriels au pays."],
+    ] },
+
+    { rubrique: 'le-panier-de-la-menagere', items: [
+      ["Enquête : La chaîne des intermédiaires : pourquoi la tomate coûte trois fois plus cher à Abidjan", "Enquête sur les spéculateurs et les coopératives grossistes qui fixent les prix avant le marché de détail."],
+      ["Dossier : 5 ans d'évolution des prix des produits de première nécessité en Côte d'Ivoire", "Tableau comparatif des prix du riz, de l'huile, de la viande et du sucre sur la demi-décennie écoulée."],
+      ["Reportage : Aux côtés d'une famille de Koumassi gérant son budget mensuel au marché", "Suivi d'une mère de famille dans ses arbitrages quotidiens face à la cherté de la vie."],
+    ] },
+    { rubrique: 'agro-industrie-export', items: [
+      ["Enquête : Les réseaux de fuite du cacao brut aux frontières terrestres", "Investigation sur les circuits de contrebande des fèves vers les pays voisins en période de campagne."],
+      ["Dossier : Transformation de l'anacarde : de la récolte en brousse aux usines d'Abidjan", "État des lieux du taux de décorticage national et des mesures d'incitation aux usiniers."],
+      ["Reportage : Dans les chaînes de conditionnement d'une coopérative agricole à San-Pédro", "Reportage photo-texte au milieu des sacs de café et de cacao prêts pour l'embarquement portuaire."],
+    ] },
+    { rubrique: 'tech-startups', items: [
+      ["Enquête : Levées de fonds des startups abidjanaises : entre annonces spectaculaires et réalité financière", "Révélations sur le taux de survie réel des pépites de la fintech ivoirienne après leur premier tour de table."],
+      ["Dossier : La guerre des applications de paiement et de transfert d'argent mobile", "Analyse comparative des frais, de la couverture réseau et des fonctionnalités des géants du mobile money."],
+      ["Reportage : 48 heures au cœur d'un Hackathon de développeurs à Cocody", "Immersion parmi les jeunes ingénieurs concevant des solutions d'intelligence artificielle pour l'agriculture."],
+    ] },
+    { rubrique: 'emploi-concours', items: [
+      ["Enquête : Le marché noir des faux sujets et corrigés de concours sur WhatsApp", "Enquête sur les arnaques ciblant les candidats aux concours administratifs et les réseaux de fraudeurs traqués par la police."],
+      ["Dossier : Guide complet des concours nationaux : effectifs, conditions et taux d'admissibilité", "Relevé exhaustif des données d'admission de l'ENA, de l'INFAS, du CAFOP et des écoles militaires."],
+      ["Reportage : Au cœur de la longue file d'attente du dépôt des dossiers de candidature", "Récit de vie et témoignages de diplômés en quête d'une place dans la fonction publique."],
+    ] },
+    { rubrique: 'systeme-educatif', items: [
+      ["Enquête : Les cours du soir payants dans les lycées publics : tolérance ou abus ?", "Investigation sur les pratiques tarifaires parallèles instaurées dans certains établissements secondaires."],
+      ["Dossier : Enseignement privé sous contrat : niveau d'encadrement et subventions de l'État", "Évaluation de la qualité d'apprentissage dans les grandes écoles et collèges privés agréés."],
+      ["Reportage : Une journée d'immersion dans un collège de proximité en zone rurale", "Découverte du quotidien des élèves et enseignants loin des commodités des grandes métropoles."],
+    ] },
+    { rubrique: 'sante-prevention', items: [
+      ["Enquête : Faux médicaments et pharmacie par terre : la filière d'approvisionnement démantelée", "Enquête sur les saisies de médicaments contrefaits dans les marchés informels et les ports d'entrée."],
+      ["Dossier : Bilan de la CMU : taux de couverture, pharmacies affiliées et reste à charge", "Radiographie complète du système de Couverture Maladie Universelle et des défis du secteur informel."],
+      ["Reportage : Garde de nuit aux urgences du CHU de Yopougon", "Carnet d'immersion auprès des médecins et infirmiers au chevet des patients durant un week-end d'affluence."],
+    ] },
+    { rubrique: 'cadre-de-vie-climat', items: [
+      ["Enquête : Permis de construire en zones inondables : qui valide les chantiers à risque ?", "Enquête sur le non-respect du plan d'urbanisme à Abidjan et les responsabilités partagées lors des glissements de terrain."],
+      ["Dossier : Recyclage des déchets plastiques : l'urgence d'une filière industrielle", "État des lieux des volumes de bouteilles et sachets rejetés, et des rares unités de transformation."],
+      ["Reportage : Sur les chantiers de curage des canaux d'évacuation avant la grande saison des pluies", "Suivi des engins de terrassement et des ouvriers nettoyant les bassins d'orage d'Indénié."],
+    ] },
+
+    { rubrique: 'showbiz-musique', items: [
+      ["Enquête : Le business des concerts au Palais de la Culture : combien gagnent vraiment les artistes ?", "Enquête sur la rentabilité des spectacles, la répartition des billets et les coûts d'organisation."],
+      ["Dossier : L'exportation de la musique ivoirienne : du Coupé-Décalé au Rap Ivoire sur les scènes mondiales", "Panorama des artistes locaux sous contrat avec des majors internationales et des festivals étrangers."],
+      ["Reportage : Dans l'intimité d'un studio d'enregistrement à Koumassi lors de la création d'un tube", "Immersion avec un beatmaker et un chanteur durant 8 heures de composition en continu."],
+    ] },
+    { rubrique: 'elephants-football-national', items: [
+      ["Enquête : Centres de formation de quartier : pépinières de talents ou miroirs aux alouettes ?", "Investigation sur les centres de football non agréés promettant des essais en Europe contre de l'argent."],
+      ["Dossier : Le modèle économique des clubs de Ligue 1 Lonaci à l'épreuve du manque de public", "Analyse des recettes de billetterie, des droits TV et du sponsoring des clubs du championnat national."],
+      ["Reportage : Jour de derby ASEC - Africa au Stade Félix Houphouët-Boigny côté virage supporters", "Ambiance, chants et ferveur populaire vécus depuis les gradins des deux plus grands clubs du pays."],
+    ] },
+    { rubrique: 'sports-internationaux', items: [
+      ["Enquête : Les réseaux d'expatriation des jeunes basketteurs ivoiriens vers les académies étrangères", "Enquête sur les bourses d'études et de sport proposées aux espoirs locaux aux États-Unis et en Europe."],
+      ["Dossier : Les Éléphants omnisports sur la scène internationale : bilan et perspectives", "Résultats et performances des athlètes ivoiriens en taekwondo, athlétisme, basket et rugby."],
+      ["Reportage : Nuit de retransmission de finale européenne dans un grin de passionnés à Treichville", "Reportage sur l'engouement du public abidjanais pour les grands championnats de football internationaux."],
+    ] },
+    { rubrique: 'gastronomie-maquis', items: [
+      ["Enquête : Hygiène et traçabilité des produits de la mer servis dans les espaces de restauration", "Investigation sur les chaînes de froid de l'approvisionnement en poisson frais dans les maquis."],
+      ["Dossier : L'Attiéké ivoirien : processus d'homologation internationale et enjeux d'exportation", "Analyse de la protection du label Attiéké et du développement des PME d'exportation de semoule de manioc."],
+      ["Reportage : Dès 5h du matin avec les braiseurs de Garba de Treichville", "Immersion auprès des garbakés, du nettoyage du poisson au rush de la pause de mi-journée."],
+    ] },
+    { rubrique: 'arts-spectacles', items: [
+      ["Enquête : Statut de l'artiste en Côte d'Ivoire : pourquoi les comédiens peinent à cotiser", "Révélations sur l'absence de couverture sociale minimale pour les comédiens, plasticiens et danseurs."],
+      ["Dossier : Le renouveau du cinéma ivoirien : essor des séries TV et des plateformes de streaming", "Bilan des coproductions audiovisuelles locales financées par des groupes télévisuels régionaux."],
+      ["Reportage : Répétition générale de la Troupe Nationale de Danse à la Cité des Arts", "Reportage visuel sur la transmission des danses traditionnelles aux nouvelles générations de danseurs."],
+    ] },
+    { rubrique: 'carnet-noir', items: [
+      ["Enquête : Le coût financier des funérailles : la flambée des tarifs des prestations mortuaires", "Investigation sur les budgets imposants consacrés aux obsèques et sur le marché des pompes funèbres."],
+      ["Dossier : Les rites funéraires traditionnels face aux contraintes de la vie urbaine moderne", "Étude sociologique sur l'adaptation des veillées et cérémonies coutumières en milieu métropolitain."],
+      ["Reportage : Pendant la veillée traditionnelle d'hommage à un notable en pays Akan", "Récit empreint de gravité sur l'organisation des cérémonies de séparation et les chants de deuil."],
+    ] },
+
+    { rubrique: 'fact-checking-web', items: [
+      ["Enquête : Qui orchestre les fermes à clics et la création de fausses rumeurs sur Facebook ?", "Enquête technique sur les identités numériques factices créées pour générer du buzz payant ou de la manipulation."],
+      ["Dossier : Les 10 plus gros canulars numériques démontés cette année en Côte d'Ivoire", "Compilations des intox ayant circulé sur WhatsApp et explications pas à pas des techniques de décryptage."],
+      ["Reportage : Une journée avec la cellule de vérification face à la propagation d'une vidéo tronquée", "Chronique minutée de la déconstruction d'un montage vidéo malveillant par la rédaction."],
+    ] },
+    { rubrique: 'grands-format', items: [
+      ["Enquête : L'orpaillage clandestin : désastre écologique et circuits d'évacuation de l'or", "Longue enquête d'investigation sur les sites d'extraction illégale et la pollution des cours d'eau."],
+      ["Dossier : Trente ans de mutations urbaines à Abidjan : de la « Perle des lagunes » à la mégapole", "Un grand dossier rétrospectif appuyé sur des cartes et des données démographiques historiques."],
+      ["Reportage : 72 heures à bord du train voyageurs reliant Abidjan à l'intérieur du pays", "Carnet de voyage ferroviaire retraçant les escales, les paysages et la vie des passagers."],
+      // Le Kiosque PDF, rattaché ici (pas de rubrique dédiée — cf. commentaire de fonction).
+      ["Enquête : La crise du papier journal : comment la hausse des coûts accélère la transition numérique", "Investigation sur le coût des intrants d'imprimerie et le basculement des abonnés vers les liseuses PDF."],
+      ["Reportage : Dans le bruit des rotatives d'imprimerie à 2 heures du matin lors du bouclage", "Coulisses de la fabrication physique du journal, du transfert informatique à l'expédition des liasses."],
+    ] },
+    { rubrique: 'opinions-tribunes', items: [
+      ["Enquête : L'influence des laboratoires d'idées et universités sur les choix politiques nationaux", "Enquête sur le rôle réel des chercheurs et économistes indépendants dans les réformes étatiques."],
+      ["Dossier : Anthologie des meilleures tribunes citoyennes sur la jeunesse et l'avenir du continent", "Sélection de textes engagés rédigés par la société civile, des intellectuels et des étudiants."],
+      ["Reportage : Au cœur d'un café-débat contradictoire sur le campus de l'Université Félix Houphouët-Boigny", "Reportage vivant au milieu des échanges passionnés des étudiants lors d'une conférence académique."],
+    ] },
+    { rubrique: 'histoire-de-cote-d-ivoire', items: [
+      ["Enquête : La quête des trésors royaux et pièces archéologiques conservés à l'étranger", "Investigation sur les démarches administratives engagées pour le rapatriement des biens culturels nationaux."],
+      ["Dossier : La saga des grands barrages hydroélectriques : de Kossou à Soubré", "Histoire de l'indépendance énergétique ivoirienne à travers la construction de ses infrastructures majeures."],
+      ["Reportage : Visite guidée dans les réserves secrètes du Musée des Civilisations d'Abidjan", "Découverte de pièces historiques centenaires conservées hors de la vue du grand public."],
+      // Le Kiosque PDF, rattaché ici (pas de rubrique dédiée — cf. commentaire de fonction).
+      ["Dossier : Un siècle de Unes historiques : l'histoire de la Côte d'Ivoire à travers la presse papier", "Une sélection des premières pages de journaux ayant immortalisé les grands événements du pays."],
+    ] },
+
+    { rubrique: 'le-debat-du-jour', items: [
+      ["Enquête : L'économie du podcast audio en Afrique de l'Ouest : sponsors ou financement propre ?", "Investigation sur les modèles de monétisation des producteurs de contenus audio indépendants."],
+      ["Dossier : Sélection des 5 émissions audio incontournables pour décrypter l'actualité ivoirienne", "Guide d'écoute et analyse du positionnement des talk-shows audio du moment."],
+      ["Reportage : Dans le studio lors de l'enregistrement en direct du débat sur la transition numérique", "Coulisses techniques : prise de son, gestion du temps de parole et régie audio."],
+    ] },
+    { rubrique: 'reportages-video', items: [
+      ["Enquête : Les risques du reportage vidéo sur le terrain : la protection des journalistes d'images", "Enquête sur les conditions de travail des caméramans lors de la couverture de zones de tension ou de catastrophes."],
+      ["Dossier : La révolution du matériel de tournage : du caméscope lourd au smartphone 4K", "Analyse de la transformation des outils de production audiovisuelle de presse."],
+      ["Reportage : Tournage embarqué sur une pirogue de patrouille lagunaire", "Reportage vidéo sur les techniques de cadrage et de prise de son en milieu aquatique."],
+    ] },
+    { rubrique: 'formats-verticaux', items: [
+      ["Enquête : L'addiction aux algorithmes vidéo : comment captiver les 15-25 ans sans dénaturer l'information", "Investigation sur la stratégie des rédactions pour adapter la rigueur journalistique aux formats courts de 60 secondes."],
+      ["Dossier : Méthodologie : condenser un dossier d'enquête en 3 vidéos verticales dynamiques", "Guide de découpage scénaristique, d'incrustation de sous-titres et d'animation graphique pour mobile."],
+      ["Reportage : Dans la « Creator Room » du journal où les journalistes tournent les vidéos TikTok du jour", "Découverte du processus d'écriture, d'enregistrement face caméra et de montage sur smartphone."],
+    ] },
+    { rubrique: 'retro-photo', items: [
+      ["Enquête : Le marché des archives photographiques de presse : préservation et droits d'auteur", "Enquête sur la conservation des négatifs originaux et la numérisation des trésors photographiques nationaux."],
+      ["Dossier : Un demi-siècle de clichés : les grands jalons de l'histoire du pays en images", "Exposition virtuelle des photos emblématiques de la Côte d'Ivoire de 1960 à nos jours."],
+      ["Reportage : Dans les pas d'un photojournaliste accrédité lors d'une cérémonie officielle au Palais", "Suivi des placements, du choix des focales et du traitement instantané des clichés d'actualité."],
+    ] },
+    { rubrique: 'interviews-exclusives', items: [
+      ["Enquête : Les exigences des conseillers en communication avant un grand entretien politique", "Coulisses des négociations sur le format, la durée et les conditions d'interview des personnalités publiques."],
+      ["Dossier : Rétrospective des interviews télévisées qui ont fait basculer l'opinion publique", "Analyse des tirades, des révélations et des grands face-à-face journalistiques de la presse ivoirienne."],
+      ["Reportage : Les 30 minutes de préparation en coulisses avant l'arrivée de l'invité VIP sur le plateau", "Récit de l'effervescence en régie, des tests d'éclairage et des derniers brief-journalistes."],
+    ] },
+  ];
+
+  let crees = 0;
+  let i = 0;
+  for (const lot of LOTS) {
+    const rubrique = await prisma.rubrique.findUnique({ where: { slug: lot.rubrique } });
+    if (!rubrique) {
+      console.warn(`⚠ Lot d'aperçu ignoré : rubrique "${lot.rubrique}" introuvable.`);
+      continue;
+    }
+    for (const [titre, chapo] of lot.items) {
+      const corps = titre.replace(/^(Enquête|Dossier|Reportage)\s*:\s*/, '');
+      const slug = 'apercu-b3-' + slugify(corps).slice(0, 60);
+      const format = titre.startsWith('Reportage') ? 'EDITION' : 'DECRYPTAGE';
+      i++;
+      const existe = await prisma.article.findUnique({ where: { slug } });
+      if (existe) continue;
+      const maintenant = new Date();
+      await prisma.article.create({
+        data: {
+          slug, titre, chapo, contenuHtml: `<p>${chapo}</p>`,
+          tags: ['apercu-interne'], format, statut: 'PUBLIE', paywall: 'LIBRE',
+          rubriqueId: rubrique.id, auteurId: redacteurEnChef.id, valideParId: redacteurEnChef.id,
+          imageUneUrl: PHOTOS[i % PHOTOS.length], portails: ['INFO_DIRECT'],
+          publieLe: maintenant, createdAt: maintenant, updatedAt: maintenant, vuesTotal: 1,
+        },
+      });
+      crees++;
+    }
+  }
+  console.log(`✔ ${crees} article(s) du 3e lot d'aperçu (trios enquête/dossier/reportage) créé(s).`);
+}
+
 async function main() {
   await seedRubriques();
   await seedSousRubriques();
@@ -2121,6 +2329,7 @@ async function main() {
   await seedVideosEtAudios();
   await seedApercuSousRubriques();
   await seedApercuEnquetesDossiersReportages();
+  await seedApercuTriosSousRubriques();
 }
 
 main()
