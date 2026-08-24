@@ -1902,6 +1902,83 @@ async function seedVideosEtAudios() {
   console.log(`✔ ${videosCrees} vidéo(s) + ${audiosCrees} audio(s) d'aperçu interne créé(s).`);
 }
 
+// Un article d'aperçu par sous-rubrique du mega-menu (cf. SOUS_RUBRIQUES),
+// fournis texte pour texte par l'utilisateur pour visualiser l'affichage.
+// "Direct & Flashs" est rattaché à Abidjan & Communes (thème proche, en
+// format FLASH) et "Le Kiosque PDF" est volontairement omis — cf.
+// SOUS_RUBRIQUES : ni l'un ni l'autre n'est une rubrique réelle, ce sont
+// des redites de pages déjà existantes (/direct, /kiosque).
+async function seedApercuSousRubriques() {
+  const redacteurEnChef = await prisma.staff.findUniqueOrThrow({ where: { email: 'redacteur-en-chef@notrevoienews.com' } });
+  const PHOTOS = [
+    'https://res.cloudinary.com/ataat5bs/image/upload/v1787572373/notre-voie/preview-gragbalilie/1-action.jpg',
+    'https://res.cloudinary.com/ataat5bs/image/upload/v1787572377/notre-voie/preview-gragbalilie/2-accueil.jpg',
+    'https://res.cloudinary.com/ataat5bs/image/upload/v1787572381/notre-voie/preview-gragbalilie/3-huddle.jpg',
+    'https://res.cloudinary.com/ataat5bs/image/upload/v1787572385/notre-voie/preview-gragbalilie/4-doyenne.jpg',
+    'https://res.cloudinary.com/ataat5bs/image/upload/v1787572389/notre-voie/preview-gragbalilie/5-riviere.jpg',
+    'https://res.cloudinary.com/ataat5bs/image/upload/v1787572393/notre-voie/preview-gragbalilie/6-chateau-eau.jpg',
+  ];
+
+  const items = [
+    { slug: 'apercu-rhdp-ppaci-strategies-locales', rubrique: 'elections-partis', titre: "RHDP et PPA-CI : Les états-majors affûtent leurs stratégies pour les locales", chapo: "À quelques mois des prochaines échéances, les formations politiques intensifient les meetings de mobilisation sur l'ensemble du territoire national." },
+    { slug: 'apercu-assemblee-nationale-modernisation-justice', rubrique: 'institutions-lois', titre: "Assemblée Nationale : Vote d'un projet de loi sur la modernisation de la justice", chapo: "Les députés ont adopté à la majorité le texte visant à dématérialiser les procédures administratives et à accélérer le traitement des dossiers judiciaires." },
+    { slug: 'apercu-cocody-yopougon-eclairage-public', rubrique: 'abidjan-communes', titre: "Cocody et Yopougon : Lancement des travaux d'extension de l'éclairage public", chapo: "Les municipalités abidjanaises renforcent le réseau électrique dans les quartiers périphériques pour améliorer la sécurité nocturne des usagers." },
+    { slug: 'apercu-poro-centre-culturel-korhogo', rubrique: 'vie-des-regions', titre: "Région du Poro : Inauguration d'un nouveau centre culturel à Korhogo", chapo: "Cet espace dédié à la jeunesse et aux arts traditionnels vise à promouvoir le patrimoine artisanal et culturel du septentrion ivoirien." },
+    { slug: 'apercu-sommet-cedeao-stabilite-sous-regionale', rubrique: 'diplomatie-cedeao', titre: "Sommet de la CEDEAO : La Côte d'Ivoire réaffirme son engagement pour la stabilité sous-régionale", chapo: "En réunion extraordinaire, les chefs d'État ont fait le point sur la coopération sécuritaire et la fluidité des échanges commerciaux inter-états." },
+    { slug: 'apercu-diaspora-france-forum-investisseurs', rubrique: 'diaspora-ivoire', titre: "Diaspora de France : Succès du premier forum des investisseurs ivoiriens à Paris", chapo: "Plus de 500 cadres et entrepreneurs de la diaspora se sont réunis pour échanger sur les opportunités de création d'entreprises à Abidjan." },
+    { slug: 'apercu-flash-5e-pont-trafic-fluide', rubrique: 'abidjan-communes', format: 'FLASH', titre: "[FLASH 14H30] Trafic fluide sur le 5e pont après l'intervention des services d'urgence", chapo: "L'incident technique survenu en mi-journée a été entièrement résorbé par les équipes d'assistance routière." },
+
+    { slug: 'apercu-marches-abidjan-plafonnement-riz-huile', rubrique: 'le-panier-de-la-menagere', titre: "Marchés d'Abidjan : Maintien du plafonnement des prix du riz et de l'huile", chapo: "Les contrôles du Ministère du Commerce se renforcent sur les marchés pour veiller au respect des barèmes sur les produits de première nécessité." },
+    { slug: 'apercu-anacarde-previsions-recolte-2026', rubrique: 'agro-industrie-export', titre: "Filière Anacarde : Des prévisions de récolte en hausse pour la campagne 2026", chapo: "Grâce aux récents investissements dans la transformation locale, le secteur prévoit une augmentation significative des revenus d'exportation." },
+    { slug: 'apercu-fintech-ivoirienne-levee-fonds', rubrique: 'tech-startups', titre: "Fintech ivoirienne : Une levée de fonds de 2 millions de dollars pour démocratiser l'épargne", chapo: "La jeune pousse abidjanaise ambitionne d'étendre ses services de transfert d'argent et d'épargne mobile à l'ensemble de la zone UEMOA." },
+    { slug: 'apercu-concours-fonction-publique-inscriptions', rubrique: 'emploi-concours', titre: "Concours de la Fonction Publique : Ouverture officielle des inscriptions en ligne", chapo: "Le Ministère invite les candidats à valider leurs dossiers sur la plateforme numérique dédiée avant la date limite fixée au mois prochain." },
+    { slug: 'apercu-tablettes-educatives-lycees-techniques', rubrique: 'systeme-educatif', titre: "Formation professionnelle : Dotation de tablettes éducatives dans les lycées techniques", chapo: "Un programme pilote de numérisation des supports pédagogiques démarre dans cinq grandes régions universitaires du pays." },
+    { slug: 'apercu-cmu-7-millions-assures', rubrique: 'sante-prevention', titre: "CMU : Franchissement du cap des 7 millions d'assurés immatriculés", chapo: "La Couverture Maladie Universelle intensifie ses campagnes de proximité dans les gares routières et les marchés pour enrôler les travailleurs du secteur informel." },
+    { slug: 'apercu-inondations-curage-bingerville', rubrique: 'cadre-de-vie-climat', titre: "Prévention des inondations : Travaux de curage préventifs à Bingerville", chapo: "Les autorités municipales déploient des chantiers d'aménagement pour sécuriser les canaux d'évacuation d'eau avant les fortes pluies." },
+
+    { slug: 'apercu-rap-ivoire-records-streaming', rubrique: 'showbiz-musique', titre: "Rap Ivoire : Nouveaux records de streaming pour les artistes locaux", chapo: "La scène urbaine ivoirienne confirme sa domination ouest-africaine avec des millions d'écoutes accumulées sur les plateformes légales." },
+    { slug: 'apercu-ligue1-lonaci-asec-tete-classement', rubrique: 'elephants-football-national', titre: "Ligue 1 Lonaci : L'ASEC Mimosas prend la tête du classement", chapo: "Les Jaune et Noir se sont imposés (2-0) au Stade Félix Houphouët-Boigny lors du choc de la journée de championnat." },
+    { slug: 'apercu-legion-ivoirienne-europe-performances', rubrique: 'sports-internationaux', titre: "Légion ivoirienne en Europe : Performances remarquées en grands championnats", chapo: "Retour sur les prestations du week-end des internationaux ivoiriens évoluant en Premier League et en Ligue 1 française." },
+    { slug: 'apercu-guide-garba-marcory', rubrique: 'gastronomie-maquis', titre: "Guide d'Abidjan : Les trois meilleures adresses pour déguster un Garba à Marcory", chapo: "Sélection des espaces incontournables où la semoule de manioc et le thon frit font la fierté de la gastronomie urbaine." },
+    { slug: 'apercu-femua-prochaine-edition-anoumabo', rubrique: 'arts-spectacles', titre: "FEMUA : Les grandes lignes de la prochaine édition dévoilées à Anoumabo", chapo: "Les organisateurs annoncent un plateau artistique international varié couplé à des actions sociales dans l'intérieur du pays." },
+    { slug: 'apercu-hommage-figure-presse-lettres', rubrique: 'carnet-noir', titre: "Disparition : Hommage à une grande figure de la presse et des lettres ivoiriennes", chapo: "La communauté journalistique salue la mémoire d'un éditorialiste chevronné qui a marqué plusieurs décennies d'information." },
+
+    { slug: 'apercu-intox-frais-transfert-argent', rubrique: 'fact-checking-web', titre: "Vérité ou Intox : Non, les frais de transfert d'argent n'ont pas augmenté", chapo: "Une fausse capture d'écran circulant sur WhatsApp sème la confusion. La direction des impôts et les opérateurs démentent cette rumeur." },
+    { slug: 'apercu-enquete-transport-lagunaire-abidjan', rubrique: 'grands-format', titre: "Enquête : Dans les coulisses de la logistique du transport lagunaire à Abidjan", chapo: "Entre bateaux-bus modernes et pirogues traditionnelles, immersion au cœur du transit quotidien de milliers d'Abidjanais sur la lagune Ébrié." },
+    { slug: 'apercu-tribune-ia-emancipation-jeunesse', rubrique: 'opinions-tribunes', titre: "Tribune : « L'Intelligence Artificielle, levier d'émancipation pour la jeunesse »", chapo: "Analyse signée par un enseignant-chercheur de l'Université Félix Houphouët-Boigny sur les opportunités du numérique pour les étudiants." },
+    { slug: 'apercu-retrospective-yamoussoukro-architecture', rubrique: 'histoire-de-cote-d-ivoire', titre: "Rétrospective : La planification de Yamoussoukro et son architecture emblématique", chapo: "Retour sur les étapes clés du développement de la capitale politique ivoirienne et de ses grands monuments nationaux." },
+
+    { slug: 'apercu-podcast-secteur-informel-bouake', rubrique: 'le-debat-du-jour', titre: "Podcast : Comment moderniser le secteur informel sans fragiliser les commerçants ?", chapo: "[12 min d'écoute] Débat audio entre économistes et représentants des commerçants du grand marché de Bouaké." },
+    { slug: 'apercu-video-patrouilles-securite-routiere', rubrique: 'reportages-video', titre: "Vidéo : Immersion avec les patrouilles de la sécurité routière sur les grands axes", chapo: "[Reportage 2 min 30] Suivez nos caméras au cœur du dispositif de prévention et de contrôle du trafic à Abidjan." },
+    { slug: 'apercu-reels-astuces-verifier-information', rubrique: 'formats-verticaux', titre: "Reels / TikTok : 3 astuces rapides pour vérifier une information sur Internet", chapo: "Un format vidéo d'une minute expliquant les réflexes simples à adopter pour ne pas tomber dans le piège des intox sur les réseaux sociaux." },
+    { slug: 'apercu-galerie-festival-arts-sanwi', rubrique: 'retro-photo', titre: "Galerie Photo : Les plus beaux clichés du Festival des Arts du Sanwi", chapo: "Série photographique capturant la richesse des danses traditionnelles, des parures et du patrimoine du Sud-Est ivoirien." },
+    { slug: 'apercu-interview-ministre-numerique-startups', rubrique: 'interviews-exclusives', titre: "Entretien vidéo : Le Ministre du Numérique répond aux questions des startups", chapo: "Échange direct sur le soutien aux jeunes entreprises technologiques, le coût d'accès à Internet et les programmes de formation au code." },
+  ];
+
+  let crees = 0;
+  for (const [i, item] of items.entries()) {
+    const existe = await prisma.article.findUnique({ where: { slug: item.slug } });
+    if (existe) continue;
+    const rubrique = await prisma.rubrique.findUnique({ where: { slug: item.rubrique } });
+    if (!rubrique) {
+      console.warn(`⚠ Article d'aperçu "${item.slug}" ignoré : rubrique "${item.rubrique}" introuvable.`);
+      continue;
+    }
+    const maintenant = new Date();
+    await prisma.article.create({
+      data: {
+        slug: item.slug, titre: item.titre, chapo: item.chapo, contenuHtml: `<p>${item.chapo}</p>`,
+        tags: ['apercu-interne'], format: item.format || 'EDITION', statut: 'PUBLIE', paywall: 'LIBRE',
+        rubriqueId: rubrique.id, auteurId: redacteurEnChef.id, valideParId: redacteurEnChef.id,
+        imageUneUrl: PHOTOS[i % PHOTOS.length], portails: ['INFO_DIRECT'],
+        publieLe: maintenant, createdAt: maintenant, updatedAt: maintenant, vuesTotal: 1,
+      },
+    });
+    crees++;
+  }
+  console.log(`✔ ${crees} article(s) d'aperçu de sous-rubrique créé(s).`);
+}
+
 async function main() {
   await seedRubriques();
   await seedSousRubriques();
@@ -1936,6 +2013,7 @@ async function main() {
   await seedInfoDirectImages();
   await seedApercuInterne();
   await seedVideosEtAudios();
+  await seedApercuSousRubriques();
 }
 
 main()
