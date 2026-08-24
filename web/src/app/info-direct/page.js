@@ -24,15 +24,30 @@ const BASE_PATH = '/info-direct';
 // Quotidien : la Une et le fil changent chaque jour, jamais figés au build.
 export const dynamic = 'force-dynamic';
 
+// Rubriques de service — publiées mais volontairement absentes du fil
+// d'actu principal (elles ne doivent jamais concurrencer l'actualité en
+// Une). Reprises ici dans un bloc dédié en bas de page, pour que tout
+// contenu publié reste accessible depuis l'accueil (cf. demande explicite).
+const RUBRIQUES_SERVICE_ACCUEIL = ['videos', 'audio-podcasts', 'photos-legendees', 'necrologie'];
+
 export default async function QuotidienAccueilPage() {
-  const [{ articles }, prix, factChecks, campagnes, editions] = await Promise.all([
+  const [{ articles }, prix, factChecks, campagnes, editions, ...serviceGroupes] = await Promise.all([
     getArticles({ pageSize: 24, portail: 'INFO_DIRECT' }),
     getTicker(),
     getFactChecks(),
     getCampagnesActives({ format: 'NATIVE_CARTE' }),
     getEditions({ pageSize: 1 }),
+    ...RUBRIQUES_SERVICE_ACCUEIL.map((slug) => getArticles({ rubrique: slug, portail: 'INFO_DIRECT', pageSize: 4 })),
   ]);
   const uneDuJour = editions?.[0];
+
+  // Une colonne par rubrique de service ayant du contenu, au même format
+  // que les blocs "Dossiers" / "Actualités" (ColonneActualites).
+  const colonnesService = RUBRIQUES_SERVICE_ACCUEIL.map((slug, i) => {
+    const { articles: items } = serviceGroupes[i];
+    if (!items?.length) return null;
+    return [items[0].rubrique?.nom || slug, { couleur: items[0].rubrique?.couleur, articles: items }];
+  }).filter(Boolean);
 
   const flashEtLive = articles.filter((a) => a.format === 'FLASH' || a.format === 'LIVE').slice(0, 8);
   const une = articles[0];
@@ -168,12 +183,24 @@ export default async function QuotidienAccueilPage() {
 
       <section className="max-w-[1180px] mx-auto px-4 sm:px-8 py-10">
         <ColonneActualites colonnes={colonnesActualites} basePath={BASE_PATH} />
-        {pub && (
-          <div className="mt-10 max-w-[380px]">
+      </section>
+
+      {colonnesService.length > 0 && (
+        <>
+          <Separateur />
+          <section className="max-w-[1180px] mx-auto px-4 sm:px-8 pb-10">
+            <ColonneActualites colonnes={colonnesService} basePath={BASE_PATH} titre="Aussi sur Info en direct" />
+          </section>
+        </>
+      )}
+
+      {pub && (
+        <section className="max-w-[1180px] mx-auto px-4 sm:px-8 pb-10">
+          <div className="max-w-[380px]">
             <PubCard campagne={pub} />
           </div>
-        )}
-      </section>
+        </section>
+      )}
     </>
   );
 }
