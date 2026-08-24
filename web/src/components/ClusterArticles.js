@@ -19,11 +19,11 @@ export default function ClusterArticles({ titre, couleur, articles, basePath = '
       </h3>
       <ul>
         {articles.map((a) => (
-          <li key={a.id} className="border-t first:border-t-0 py-3 flex gap-3 items-start" style={{ borderColor: '#232B45' }}>
+          <li key={a.id} className="border-t first:border-t-0 py-3 flex gap-3 items-start group" style={{ borderColor: '#232B45' }}>
             {avecVignette && a.imageUneUrl && (
-              <div className="relative w-[52px] h-[52px] rounded overflow-hidden shrink-0 bg-navy2">
-                <Image src={a.imageUneUrl} alt="" fill sizes="52px" className="object-cover" />
-              </div>
+              <Link href={`${basePath}/article/${a.slug}`} className="relative w-[52px] h-[52px] rounded overflow-hidden shrink-0 bg-navy2 block">
+                <Image src={a.imageUneUrl} alt="" fill sizes="52px" className="object-cover transition-transform duration-300 group-hover:scale-105" />
+              </Link>
             )}
             <div className="min-w-0">
               <Link href={`${basePath}/article/${a.slug}`} className="font-serif text-[14.5px] leading-snug hover:text-[#22D3EE] transition-colors">

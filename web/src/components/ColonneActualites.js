@@ -25,8 +25,20 @@ export default function ColonneActualites({ colonnes, basePath = '', titre = 'Ac
               {tete && (
                 <Link href={`${basePath}/article/${tete.slug}`} className="group block mb-4">
                   {tete.imageUneUrl && (
-                    <div className="relative aspect-[4/3] rounded-[6px] overflow-hidden mb-2.5">
-                      <Image src={tete.imageUneUrl} alt="" fill sizes="220px" className="object-cover" />
+                    <div className="relative aspect-[4/3] rounded-[6px] overflow-hidden mb-2.5 bg-[#171d30]">
+                      <Image src={tete.imageUneUrl} alt="" fill sizes="220px" className="object-cover transition-transform duration-300 group-hover:scale-105" />
+                      {(tete.format === 'VIDEO_COURTE' || tete.format === 'LIVE') && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/10 group-hover:bg-black/25 transition-colors">
+                          <span className="w-9 h-9 rounded-full bg-white/85 flex items-center justify-center">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="#0a0e1a"><path d="M8 5v14l11-7z" /></svg>
+                          </span>
+                        </div>
+                      )}
+                      {tete.dureeEcouteSec && (
+                        <span className="absolute bottom-1.5 right-1.5 bg-black/75 text-white font-mono text-[9.5px] px-1.5 py-0.5 rounded">
+                          {Math.floor(tete.dureeEcouteSec / 60)}:{String(tete.dureeEcouteSec % 60).padStart(2, '0')}
+                        </span>
+                      )}
                     </div>
                   )}
                   <h4 className="font-serif text-[15px] leading-snug group-hover:text-[#22D3EE] transition-colors">{tete.titre}</h4>

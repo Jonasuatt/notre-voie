@@ -17,6 +17,18 @@ export default function ArticleCard({ article, basePath = '' }) {
         {article.paywall === 'PAYANT' && (
           <span className="absolute top-2.5 right-2.5 bg-ink/70 text-white text-[9px] font-mono px-1.5 py-1 rounded">Abonnés</span>
         )}
+        {(article.format === 'VIDEO_COURTE' || article.format === 'LIVE') && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black/10 group-hover:bg-black/25 transition-colors">
+            <span className="w-10 h-10 rounded-full bg-white/85 flex items-center justify-center">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="#0a0e1a"><path d="M8 5v14l11-7z" /></svg>
+            </span>
+          </div>
+        )}
+        {article.dureeEcouteSec && (
+          <span className="absolute bottom-2 right-2 bg-black/75 text-white font-mono text-[10px] px-1.5 py-0.5 rounded">
+            {Math.floor(article.dureeEcouteSec / 60)}:{String(article.dureeEcouteSec % 60).padStart(2, '0')}
+          </span>
+        )}
       </div>
       <div className="p-4">
         <div className="flex items-center gap-2 font-mono text-[9.5px] uppercase tracking-wide" style={{ color: article.rubrique?.couleur || '#0B6FA8' }}>

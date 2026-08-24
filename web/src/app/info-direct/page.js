@@ -10,7 +10,8 @@ import FactCheckBlock from '@/components/FactCheckBlock';
 import FormatBadge from '@/components/FormatBadge';
 import PubCard from '@/components/PubCard';
 import UneVerrouillee from '@/components/UneVerrouillee';
-import { timeAgo, formatDateRange } from '@/lib/format';
+import GrillePiliers from '@/components/GrillePiliers';
+import { timeAgo, formatDateRange, LABEL_FORMAT } from '@/lib/format';
 
 // Fine ligne de séparation entre les blocs — signature visuelle du New York
 // Times (nytimes.com), demandée explicitement pour distinguer Info en
@@ -51,7 +52,7 @@ export default async function QuotidienAccueilPage() {
 
   const flashEtLive = articles.filter((a) => a.format === 'FLASH' || a.format === 'LIVE').slice(0, 8);
   const une = articles[0];
-  const lecturesGratuites = articles.slice(1, 5);
+  const lecturesGratuites = articles.slice(1, 4);
   const resumeDuJour = articles.slice(0, 5);
   const directEnCours = articles.find((a) => a.format === 'LIVE');
   const pub = campagnes?.[0];
@@ -106,18 +107,23 @@ export default async function QuotidienAccueilPage() {
             <Link href={`${BASE_PATH}/article/${une.slug}`} className="group block">
               <div className="relative h-[260px] sm:h-[340px] rounded-[10px] bg-gradient-to-br from-navy2 to-navy overflow-hidden">
                 {une.imageUneUrl && (
-                  <Image src={une.imageUneUrl} alt="" fill sizes="(max-width: 1024px) 100vw, 820px" priority className="object-cover" />
+                  <Image src={une.imageUneUrl} alt="" fill sizes="(max-width: 1024px) 100vw, 820px" priority className="object-cover transition-transform duration-300 group-hover:scale-105" />
                 )}
                 <FormatBadge format={une.format} />
               </div>
               <div className="pt-4">
-                <span className="font-mono text-[11px] uppercase tracking-wide" style={{ color: une.rubrique?.couleur }}>
-                  {une.rubrique?.nom}
-                </span>
-                <h1 className="font-serif text-[28px] sm:text-[32px] leading-tight mt-2 group-hover:text-[#22D3EE] transition-colors">
+                <div className="flex items-center gap-2.5">
+                  <span className="font-mono text-[10.5px] font-bold uppercase tracking-widest bg-[#22D3EE] text-[#0a0e1a] px-2.5 py-1 rounded-full">
+                    {LABEL_FORMAT[une.format] || une.format}
+                  </span>
+                  <span className="font-mono text-[11px] uppercase tracking-wide" style={{ color: une.rubrique?.couleur }}>
+                    {une.rubrique?.nom}
+                  </span>
+                </div>
+                <h1 className="font-serif text-[28px] sm:text-[32px] leading-tight mt-3 group-hover:text-[#22D3EE] transition-colors">
                   {une.titre}
                 </h1>
-                {une.chapo && <p className="text-muted text-[14.5px] mt-2.5 leading-relaxed max-w-2xl">{une.chapo}</p>}
+                {une.chapo && <p className="text-muted text-[14.5px] mt-2.5 leading-relaxed max-w-2xl line-clamp-2">{une.chapo}</p>}
                 <div className="flex gap-3 items-center mt-3.5 font-mono text-[11px] text-muted">
                   <span>{timeAgo(une.publieLe)}</span>
                   {une.auteur && <span>· {une.auteur.prenom} {une.auteur.nom}</span>}
@@ -155,8 +161,12 @@ export default async function QuotidienAccueilPage() {
               <ol className="pl-0 text-[12.5px] text-[#D8DCEA]">
                 {resumeDuJour.map((a, i) => (
                   <li key={a.id} className="flex gap-2.5 py-2.5 border-t border-white/10 first:border-t-0">
-                    <span className="font-mono text-[#22D3EE] font-bold shrink-0">{String(i + 1).padStart(2, '0')}</span>
-                    <Link href={`${BASE_PATH}/article/${a.slug}`} className="hover:text-white leading-snug">{a.titre}</Link>
+                    <span className="font-mono text-[#22D3EE] font-bold shrink-0 flex items-center gap-1.5">
+                      {a.format === 'LIVE' && <span className="w-1.5 h-1.5 rounded-full bg-coral dot-live" />}
+                      {String(i + 1).padStart(2, '0')}
+                    </span>
+                    <Link href={`${BASE_PATH}/article/${a.slug}`} className="hover:text-white leading-snug flex-1">{a.titre}</Link>
+                    <span className="font-mono text-[10px] text-[#8993B0] shrink-0 tabular-nums">{timeAgo(a.publieLe)}</span>
                   </li>
                 ))}
               </ol>
@@ -182,7 +192,7 @@ export default async function QuotidienAccueilPage() {
       <FlashBar articles={flashEtLive} basePath={BASE_PATH} />
 
       <section className="max-w-[1180px] mx-auto px-4 sm:px-8 py-10">
-        <ColonneActualites colonnes={colonnesActualites} basePath={BASE_PATH} />
+        <GrillePiliers colonnes={colonnesActualites} basePath={BASE_PATH} />
       </section>
 
       {colonnesService.length > 0 && (
