@@ -3,7 +3,11 @@ import { RUBRIQUES_WEB_UNIQUEMENT } from '@/lib/rubriques';
 
 export default function RubriqueTabs({ rubriques, active, basePath = '' }) {
   const estQuotidien = basePath === '/quotidien';
-  const visibles = estQuotidien ? rubriques.filter((r) => !RUBRIQUES_WEB_UNIQUEMENT.includes(r.slug)) : rubriques;
+  // Les sous-rubriques (parentId défini — cf. mega-menu Info en direct) ne
+  // s'affichent qu'imbriquées dans le mega-menu, jamais dans ces onglets
+  // plats : sinon ~25 nouveaux onglets noieraient les rubriques principales.
+  const sansSousRubriques = rubriques.filter((r) => !r.parentId);
+  const visibles = estQuotidien ? sansSousRubriques.filter((r) => !RUBRIQUES_WEB_UNIQUEMENT.includes(r.slug)) : sansSousRubriques;
   return (
     <div className="flex flex-wrap gap-2 mb-6">
       <Link

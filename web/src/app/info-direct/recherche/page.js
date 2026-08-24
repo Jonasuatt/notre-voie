@@ -38,7 +38,7 @@ export default async function RecherchePage({ searchParams }) {
           <label className="block text-[11px] font-mono uppercase tracking-wide text-muted mb-1.5">Rubrique</label>
           <select name="rubrique" defaultValue={rubrique} className="w-full border border-line rounded-md px-3 py-2 text-[14px] bg-white">
             <option value="">Toutes</option>
-            {rubriques.filter((r) => r.type === 'EDITORIALE').map((r) => (
+            {rubriques.filter((r) => r.type === 'EDITORIALE' && !r.parentId).map((r) => (
               <option key={r.id} value={r.slug}>{r.nom}</option>
             ))}
           </select>

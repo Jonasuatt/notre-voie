@@ -218,6 +218,13 @@ model Rubrique {
   couleur        String? // pour badges/tabs de la maquette
   actif          Boolean      @default(true)
 
+  // Sous-rubrique optionnelle d'une rubrique existante (ex : "Élections &
+  // Partis" sous "Politique") — utilisée par le mega-menu Info en direct.
+  // Une rubrique sans parent est une rubrique de premier niveau.
+  parent        Rubrique?  @relation("SousRubriques", fields: [parentId], references: [id])
+  parentId      String?
+  sousRubriques Rubrique[] @relation("SousRubriques")
+
   articles            Article[]     @relation("ArticleRubriquePrincipale")
   articlesSecondaires Article[]     @relation("ArticleRubriqueSecondaire")
   campagnes           CampagnePub[] @relation("CampagneCiblageRubrique")

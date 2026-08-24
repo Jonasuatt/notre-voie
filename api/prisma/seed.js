@@ -45,6 +45,52 @@ const RUBRIQUES_SERVICE = [
   { nom: 'Test', angleEditorial: "Article vitrine de démonstration — n'apparaît pas dans la navigation principale" },
 ];
 
+// Sous-rubriques du mega-menu Info en direct (cf. proposition Gemini
+// soumise et validée explicitement par l'utilisateur pour intégration en
+// base — angleEditorial repris de la proposition). Chaque entrée référence
+// le slug d'une rubrique parente déjà seedée ci-dessus ; `parentSlug: null`
+// pour "Opinions & Tribunes" et "Histoire de Côte d'Ivoire", qui n'ont pas
+// de rubrique parente naturelle et deviennent des rubriques Info en direct
+// de premier niveau (comme Éducation/Santé/Environnement/Numérique).
+// Volontairement omis (redondants avec une fonctionnalité déjà existante,
+// pas un thème éditorial classable) : "Direct & Flashs" (= la page /direct
+// existante) et "Le Kiosque PDF" (= la page /kiosque existante).
+// Créées vides : aucun article n'est inventé pour les peupler.
+const SOUS_RUBRIQUES = [
+  { parentSlug: 'politique', nom: 'Élections & Partis', angleEditorial: 'Actu RHDP, PPA-CI, PDCI-RDA, partis indépendants' },
+  { parentSlug: 'politique', nom: 'Institutions & Lois', angleEditorial: 'Assemblée nationale, Sénat, décrets présidentiels' },
+  { parentSlug: 'regions', nom: 'Abidjan & Communes', angleEditorial: 'Actu Cocody, Yopougon, Abobo, Marcory, Treichville, Plateau' },
+  { parentSlug: 'regions', nom: 'Vie des Régions', angleEditorial: 'Poro, Gbêkê, San-Pédro, Indénié-Djuablin, Tonkpi' },
+  { parentSlug: 'refondation', nom: 'Diplomatie & CEDEAO', angleEditorial: 'Relations internationales, Union Africaine, coopération sous-régionale' },
+  { parentSlug: 'diaspora', nom: 'Diaspora Ivoire', angleEditorial: 'Communautés en Europe, Amérique et Afrique' },
+
+  { parentSlug: 'vie-chere', nom: 'Le Panier de la Ménagère', angleEditorial: 'Évolution des prix des marchés, vivrier, carburant, loyers' },
+  { parentSlug: 'economie', nom: 'Agro-industrie & Export', angleEditorial: 'Filières cacao, anacarde, hévéa, palmier à huile, café' },
+  { parentSlug: 'economie', nom: 'Emploi & Concours', angleEditorial: 'Offres d\'emploi, concours de la fonction publique (ENA, CAFOP, INFAS)' },
+  { parentSlug: 'numerique', nom: 'Tech & Startups', angleEditorial: 'Écosystème numérique d\'Abidjan, IA, fintech, agtech' },
+  { parentSlug: 'education', nom: 'Système Éducatif', angleEditorial: 'Rentrée scolaire, examens nationaux (BAC, BEPC, CEPE), universités' },
+  { parentSlug: 'sante', nom: 'Santé & Prévention', angleEditorial: 'Couverture Maladie Universelle (CMU), hôpitaux, campagnes de vaccination' },
+  { parentSlug: 'environnement', nom: 'Cadre de vie & Climat', angleEditorial: 'Saison des pluies, infrastructures routières, gestion des déchets, SOTRA' },
+
+  { parentSlug: 'culture', nom: 'Showbiz & Musique', angleEditorial: 'Rap Ivoire, coupé-décalé, zouglou, afrobeats, sorties d\'albums' },
+  { parentSlug: 'culture', nom: 'Gastronomie & Maquis', angleEditorial: 'Le guide des maquis, tendances culinaires (attiéké-poisson, garba, sauce graine)' },
+  { parentSlug: 'culture', nom: 'Arts & Spectacles', angleEditorial: 'Cinéma, théâtre, FEMUA, défilés de mode, expositions' },
+  { parentSlug: 'sport', nom: 'Éléphants & Football National', angleEditorial: 'Sélection nationale, Ligue 1 Lonaci, mercato local' },
+  { parentSlug: 'sport', nom: 'Sports Internationaux', angleEditorial: 'Champions League, Premier League, NBA, UFC' },
+  { parentSlug: 'necrologie', nom: 'Carnet Noir', angleEditorial: 'Avis de décès, hommages nationaux, programmes des obsèques' },
+
+  { parentSlug: 'verite-ou-intox', nom: 'Fact-Checking Web', angleEditorial: 'Désintox des rumeurs virales sur Facebook, TikTok et WhatsApp' },
+  { parentSlug: 'verite-ou-intox', nom: 'Grands Format', angleEditorial: 'Enquêtes d\'immersion et reportages d\'investigation' },
+  { parentSlug: null, nom: 'Opinions & Tribunes', angleEditorial: 'Analyses signées par des experts, politologues et universitaires' },
+  { parentSlug: null, nom: 'Histoire de Côte d\'Ivoire', angleEditorial: 'Archives historiques, figures marquantes et rétrospectives' },
+
+  { parentSlug: 'audio-podcasts', nom: 'Le Débat du Jour', angleEditorial: 'Émissions de podcast audio à écouter en ligne' },
+  { parentSlug: 'videos', nom: 'Reportages Vidéo', angleEditorial: 'Micro-trottoirs, coulisses des marchés, interventions en direct' },
+  { parentSlug: 'videos', nom: 'Formats Verticaux', angleEditorial: 'Vidéos courtes au format TikTok/Reels pour les réseaux sociaux' },
+  { parentSlug: 'videos', nom: 'Interviews Exclusives', angleEditorial: 'Entretiens vidéo et audio grand format' },
+  { parentSlug: 'photos-legendees', nom: 'Rétro Photo', angleEditorial: 'Les plus beaux clichés et l\'actualité de la semaine en images' },
+];
+
 function slugify(str) {
   return str
     .normalize('NFD')
@@ -79,6 +125,32 @@ async function seedRubriques() {
     });
   }
   console.log(`✔ ${RUBRIQUES_EDITORIALES.length + RUBRIQUES_INFO_DIRECT.length + RUBRIQUES_SERVICE.length} rubriques créées/à jour.`);
+}
+
+// Sous-rubriques du mega-menu — cf. SOUS_RUBRIQUES ci-dessus. Doit tourner
+// après seedRubriques() (parents déjà en base) et après une migration
+// Prisma ayant ajouté Rubrique.parentId (cf. schema.prisma).
+async function seedSousRubriques() {
+  let ordre = 100; // après les rubriques de premier niveau
+  let crees = 0;
+  for (const sr of SOUS_RUBRIQUES) {
+    const parent = sr.parentSlug ? await prisma.rubrique.findUnique({ where: { slug: sr.parentSlug } }) : null;
+    if (sr.parentSlug && !parent) {
+      console.warn(`⚠ Sous-rubrique "${sr.nom}" ignorée : parent "${sr.parentSlug}" introuvable.`);
+      continue;
+    }
+    const slug = slugify(sr.nom);
+    const existe = await prisma.rubrique.findUnique({ where: { slug } });
+    if (existe) continue;
+    await prisma.rubrique.create({
+      data: {
+        nom: sr.nom, slug, type: 'EDITORIALE', angleEditorial: sr.angleEditorial,
+        couleur: parent?.couleur || null, ordre: ordre++, parentId: parent?.id || null,
+      },
+    });
+    crees++;
+  }
+  console.log(`✔ ${crees} sous-rubrique(s) créée(s).`);
 }
 
 // Comptes rédaction/administration — cf. organigramme rédactionnel réel
@@ -1832,6 +1904,7 @@ async function seedVideosEtAudios() {
 
 async function main() {
   await seedRubriques();
+  await seedSousRubriques();
   await seedStaff();
   const dejaDesReleves = await prisma.prixVieChere.count();
   if (dejaDesReleves === 0) await seedPrixVieChere();
