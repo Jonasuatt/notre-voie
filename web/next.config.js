@@ -4,6 +4,7 @@ const nextConfig = {
     remotePatterns: [
       { protocol: 'https', hostname: 'res.cloudinary.com' },
       { protocol: 'https', hostname: '**.notrevoienews.com' },
+      { protocol: 'https', hostname: 'img.youtube.com' },
     ],
   },
 };
