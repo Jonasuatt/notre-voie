@@ -1979,6 +1979,112 @@ async function seedApercuSousRubriques() {
   console.log(`✔ ${crees} article(s) d'aperçu de sous-rubrique créé(s).`);
 }
 
+// 3 formats longs (Enquête/Dossier/Reportage) par pilier, fournis
+// intégralement par l'utilisateur — format DECRYPTAGE pour les
+// enquêtes/dossiers (« analyse approfondie »), EDITION pour les
+// reportages. Chacun rattaché à la sous-rubrique la plus pertinente.
+async function seedApercuEnquetesDossiersReportages() {
+  const redacteurEnChef = await prisma.staff.findUniqueOrThrow({ where: { email: 'redacteur-en-chef@notrevoienews.com' } });
+  const PHOTOS = [
+    'https://res.cloudinary.com/ataat5bs/image/upload/v1787572373/notre-voie/preview-gragbalilie/1-action.jpg',
+    'https://res.cloudinary.com/ataat5bs/image/upload/v1787572377/notre-voie/preview-gragbalilie/2-accueil.jpg',
+    'https://res.cloudinary.com/ataat5bs/image/upload/v1787572381/notre-voie/preview-gragbalilie/3-huddle.jpg',
+    'https://res.cloudinary.com/ataat5bs/image/upload/v1787572385/notre-voie/preview-gragbalilie/4-doyenne.jpg',
+    'https://res.cloudinary.com/ataat5bs/image/upload/v1787572389/notre-voie/preview-gragbalilie/5-riviere.jpg',
+    'https://res.cloudinary.com/ataat5bs/image/upload/v1787572393/notre-voie/preview-gragbalilie/6-chateau-eau.jpg',
+  ];
+
+  const items = [
+    { slug: 'apercu-enquete-financement-partis-politiques', rubrique: 'politique', format: 'DECRYPTAGE',
+      titre: "Enquête : Les dessous du financement des partis politiques avant les grandes échéances",
+      chapo: "À l'approche des grands rendez-vous électoraux, l'argent reste le nerf de la guerre. Entre cotisations des militants, appuis de la diaspora et fonds privés, plongée dans les réseaux d'influence et les circuits financiers qui alimentent les états-majors politiques.",
+      contenuHtml: `<p>Comment s'organisent les budgets de campagne à Abidjan et à l'intérieur du pays ? Alors que la loi encadre théoriquement les contributions, la réalité du terrain montre une prolifération de financements informels. Nos investigations révèlent le rôle clé des clubs de soutien et des hommes d'affaires locaux dans l'organisation des meetings et le déploiement logistique dans les 31 régions du pays.</p>` },
+    { slug: 'apercu-dossier-decentralisation-communes-abidjan', rubrique: 'abidjan-communes', format: 'DECRYPTAGE',
+      titre: "Dossier : Décentralisation et gouvernance locale : Quel bilan pour les communes d'Abidjan ?",
+      chapo: "De Yopougon à Cocody en passant par Abobo, le transfert de compétences du gouvernement central vers les municipalités produit des résultats contrastés. Analyse comparative de l'efficacité budgétaire et des services publics.",
+      contenuHtml: `<ul><li><strong>Volet 1 :</strong> Collecte des taxes locales et autonomie financière des mairies.</li><li><strong>Volet 2 :</strong> Aménagement urbain et voirie : le défi des chantiers d'assainissement.</li><li><strong>Volet 3 :</strong> Parole aux citoyens : le baromètre de satisfaction des habitants par commune.</li></ul>` },
+    { slug: 'apercu-reportage-patrouille-nuit-yopougon', rubrique: 'abidjan-communes', format: 'EDITION',
+      titre: "Reportage : Une nuit en patrouille avec les unités de sécurisation à Yopougon",
+      chapo: "De 22h à 5h du matin, nos reporters ont embarqué avec les forces de police dans la plus grande commune de Côte d'Ivoire. Immersion au cœur d'une opération de contrôle et de prévention.",
+      contenuHtml: `<p>Le gyrophare bleu balaye les ruelles éclairées de Sicogi. Au poste de commandement mobile, les appels radio s'enchaînent. Entre régulation des zones de rassemblement nocturne et interventions d'urgence sur les axes principaux, le reportage dévoile la réalité de la sécurité de proximité dans les quartiers populaires.</p>` },
+
+    { slug: 'apercu-enquete-speculation-fonciere-grand-abidjan', rubrique: 'economie', format: 'DECRYPTAGE',
+      titre: "Enquête : Spéculation foncière dans le Grand Abidjan : Qui profite de la hausse des coûts du logement ?",
+      chapo: "Bingerville, Songon, Grand-Bassam : l'étalement urbain transforme les terres agricoles en chantiers immobiliers. Une spéculation effrénée qui pèse directement sur le portefeuille des ménages.",
+      contenuHtml: `<p>En retraçant les transactions de plusieurs parcelles urbaines, cette enquête met en lumière les failles du processus d'attestation villageoise, le rôle des intermédiaires non agréés et l'impact direct sur les loyers de la capitale économique.</p>` },
+    { slug: 'apercu-dossier-transformation-locale-cacao', rubrique: 'agro-industrie-export', format: 'DECRYPTAGE',
+      titre: "Dossier : Transformation locale du cacao : La Côte d'Ivoire en passe de réussir son pari industriel ?",
+      chapo: "Premier producteur mondial, le pays accélère la transformation de ses fèves sur le sol national. État des lieux d'une mutation stratégique de l'économie ivoirienne.",
+      contenuHtml: `<ul><li><strong>Analyse :</strong> Capacités de broyage installées et niveau de transformation effective.</li><li><strong>Enjeux :</strong> L'impact sur la création d'emplois industriels pour les jeunes diplômés.</li><li><strong>Perspective :</strong> Les marchés émergents et la consommation locale de chocolat artisanaux.</li></ul>` },
+    { slug: 'apercu-reportage-marche-gouro-adjame', rubrique: 'le-panier-de-la-menagere', format: 'EDITION',
+      titre: "Reportage : Au cœur du marché de Gouro à Adjamé : Le périple des vivriers du champ à l'assiette",
+      chapo: "Arrivée des camions à 4h du matin, négociations serrées et chargement des grossistes : immersion dans le poumon du ravitaillement alimentaire abidjanais.",
+      contenuHtml: `<p>Les moteurs des camions venus du Centre et du Nord vrombissent encore dans la pénombre. Les commerçantes, pièces maîtresses de la chaîne de distribution, s'affairent autour des sacs de banane, de piment et de manioc. Reportage vivant sur la réalité logistique qui fixe le prix de la nourriture au quotidien.</p>` },
+
+    { slug: 'apercu-enquete-economie-cachee-rap-ivoire', rubrique: 'showbiz-musique', format: 'DECRYPTAGE',
+      titre: "Enquête : L'économie cachée du Rap Ivoire : Entre streams, concerts et contrats de marque",
+      chapo: "Devenu le genre musical dominant chez les jeunes, le Rap Ivoire brasse des millions de FCFA. Mais comment vivent réellement les artistes et leurs producteurs derrière les réseaux sociaux ?",
+      contenuHtml: `<p>Analyse des revenus générés par les plateformes de streaming en Afrique de l'Ouest, transparence des droits d'auteur et rentabilité des spectacles en salle face aux modèles de sponsoring corporate.</p>` },
+    { slug: 'apercu-dossier-heritage-stades-nationaux', rubrique: 'sport', format: 'DECRYPTAGE',
+      titre: "Dossier : L'héritage des grandes infrastructures sportives : Quelle gestion pour les stades nationaux ?",
+      chapo: "Un réseau de stades modernes couvre désormais le territoire national. Quel est le plan de rentabilisation et de maintenance de ces complexes omnisports ?",
+      contenuHtml: `<ul><li><strong>Infrastructures :</strong> État des lieux des stades d'Ebimpé, Bouaké, San-Pédro, Korhogo et Yamoussoukro.</li><li><strong>Modèle économique :</strong> Accueil d'événements culturels, matchs internationaux et concession privée.</li><li><strong>Formation :</strong> L'accès des centres de formation locaux à ces installations de pointe.</li></ul>` },
+    { slug: 'apercu-reportage-maquis-marcory-zone4', rubrique: 'gastronomie-maquis', format: 'EDITION',
+      titre: "Reportage : Dans les coulisses d'un maquis mythique de Marcory Zone 4",
+      chapo: "Entre l'odeur de la grillade de poisson, le son coupé-décalé et le ballet des serveurs, immersion dans l'art de recevoir à l'ivoirienne à la tombée de la nuit.",
+      contenuHtml: `<p>À partir de 19h, la terrasse ne désemplit pas. Le gérant orchestre les commandes avec une précision d'horloger pendant que le maître-grilleur surveille les braises. Le reportage capture cette ambiance unique où dirigeants d'entreprises, artistes et noctambules se croisent autour de la gastronomie locale.</p>` },
+
+    { slug: 'apercu-enquete-cybercriminalite-ia', rubrique: 'grands-format', format: 'DECRYPTAGE',
+      titre: "Enquête : Traque de la cybercriminalité : Comment les escroqueries en ligne s'adaptent à l'IA",
+      chapo: "Usurpation d'identité vocale, faux profils ultra-réalistes et hameçonnage ciblé : la lutte contre la délinquance numérique franchit un nouveau cap technologique.",
+      contenuHtml: `<p>Les experts en cybersécurité et les unités spécialisées de la police dévoilent les nouvelles techniques d'usurpation utilisées sur le web et les mécanismes de coopération avec les banques et opérateurs télécoms pour bloquer les flux financiers frauduleux.</p>` },
+    { slug: 'apercu-dossier-anatomie-desinformation-web', rubrique: 'fact-checking-web', format: 'DECRYPTAGE',
+      titre: "Dossier : Anatomie de la désinformation sur le web ivoirien : Circuits et méthodes de contagion",
+      chapo: "Des groupes WhatsApp familiaux aux pages Facebook à fort trafic, étude de la propagation des rumeurs et des contenus manipulés.",
+      contenuHtml: `<ul><li><strong>Cartographie :</strong> Comment une fausse information prend naissance et devient virale en moins de 2 heures.</li><li><strong>Fact-Checking :</strong> Les outils de vérification d'images et d'extraits sonores.</li><li><strong>Prévention :</strong> Rôle de la sensibilisation dans le milieu scolaire et universitaire.</li></ul>` },
+    { slug: 'apercu-reportage-24h-cellule-fact-checking', rubrique: 'grands-format', format: 'EDITION',
+      titre: "Reportage : 24 heures au sein d'une cellule de vérification de l'information (Fact-Checking)",
+      chapo: "Face au flux ininterrompu de publications sur les réseaux sociaux, les journalistes de la rédaction traquent les images tronquées et les faux communiqués.",
+      contenuHtml: `<p>Horodatage, géolocalisation de vidéos, contact direct avec les sources officielles : suivez pas à pas la déconstruction d'un faux communiqué ministériel qui s'est répandu sur le web en cours de matinée.</p>` },
+
+    { slug: 'apercu-enquete-guerre-attention-tiktok', rubrique: 'formats-verticaux', format: 'DECRYPTAGE',
+      titre: "Enquête : La guerre de l'attention : Comment les créateurs TikTok bousculent les médias traditionnels",
+      chapo: "Avec des vidéos de 60 secondes, de jeunes vidéastes cumulent plus d'audience que certains plateaux télé. Une mutation majeure dans l'accès à l'information.",
+      contenuHtml: `<p>Analyse des modèles de création de contenu d'information sur les réseaux sociaux. Cette enquête compare le coût de production, la rapidité de diffusion et le niveau de confiance accordé par les jeunes générations aux journalistes vs les influenceurs.</p>` },
+    { slug: 'apercu-dossier-essor-podcast-video-afrique-ouest', rubrique: 'le-debat-du-jour', format: 'DECRYPTAGE',
+      titre: "Dossier : L'essor du Podcast vidéo en Afrique de l'Ouest : Nouveau carrefour du débat d'idées",
+      chapo: "Longtemps réservé au format audio, le podcast filmé s'impose à Abidjan comme l'espace privilégié des interviews de fond et des débats sociétaux.",
+      contenuHtml: `<ul><li><strong>Tendance :</strong> La montée en puissance des studios d'enregistrement indépendants à Abidjan.</li><li><strong>Audience :</strong> Qui écoute et regarde les podcasts de décryptage politique et économique ?</li><li><strong>Monétisation :</strong> Placements de produits, abonnements et partenariats de diffusion.</li></ul>` },
+    { slug: 'apercu-reportage-tournage-lagunaire', rubrique: 'reportages-video', format: 'EDITION',
+      titre: "Reportage : Tournage lagunaire : Dans l'objectif des caméras d'un grand reportage vidéo",
+      chapo: "Équipés de drones, de stabilisateurs et de micros haute précision, nos équipes vidéo ont sillonné la lagune Ébrié pour capturer la vie des transporteurs maritimes.",
+      contenuHtml: `<p>Du lever du jour au quai d'Abobo-Doumé jusqu'à la traversée vers Treichville, les coulisses d'un tournage multimédia : réglages techniques, contraintes de prise de vue sur l'eau et interviews sur le vif auprès des usagers des bateaux-bus.</p>` },
+  ];
+
+  let crees = 0;
+  for (const [i, item] of items.entries()) {
+    const existe = await prisma.article.findUnique({ where: { slug: item.slug } });
+    if (existe) continue;
+    const rubrique = await prisma.rubrique.findUnique({ where: { slug: item.rubrique } });
+    if (!rubrique) {
+      console.warn(`⚠ Article d'aperçu "${item.slug}" ignoré : rubrique "${item.rubrique}" introuvable.`);
+      continue;
+    }
+    const maintenant = new Date();
+    await prisma.article.create({
+      data: {
+        slug: item.slug, titre: item.titre, chapo: item.chapo, contenuHtml: item.contenuHtml,
+        tags: ['apercu-interne'], format: item.format, statut: 'PUBLIE', paywall: 'LIBRE',
+        rubriqueId: rubrique.id, auteurId: redacteurEnChef.id, valideParId: redacteurEnChef.id,
+        imageUneUrl: PHOTOS[i % PHOTOS.length], portails: ['INFO_DIRECT'],
+        publieLe: maintenant, createdAt: maintenant, updatedAt: maintenant, vuesTotal: 1,
+      },
+    });
+    crees++;
+  }
+  console.log(`✔ ${crees} enquête(s)/dossier(s)/reportage(s) d'aperçu créé(s).`);
+}
+
 async function main() {
   await seedRubriques();
   await seedSousRubriques();
@@ -2014,6 +2120,7 @@ async function main() {
   await seedApercuInterne();
   await seedVideosEtAudios();
   await seedApercuSousRubriques();
+  await seedApercuEnquetesDossiersReportages();
 }
 
 main()
