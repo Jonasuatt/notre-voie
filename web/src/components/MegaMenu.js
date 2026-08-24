@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -11,6 +11,7 @@ import Image from 'next/image';
 export default function MegaMenu({ piliers, basePath }) {
   const [ouvert, setOuvert] = useState(null);
   const fermerTimeout = useRef(null);
+  const conteneurRef = useRef(null);
 
   function ouvrir(cle) {
     clearTimeout(fermerTimeout.current);
@@ -20,13 +21,31 @@ export default function MegaMenu({ piliers, basePath }) {
     fermerTimeout.current = setTimeout(() => setOuvert(null), 150);
   }
 
+  // Clic en dehors ou touche Échap : ferme le panneau ouvert (utile au
+  // clic/tactile, qui ne déclenche pas onMouseLeave).
+  useEffect(() => {
+    if (!ouvert) return;
+    function surClicExterieur(e) {
+      if (conteneurRef.current && !conteneurRef.current.contains(e.target)) setOuvert(null);
+    }
+    function surEchap(e) {
+      if (e.key === 'Escape') setOuvert(null);
+    }
+    document.addEventListener('mousedown', surClicExterieur);
+    document.addEventListener('keydown', surEchap);
+    return () => {
+      document.removeEventListener('mousedown', surClicExterieur);
+      document.removeEventListener('keydown', surEchap);
+    };
+  }, [ouvert]);
+
   return (
-    <div className="flex items-center gap-6 relative">
+    <div ref={conteneurRef} className="flex items-center gap-6 relative">
       {piliers.map((pilier) => (
         <div key={pilier.cle} onMouseEnter={() => ouvrir(pilier.cle)} onMouseLeave={fermerDifferee}>
           <button
             type="button"
-            onClick={() => setOuvert((c) => (c === pilier.cle ? null : pilier.cle))}
+            onClick={() => ouvrir(pilier.cle)}
             className={`hover:text-[#22D3EE] transition-colors ${ouvert === pilier.cle ? 'text-[#22D3EE]' : ''}`}
             aria-expanded={ouvert === pilier.cle}
           >
