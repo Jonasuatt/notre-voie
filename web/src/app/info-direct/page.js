@@ -187,6 +187,26 @@ export default async function QuotidienAccueilPage() {
                 <span className="font-mono text-[11px] text-muted mt-3 block">
                   N°{uneDuJour.numero} — {formatDateRange(uneDuJour.dateParution, uneDuJour.dateFin)}
                 </span>
+
+                {/* Encart institutionnel — comble l'espace sous la Une pour
+                    aligner la hauteur avec "5 choses à retenir" à droite,
+                    couleurs officielles du logo Notre Voie. */}
+                <div className="mt-4 p-5 bg-[#131a2b]/90 border-2 border-[#E6007E]/60 rounded-xl text-center flex flex-col items-center justify-center shadow-lg shadow-[#E6007E]/10">
+                  <span className="text-3xl font-black text-[#E6007E] tracking-wider uppercase">Notre Voie</span>
+                  <span className="text-xs font-bold uppercase tracking-wider text-[#0a0e1a] bg-[#009EE3] px-3 py-0.5 rounded-full mt-1.5 shadow-sm">
+                    Notre métier, informer
+                  </span>
+                  <span className="w-12 h-0.5 bg-[#E6007E]/40 my-3" />
+                  <p className="text-xs text-[#CBD3EC] leading-relaxed max-w-xs">
+                    En vente tous les jours dans vos kiosques ou par abonnement.
+                  </p>
+                  <Link
+                    href={`${BASE_PATH}/abonnement`}
+                    className="mt-3 px-5 py-2 text-xs font-bold text-white bg-[#E6007E] hover:bg-[#c9006e] rounded-lg transition-all shadow-md"
+                  >
+                    S&apos;abonner au journal
+                  </Link>
+                </div>
               </div>
             )}
 
