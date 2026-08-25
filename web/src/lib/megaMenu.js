@@ -60,12 +60,17 @@ function construireSecours(type, contexte) {
 }
 
 // Construit les données prêtes-à-afficher du mega-menu à partir des
-// rubriques et des articles déjà récupérés (une seule requête chacune,
-// partagées par tout le layout Info en direct — pas d'appel API par
-// pilier). `contexte` fournit la dernière édition (Une) et le dernier
-// audio publié, pour les blocs de secours. Purement synchrone : aucune
-// donnée n'est inventée, seulement regroupée.
-export function construireMegaMenu(rubriques, articles, contexte = {}) {
+// rubriques et des articles déjà récupérés PAR PILIER (`articlesParPilier`
+// — un objet { [pilier.cle]: articles[] } déjà fusionné rubrique+enfants,
+// cf. layout.js et lib/onglets.js). Important : on ne filtre PAS depuis un
+// fil général unique (top N articles Info en direct) — avec un volume
+// important d'articles, les plus anciens piliers du fil général se
+// retrouvent hors fenêtre et affichent à tort le bloc de secours alors
+// qu'ils ont bien du contenu réel (bug constaté : "Actualités & Politique"
+// tombait sur la carte Abonnement malgré des dizaines d'articles publiés).
+// `contexte` fournit la dernière édition (Une) et le dernier audio publié,
+// pour les blocs de secours. Purement synchrone : aucune donnée inventée.
+export function construireMegaMenu(rubriques, articlesParPilier, contexte = {}) {
   const rubriqueParSlug = new Map(rubriques.map((r) => [r.slug, r]));
   const sousRubriquesParParentId = new Map();
   for (const r of rubriques) {
@@ -75,15 +80,6 @@ export function construireMegaMenu(rubriques, articles, contexte = {}) {
   }
 
   return PILIERS_MEGA_MENU.map((pilier) => {
-    // "En ce moment" couvre aussi les articles des sous-rubriques (une
-    // fois qu'elles auront du contenu réel), pas seulement des rubriques
-    // principales du pilier.
-    const slugsSet = new Set(pilier.rubriques);
-    for (const slug of pilier.rubriques) {
-      const parent = rubriqueParSlug.get(slug);
-      if (parent) for (const sr of sousRubriquesParParentId.get(parent.id) || []) slugsSet.add(sr.slug);
-    }
-
     const liensRubriques = pilier.rubriques
       .map((slug) => rubriqueParSlug.get(slug))
       .filter(Boolean)
@@ -94,7 +90,7 @@ export function construireMegaMenu(rubriques, articles, contexte = {}) {
         sousRubriques: (sousRubriquesParParentId.get(r.id) || []).map((sr) => ({ label: sr.nom, href: `/rubrique/${sr.slug}` })),
       }));
 
-    const aLaUne = articles.filter((a) => slugsSet.has(a.rubrique?.slug)).slice(0, 4);
+    const aLaUne = (articlesParPilier[pilier.cle] || []).slice(0, 4);
     const blocSecours = aLaUne.length < 3 ? construireSecours(pilier.secours, contexte) : null;
 
     return { ...pilier, liensRubriques, aLaUne, blocSecours };
