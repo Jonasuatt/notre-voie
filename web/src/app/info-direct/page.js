@@ -210,7 +210,10 @@ export default async function QuotidienAccueilPage() {
               {/* Encart institutionnel — sous "5 choses à retenir", couleurs
                   officielles du logo Notre Voie. */}
               <div className="mt-4 p-5 bg-[#131a2b]/90 border-2 border-[#E6007E]/60 rounded-xl text-center flex flex-col items-center justify-center shadow-lg shadow-[#E6007E]/10">
-                <span className="text-3xl font-black text-[#E6007E] tracking-wider uppercase">Notre Voie</span>
+                <h3 className="text-3xl font-black uppercase tracking-wider">
+                  <span className="text-white">Notre </span>
+                  <span className="text-[#E6007E]">Voie</span>
+                </h3>
                 <span className="text-xs font-bold uppercase tracking-wider text-[#0a0e1a] bg-[#009EE3] px-3 py-0.5 rounded-full mt-1.5 shadow-sm">
                   Notre métier, informer
                 </span>
