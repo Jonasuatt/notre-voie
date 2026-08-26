@@ -2330,6 +2330,132 @@ async function main() {
   await seedApercuSousRubriques();
   await seedApercuEnquetesDossiersReportages();
   await seedApercuTriosSousRubriques();
+  await seedWaloFestival();
+}
+
+// Reportage réel sur le Walo Festival & Patrimoine Dida (3ᵉ édition,
+// Gragbalilié, 21-23 août 2026) — texte et photos fournis par l'utilisateur
+// (document "Walo Festival & Patrimoine Dida.docx", signé Jonas Ouattara),
+// à partir d'entretiens de terrain réels avec des sources nommées.
+// Contenu réel, publié normalement (pas de tag apercu-interne) : à la
+// différence des lots précédents, il ne s'agit pas d'un contenu de test
+// mais d'un reportage effectivement mené par l'utilisateur.
+async function seedWaloFestival() {
+  const redacteurEnChef = await prisma.staff.findUniqueOrThrow({ where: { email: 'redacteur-en-chef@notrevoienews.com' } });
+  const CREDIT = 'Jonas Ouattara';
+  const P = {
+    crowd: 'https://res.cloudinary.com/ataat5bs/image/upload/v1787771032/notre-voie/walo-festival/img_0310.jpg',
+    equipe: 'https://res.cloudinary.com/ataat5bs/image/upload/v1787771037/notre-voie/walo-festival/img_0361.jpg',
+    riviere1: 'https://res.cloudinary.com/ataat5bs/image/upload/v1787771040/notre-voie/walo-festival/img_0850.jpg',
+    riviere2: 'https://res.cloudinary.com/ataat5bs/image/upload/v1787771044/notre-voie/walo-festival/img_0754.jpg',
+    foufou: 'https://res.cloudinary.com/ataat5bs/image/upload/v1787771048/notre-voie/walo-festival/img_0603.jpg',
+    cuisine: 'https://res.cloudinary.com/ataat5bs/image/upload/v1787771052/notre-voie/walo-festival/img_0156.jpg',
+    feu: 'https://res.cloudinary.com/ataat5bs/image/upload/v1787771065/notre-voie/walo-festival/img_0428.jpg',
+    foot: 'https://res.cloudinary.com/ataat5bs/image/upload/v1787771080/notre-voie/walo-festival/img_0008.jpg',
+    dignitaire: 'https://res.cloudinary.com/ataat5bs/image/upload/v1787771084/notre-voie/walo-festival/img_0997.jpg',
+    doyenne: 'https://res.cloudinary.com/ataat5bs/image/upload/v1787771099/notre-voie/walo-festival/img_0069.jpg',
+    bois: 'https://res.cloudinary.com/ataat5bs/image/upload/v1787771112/notre-voie/walo-festival/img_0192.jpg',
+    doyenne2: 'https://res.cloudinary.com/ataat5bs/image/upload/v1787771137/notre-voie/walo-festival/img_0903.jpg',
+    foule: 'https://res.cloudinary.com/ataat5bs/image/upload/v1787771141/notre-voie/walo-festival/img_1354.jpg',
+  };
+
+  const items = [
+    {
+      slug: 'walo-festival-2026-gragbalilie-3e-edition', rubrique: 'vie-des-regions', imageUneUrl: P.crowd,
+      titre: "Walo Festival 2026 : trois jours de fraternité à Gragbalilié",
+      chapo: "Du 21 au 23 août, le village de Gragbalilié, dans le département de Lakota, a vécu sa 3ᵉ édition du Walo Festival & Patrimoine Dida — sport, danse traditionnelle et retrouvailles familiales, sous une philosophie assumée : ici, personne ne repart les mains vides.",
+      contenuHtml: `<p>Seize kilomètres de piste séparent Gragbalilié de Lakota. C'est au bout de cette route de latérite que le village a organisé, du 21 au 23 août, la 3ᵉ édition du Walo Festival &amp; Patrimoine Dida, sous la présidence de la Mutuelle de Développement de Gragbalilié (MUDG) et de son président, M. Guéyoun Eric Kagba.</p>
+<p>Le festival est né d'un geste intime. « Initialement, je voulais honorer la mémoire de mon père parce qu'il travaillait. Et puis, ce à quoi je travaille, mon père n'a jamais eu l'occasion d'en profiter », confie Éric Guéyoun. « Et puis après, j'ai pensé à l'idée de réunir la cohésion sociale. » L'événement puise dans une tradition aujourd'hui disparue, le <em>Dida sa kalimati</em> — des rencontres amicales inter-villages sans enjeu financier, où l'on partageait le riz dans l'esprit de l'hospitalité.</p>
+<p>Le premier jour a été marqué par le deuil : la veille de l'ouverture, le parrain de l'événement, M. Gadji Mathieu, a perdu son frère aîné. Une journée de sobriété a été décrétée, la fanfare n'a pas joué. Le lendemain, les délégations des villages invités ont été accueillies sous l'abri à palabre, avant une procession vers la rivière sacrée Zoukou pour un rite d'immersion et de purification.</p>
+<p>Le deuxième jour a été celui du tournoi de football intervillage — féminin et masculin, à égalité de trophées — puis d'une soirée animée par une fanfare et un cracheur de feu. Le troisième jour a réuni les troupes de danse traditionnelle maquillées au kaolin blanc, la compétition de Gbanyan-nya et le concours Bangoran, avant la cérémonie de remise des prix.</p>
+<p>Le principe fondateur du festival tient en une phrase d'Éric Guéyoun : « Le Walo Festival, ce n'est pas une compétition comme les autres. […] Tout le monde gagne. Il y a une coupe pour le premier, le deuxième, le troisième et même le quatrième. […] Ce ne sont pas de grandes récompenses, mais ce sont des montants symboliques pour faire plaisir à chacun. Pour qu'on tisse des amitiés. »</p>
+<p>Pour cette édition, le festival a reçu le soutien d'un premier sponsor institutionnel, la Fondation Dakouri Marius Trésor, ainsi que la présence de délégations de la diaspora venues de Paris et du Canada.</p>`,
+      galerie: [
+        { url: P.equipe, legende: "L'équipe organisatrice de la MUDG sur scène, lors de la soirée du festival.", credit: CREDIT },
+        { url: P.foule, legende: "Public venu assister aux festivités à Gragbalilié.", credit: CREDIT },
+      ],
+    },
+    {
+      slug: 'zoukou-riviere-sacree-gragbalilie', rubrique: 'histoire-de-cote-d-ivoire', imageUneUrl: P.riviere1,
+      titre: "Le Zoukou, la rivière sacrée qui veille sur Gragbalilié",
+      chapo: "À quelques centaines de mètres du village, la rivière Do — appelée localement Zoukou — est un lieu d'immersion rituelle, mais aussi un site chargé d'histoire : les habitants racontent comment leurs ancêtres s'y réfugiaient pendant les guerres tribales et la colonisation.",
+      contenuHtml: `<p>La section de la rivière Do qui traverse le territoire de Gragbalilié porte un nom propre : le Zoukou, ou Zuku-Klé en langue Dida, qui signifie « la quantité », « le grand nombre ». Un nom qui rappelle, selon la tradition orale, l'installation d'ancêtres venus en nombre après une longue migration depuis la Basse-Côte.</p>
+<p>On n'entre pas dans ce lieu sans précaution. Le rite d'entrée est immuable : la libation, pour invoquer les esprits avant toute activité. Les gardiens du site racontent un épisode survenu lors du nettoyage des abords, peu avant le festival : « La bouteille de liqueur que nous avons déposée, personne ne l'a touchée. Mais elle seule, elle s'est explosée et puis toute la boisson est versée. Donc on a arrêté le travail et on a pris une nouvelle bouteille pour invoquer les esprits. »</p>
+<p>Le Zoukou n'est pas seulement un lieu de recueillement. Il occupe une place dans la mémoire des conflits qui ont marqué la région. « Quand on faisait les guerres tribales […], quand nos parents bataillaient, quand ils traversent, ils viennent derrière ici. Les autres ne peuvent plus traverser parce qu'ils ne savent pas nager », racontent les gardiens du lieu. La même stratégie aurait servi pendant la colonisation : « Quand les blancs viennent, c'est la panique. […] Dès qu'ils arrivent ici, le colon se perd. Il ne peut plus les retrouver. »</p>
+<p>Les gardiens du Zoukou évoquent aujourd'hui un potentiel touristique, à condition d'encadrer les visites : le site est profond, et un étranger ne doit jamais s'y aventurer seul. « Nous souhaitons qu'avec le soutien d'investisseurs et du ministère du Tourisme, ce site sacré et naturel puisse être aménagé pour accueillir des visiteurs dans le respect de nos traditions. »</p>`,
+      galerie: [
+        { url: P.riviere2, legende: "Rite d'immersion dans les eaux du Zoukou, lors du premier jour du festival.", credit: CREDIT },
+      ],
+    },
+    {
+      slug: 'gbanyan-nya-danse-nee-a-gragbalilie', rubrique: 'showbiz-musique', imageUneUrl: P.doyenne2,
+      titre: "Gbanyan-nya : la danse née à Gragbalilié qui a conquis le pays Dida",
+      chapo: "Danse acrobatique exécutée au son des tam-tams, le Gbanyan-nya (ou Agba Nye Nye) est aujourd'hui pratiqué dans toute la région Dida. Mais le genre est né à Gragbalilié même, où sa compétition constitue le cœur artistique du Walo Festival.",
+      contenuHtml: `<p>Danseurs enduits de kaolin blanc, vêtus du pagne traditionnel kamandjè, exécutant des figures acrobatiques au son lourd des tam-tams : le Gbanyan-nya est, selon les mots d'Éric Guéyoun, « un genre musical créé dans notre village. […] Les gens écoutent ça chez nous. Et tout le monde essaie de le reproduire aujourd'hui. Mais les gens ignorent que c'est venu d'ici. »</p>
+<p>Le Chef Douto Dakoury Niadré Benson, Chef central de Gragbalilié, en parle comme d'un héritage familial autant que collectif : « La culture Dida, je ne sais pas, mais c'est un don. Moi qui vous parle, ma maman a été la meilleure chanteuse de tout Lakota. Elle s'appelait Koudou Tato Janette. […] Quand je vais me déshabiller et puis faire la Gbanyan-nya, vous n'allez pas me reconnaître ! »</p>
+<p>Au Walo Festival, la compétition de Gbanyan-nya permet de comparer les interprétations des différents villages invités et de désigner les meilleurs groupes — une manière, selon les organisateurs, de faire vivre la tradition devant les jeunes générations plutôt que de la laisser s'éteindre.</p>
+<p>L'habillement traditionnel occupe une place centrale dans ces prestations : les hommes portent le pagne d'apparat à l'épaule, les femmes le violacé caractéristique des doyennes du village, agrémenté de colliers de perles.</p>`,
+      galerie: [],
+    },
+    {
+      slug: 'sauce-dida-gastronomie-sans-artifice', rubrique: 'gastronomie-maquis', imageUneUrl: P.foufou,
+      titre: "La sauce Dida, une gastronomie sans artifice",
+      chapo: "Piment écrasé, eau, huile rouge : la sauce Dida authentique, telle que décrite par le Chef de Gragbalilié, se prépare sans oignon, sans tomate et sans condiments industriels. Au Walo Festival, la « consommation publique du foufou » pilé au mortier est un temps fort à part entière.",
+      contenuHtml: `<p>« La vraie sauce Dida, vous prenez du piment. Vous l'écrasez bien. Et puis, avec un peu d'eau mélangée. Et on prend de l'huile rouge. Et puis, on te fait une sauce agréable. Il n'y a pas d'huile raffinée dedans. Il n'y a pas de tomate. Il n'y a pas d'oignon. Il n'y a pas de condiments artificiels », décrit le Chef Douto Dakoury Niadré Benson.</p>
+<p>Au Walo Festival, cette cuisine se prépare à grande échelle et en public. « On a voulu que ce soit une consommation publique, une préparation à grande échelle », explique Éric Guéyoun, président de la MUDG, qui présente le foufou comme « la nourriture de notre terroir, la nourriture qui est très prisée ».</p>
+<p>Dans les cours familiales, le son cadencé des pilons frappant le foufou dans d'imposants mortiers en bois résonne d'une cour à l'autre pendant les trois jours du festival, tandis que les femmes préparent en grandes quantités une sauce claire à l'aubergine, au gombo et aux champignons pour nourrir les délégations des villages invités, hébergées dans les familles du village.</p>`,
+      galerie: [
+        { url: P.cuisine, legende: "Préparation des repas pour les délégations invitées, dans une cour de Gragbalilié.", credit: CREDIT },
+        { url: P.bois, legende: "Réserve de bois pour la cuisson, dans une cour du village.", credit: CREDIT },
+      ],
+    },
+    {
+      slug: 'canton-dieco-routes-sante-education-chef-interpelle', rubrique: 'regions', imageUneUrl: P.dignitaire,
+      titre: "Routes, santé, éducation : le chef du canton Dieco interpelle l'État",
+      chapo: "Chef central de Gragbalilié et chef du canton Dieco, Douto Dakoury Niadré Benson a profité du Walo Festival pour porter devant les caméras les besoins de ses 18 villages : l'enclavement, en premier lieu, mais aussi la santé et l'éducation.",
+      contenuHtml: `<p>Gragbalilié se trouve à seize kilomètres de piste de Lakota — trente minutes à deux heures de trajet selon la saison. « Sans route, on ne peut rien faire. Sans route, on ne peut rien faire », insiste le Chef Douto Dakoury Niadré Benson, à la tête du collectif des chefs traditionnels du département de Lakota. « Il y a un côté de mon canton qui vient se plaindre à moi. Et quand je vais voir le patron à Guivo, à Lakota : "Non, on vient demain. Non, on vient après-demain. Ta voiture ne peut pas aller là-bas." »</p>
+<p>Son appel au président de la République est direct : « Il a fait beaucoup, mais il reste beaucoup à faire. On va construire un dispensaire nous-mêmes. Il n'est qu'à nous aider à faire la route. »</p>
+<p>Le chef salue en revanche un progrès net : l'électrification. Les 18 villages du canton Dieco sont désormais tous raccordés au réseau. « Il n'y a aucun village de mon canton qui est en manque d'électricité. […] On dit vraiment merci au Président de la République. »</p>
+<p>Sur l'éducation, deux collèges de proximité ont été construits, à Base 2 et Base 4 — une avancée saluée, mais jugée insuffisante face à l'éloignement de villages comme Béga, Gécoco, Dagobwa ou Dagodou. Sur la santé, l'absence de centre médical reste une urgence : le canton se dit prêt à construire son propre dispensaire, avec ou sans l'aide de l'État.</p>`,
+      galerie: [],
+    },
+    {
+      slug: 'fondation-dakouri-marius-tresor-sponsor-walo-festival', rubrique: 'diaspora-ivoire', imageUneUrl: P.doyenne,
+      titre: "La Fondation Dakouri Marius Trésor, sponsor officiel du Walo Festival",
+      chapo: "Fils de Gragbalilié établi aux États-Unis, Dakouri Marius Trésor a créé il y a deux ans une fondation qui soutient veuves, personnes démunies et projets culturels dans le canton Dieco. Pour sa première participation au Walo Festival, elle en est devenue le sponsor officiel.",
+      contenuHtml: `<p>Retenu hors du pays, le fondateur n'a pas pu se déplacer à Gragbalilié : il a été représenté par une délégation de dix personnes venue d'Abidjan, conduite par M. Djessa Attebi Filao, directeur exécutif de la Fondation Dakouri Marius Trésor.</p>
+<p>« Très attaché à son canton, il soutient les veuves, les personnes démunies et finance des projets culturels », explique M. Djessa Attebi Filao. La fondation, créée il y a deux ans, a notamment porté secours à des ressortissants de Lakota touchés par les incidents survenus à Abidjan (Koumassi et Port-Bouët), accompagné la Fête des Mères et soutenu plusieurs activités culturelles liées au patrimoine Dida.</p>
+<p>Pour cette 3ᵉ édition du Walo Festival, la délégation a assuré la représentation officielle du sponsor durant les trois jours : réceptions protocolaires, présence aux compétitions sportives et culturelles, et participation à la remise des trophées et des enveloppes de soutien.</p>
+<p>La fondation affiche une ambition plus large : « Les prochaines éditions, nous allons étendre au mieux le nombre de villages à inviter », indique M. Djessa Attebi Filao, qui évoque aussi un projet de dispensaire pour le canton, sous réserve des autorisations nécessaires auprès du ministère de la Santé.</p>`,
+      galerie: [],
+    },
+  ];
+
+  let crees = 0;
+  for (const item of items) {
+    const existe = await prisma.article.findUnique({ where: { slug: item.slug } });
+    if (existe) continue;
+    const rubrique = await prisma.rubrique.findUnique({ where: { slug: item.rubrique } });
+    if (!rubrique) {
+      console.warn(`⚠ Article Walo Festival "${item.slug}" ignoré : rubrique "${item.rubrique}" introuvable.`);
+      continue;
+    }
+    const maintenant = new Date();
+    const article = await prisma.article.create({
+      data: {
+        slug: item.slug, titre: item.titre, chapo: item.chapo, contenuHtml: item.contenuHtml,
+        tags: ['walo-festival', 'gragbalilie', 'patrimoine-dida'], format: 'EDITION', statut: 'PUBLIE', paywall: 'LIBRE',
+        rubriqueId: rubrique.id, auteurId: redacteurEnChef.id, valideParId: redacteurEnChef.id,
+        imageUneUrl: item.imageUneUrl, portails: ['INFO_DIRECT'],
+        publieLe: maintenant, createdAt: maintenant, updatedAt: maintenant, vuesTotal: 1,
+      },
+    });
+    for (const [i, g] of item.galerie.entries()) {
+      await prisma.media.create({ data: { type: 'PHOTO', articleId: article.id, url: g.url, legende: g.legende, credit: g.credit, ordre: i } });
+    }
+    crees++;
+  }
+  console.log(`✔ ${crees} article(s) Walo Festival créé(s).`);
 }
 
 main()
