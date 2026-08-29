@@ -81,3 +81,24 @@ body {
 .theme-direct .bg-gradient-to-r.from-white { --tw-gradient-from: #131a2b; }
 .theme-direct .to-\[\#FBF3E4\] { --tw-gradient-to: #1c1a12; }
 .theme-direct .border-\[\#F0DFB8\] { border-color: #3a331f; }
+
+/* Diaporama album photo (Diaporama.js) — chaque vue est visible 1/6 du
+   cycle puis s'efface en fondu ; le décalage par photo est posé en style
+   inline. Découpage calé sur 6 photos de 5 s (cycle de 30 s). */
+@keyframes diaporama-fondu {
+  0%      { opacity: 0; }
+  2%      { opacity: 1; }
+  16.66%  { opacity: 1; }
+  18.66%  { opacity: 0; }
+  100%    { opacity: 0; }
+}
+.diaporama-slide {
+  opacity: 0;
+  animation-name: diaporama-fondu;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .diaporama-slide { animation: none; }
+  .diaporama-slide:first-child { opacity: 1; }
+}

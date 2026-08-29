@@ -15,6 +15,7 @@ import FormatBadge from '@/components/FormatBadge';
 import PubCard from '@/components/PubCard';
 import UneVerrouillee from '@/components/UneVerrouillee';
 import GrillePiliers from '@/components/GrillePiliers';
+import Diaporama from '@/components/Diaporama';
 import { timeAgo, formatDateRange, LABEL_FORMAT } from '@/lib/format';
 
 // Fine ligne de séparation entre les blocs — signature visuelle du New York
@@ -82,6 +83,12 @@ export default async function QuotidienAccueilPage() {
     if (!items?.length) return null;
     return [items[0].rubrique?.nom || slug, { couleur: items[0].rubrique?.couleur, articles: items }];
   }).filter(Boolean);
+
+  // Album photo du diaporama — toutes les photos légendées des articles
+  // déjà récupérés ci-dessus (aucune requête supplémentaire).
+  const photosAlbum = (serviceGroupes[RUBRIQUES_SERVICE_ACCUEIL.indexOf('photos-legendees')]?.articles || [])
+    .flatMap((a) => a.medias || [])
+    .filter((m) => m.type === 'PHOTO' && m.legende);
 
   const flashEtLive = articles.filter((a) => a.format === 'FLASH' || a.format === 'LIVE').slice(0, 8);
   const une = articles[0];
@@ -287,6 +294,7 @@ export default async function QuotidienAccueilPage() {
         <>
           <Separateur />
           <section className="max-w-[1180px] mx-auto px-4 sm:px-8 pb-10">
+            <Diaporama photos={photosAlbum} basePath={BASE_PATH} />
             <ColonneActualites colonnes={colonnesService} basePath={BASE_PATH} titre="Aussi sur Info en direct" styleCartes />
           </section>
         </>
