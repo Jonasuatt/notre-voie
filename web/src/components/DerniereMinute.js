@@ -1,30 +1,34 @@
 import Link from 'next/link';
 import { timeAgo } from '@/lib/format';
 
-// Bandeau "Dernière minute" — inspiré du strip horodaté en tête de
-// lemonde.fr : une ligne compacte, heure + titre, pour montrer que le fil
-// vit en continu. Complète le FlashBar (bulles façon story) sans le
-// remplacer ; propre à Info en direct, pas de vraie fraîcheur minute par
-// minute à reproduire côté Quotidien (contenu du jour, pas du direct).
+// Bandeau "Dernière minute" — strip horodaté façon lemonde.fr, en
+// défilement continu comme le Flash Info (mêmes keyframes ticker-*, cf.
+// globals.css) : contenu dupliqué une fois pour une boucle sans coupure,
+// pause au survol.
 export default function DerniereMinute({ articles, basePath = '' }) {
   if (!articles?.length) return null;
+  const boucle = [...articles, ...articles];
 
   return (
-    <div className="border-y border-[#6E7897] bg-[#404A5E]">
-      <div className="max-w-[1180px] mx-auto px-4 sm:px-8 flex items-stretch gap-0 overflow-x-auto">
-        <span className="flex-none flex items-center gap-1.5 font-mono text-[10.5px] font-bold uppercase tracking-widest text-[#22D3EE] pr-4 py-2.5 border-r border-[#6E7897]">
+    <div className="border-y border-[#6E7897] bg-[#404A5E] overflow-hidden">
+      <div className="max-w-[1180px] mx-auto flex items-stretch">
+        <span className="flex-none flex items-center gap-1.5 font-mono text-[10.5px] font-bold uppercase tracking-widest text-[#22D3EE] px-4 py-2.5 border-r border-[#6E7897] z-10 bg-[#404A5E]">
           <span className="w-1.5 h-1.5 rounded-full bg-[#22D3EE] dot-live" /> Dernière minute
         </span>
-        {articles.map((a) => (
-          <Link
-            key={a.id}
-            href={`${basePath}/article/${a.slug}`}
-            className="flex-none flex items-center gap-2.5 px-4 py-2.5 border-r border-[#6E7897] last:border-r-0 hover:bg-white/5 transition-colors"
-          >
-            <span className="font-mono text-[10.5px] text-[#A9B2C9] tabular-nums">{timeAgo(a.publieLe)}</span>
-            <span className="text-[12.5px] text-[#E7EBF7] whitespace-nowrap max-w-[280px] overflow-hidden text-ellipsis">{a.titre}</span>
-          </Link>
-        ))}
+        <div className="ticker-piste flex-1 overflow-hidden">
+          <div className="ticker-defiler flex items-stretch w-max" style={{ '--ticker-duree': `${Math.max(articles.length * 14, 60)}s` }}>
+            {boucle.map((a, i) => (
+              <Link
+                key={`${a.id}-${i}`}
+                href={`${basePath}/article/${a.slug}`}
+                className="flex-none flex items-center gap-2.5 px-4 py-2.5 border-r border-[#6E7897] hover:bg-white/5 transition-colors"
+              >
+                <span className="font-mono text-[10.5px] text-[#A9B2C9] tabular-nums">{timeAgo(a.publieLe)}</span>
+                <span className="text-[12.5px] text-[#E7EBF7] whitespace-nowrap">{a.titre}</span>
+              </Link>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );
