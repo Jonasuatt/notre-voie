@@ -54,7 +54,7 @@ export default function MegaMenu({ piliers, basePath }) {
 
           {ouvert === pilier.cle && (
             <div
-              className="fixed left-0 right-0 top-[72px] bg-[#0d1220] border-t border-b border-[#232B45] shadow-2xl z-40"
+              className="fixed left-0 right-0 top-[72px] bg-[#333B4E] border-t border-b border-[#5B6480] shadow-2xl z-40"
               onMouseEnter={() => ouvrir(pilier.cle)}
               onMouseLeave={fermerDifferee}
             >
@@ -76,7 +76,7 @@ export default function MegaMenu({ piliers, basePath }) {
                           {r.label}
                         </Link>
                         {r.sousRubriques?.length > 0 && (
-                          <ul className="mt-1.5 ml-3 space-y-1 border-l border-[#232B45] pl-3">
+                          <ul className="mt-1.5 ml-3 space-y-1 border-l border-[#5B6480] pl-3">
                             {r.sousRubriques.map((sr) => (
                               <li key={sr.href}>
                                 <Link
@@ -119,7 +119,7 @@ export default function MegaMenu({ piliers, basePath }) {
                           className="group flex gap-3"
                         >
                           {a.imageUneUrl && (
-                            <div className="relative w-[76px] h-[76px] shrink-0 rounded-[6px] overflow-hidden bg-[#171d30]">
+                            <div className="relative w-[76px] h-[76px] shrink-0 rounded-[6px] overflow-hidden bg-[#404A63]">
                               <Image src={a.imageUneUrl} alt="" fill sizes="76px" className="object-cover" />
                             </div>
                           )}
@@ -151,14 +151,14 @@ export default function MegaMenu({ piliers, basePath }) {
 // moment" < 3) — toujours du vrai contenu/lien du site, jamais un widget
 // factice (pas de formulaire newsletter/WhatsApp inexistant côté site).
 function BlocSecours({ secours, basePath, onNaviguer }) {
-  const conteneur = 'rounded-[10px] border border-[#232B45] bg-[#131a2b] p-4 flex flex-col h-full';
+  const conteneur = 'rounded-[10px] border border-[#5B6480] bg-[#39425A] p-4 flex flex-col h-full';
 
   if (secours.type === 'kiosque' && secours.edition) {
     const { edition } = secours;
     return (
       <div className={conteneur}>
         <span className="font-mono text-[10.5px] uppercase tracking-widest text-[#8993B0] mb-3">Kiosque numérique</span>
-        <div className="relative aspect-[3/4] rounded-[6px] overflow-hidden mb-3 bg-[#0a0e1a]">
+        <div className="relative aspect-[3/4] rounded-[6px] overflow-hidden mb-3 bg-[#2E3546]">
           <Image src={edition.couvertureUrl} alt={`Une n°${edition.numero}`} fill sizes="200px" className="object-cover" />
         </div>
         <p className="text-[12px] text-[#8993B0] mb-3">N°{edition.numero} — édition du jour</p>

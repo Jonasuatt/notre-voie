@@ -14,10 +14,10 @@ export default function Diaporama({ photos, basePath = '', titre = 'Album photo'
 
   return (
     <div className="mb-10">
-      <h3 className="font-mono text-[11px] font-bold uppercase tracking-widest pb-3 mb-5 border-b" style={{ borderColor: '#232B45', color: '#8993B0' }}>
+      <h3 className="font-mono text-[11px] font-bold uppercase tracking-widest pb-3 mb-5 border-b" style={{ borderColor: '#5B6480', color: '#8993B0' }}>
         {titre}
       </h3>
-      <div className="relative aspect-video rounded-xl overflow-hidden bg-[#171d30] border" style={{ borderColor: '#232B45' }}>
+      <div className="relative aspect-video rounded-xl overflow-hidden bg-[#404A63] border" style={{ borderColor: '#5B6480' }}>
         {slides.map((p, i) => (
           <figure
             key={p.id}

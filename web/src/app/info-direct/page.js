@@ -22,7 +22,7 @@ import { timeAgo, formatDateRange, LABEL_FORMAT } from '@/lib/format';
 // Times (nytimes.com), demandée explicitement pour distinguer Info en
 // direct du Quotidien.
 function Separateur() {
-  return <hr className="max-w-[1180px] mx-auto my-10" style={{ borderColor: '#232B45' }} />;
+  return <hr className="max-w-[1180px] mx-auto my-10" style={{ borderColor: '#5B6480' }} />;
 }
 
 const BASE_PATH = '/info-direct';
@@ -216,7 +216,7 @@ export default async function QuotidienAccueilPage() {
 
               {/* Encart institutionnel — sous "5 choses à retenir", couleurs
                   officielles du logo Notre Voie. */}
-              <div className="mt-4 p-5 bg-[#131a2b]/90 border-2 border-[#E6007E]/60 rounded-xl text-center flex flex-col items-center justify-center shadow-lg shadow-[#E6007E]/10">
+              <div className="mt-4 p-5 bg-[#39425A]/90 border-2 border-[#E6007E]/60 rounded-xl text-center flex flex-col items-center justify-center shadow-lg shadow-[#E6007E]/10">
                 <h3 className="text-3xl font-black uppercase tracking-wider">
                   <span className="text-white">Notre </span>
                   <span className="text-[#E6007E]">Voie</span>

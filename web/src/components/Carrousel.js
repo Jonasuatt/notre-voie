@@ -20,7 +20,7 @@ export default function Carrousel({ titre, articles, basePath = '' }) {
 
   return (
     <div>
-      <div className="flex items-center justify-between pb-3 mb-6 border-b" style={{ borderColor: '#232B45' }}>
+      <div className="flex items-center justify-between pb-3 mb-6 border-b" style={{ borderColor: '#5B6480' }}>
         <h3 className="font-mono text-[11px] font-bold uppercase tracking-widest" style={{ color: '#8993B0' }}>{titre}</h3>
         <div className="flex gap-2">
           <button
@@ -28,7 +28,7 @@ export default function Carrousel({ titre, articles, basePath = '' }) {
             onClick={() => defiler(-1)}
             aria-label="Précédent"
             className="w-8 h-8 rounded-full border flex items-center justify-center hover:bg-white/5 transition-colors"
-            style={{ borderColor: '#232B45', color: '#E7EBF7' }}
+            style={{ borderColor: '#5B6480', color: '#E7EBF7' }}
           >
             ‹
           </button>
@@ -37,7 +37,7 @@ export default function Carrousel({ titre, articles, basePath = '' }) {
             onClick={() => defiler(1)}
             aria-label="Suivant"
             className="w-8 h-8 rounded-full border flex items-center justify-center hover:bg-white/5 transition-colors"
-            style={{ borderColor: '#232B45', color: '#E7EBF7' }}
+            style={{ borderColor: '#5B6480', color: '#E7EBF7' }}
           >
             ›
           </button>
@@ -52,7 +52,7 @@ export default function Carrousel({ titre, articles, basePath = '' }) {
             className="group block shrink-0 w-[260px] snap-start"
           >
             {a.imageUneUrl && (
-              <div className="relative aspect-video rounded-[8px] overflow-hidden mb-2.5 bg-[#171d30]">
+              <div className="relative aspect-video rounded-[8px] overflow-hidden mb-2.5 bg-[#404A63]">
                 <Image src={a.imageUneUrl} alt="" fill sizes="260px" className="object-cover transition-transform duration-300 group-hover:scale-105" />
               </div>
             )}

@@ -9,7 +9,7 @@ export default function TickerFlashInfo({ articles, basePath = '' }) {
   const boucle = [...articles, ...articles];
 
   return (
-    <div className="border-b border-[#232B45] bg-[#0d1220] overflow-hidden">
+    <div className="border-b border-[#5B6480] bg-[#333B4E] overflow-hidden">
       <div className="max-w-[1180px] mx-auto flex items-stretch">
         <span className="flex-none flex items-center gap-1.5 font-mono text-[10.5px] font-bold uppercase tracking-widest text-white bg-coral px-4 py-2 z-10">
           <span className="w-1.5 h-1.5 rounded-full bg-white dot-live" /> Flash Info

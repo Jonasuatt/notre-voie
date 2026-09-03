@@ -19,7 +19,7 @@ export default function GrillePiliers({ colonnes, basePath = '', titre = 'Actual
 
   return (
     <div>
-      <h3 className="font-mono text-[11px] font-bold uppercase tracking-widest pb-3 mb-6 border-b" style={{ borderColor: '#232B45', color: '#8993B0' }}>
+      <h3 className="font-mono text-[11px] font-bold uppercase tracking-widest pb-3 mb-6 border-b" style={{ borderColor: '#5B6480', color: '#8993B0' }}>
         {titre}
       </h3>
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-x-10 gap-y-8">
@@ -27,7 +27,7 @@ export default function GrillePiliers({ colonnes, basePath = '', titre = 'Actual
           {cartesPrincipales.map(({ nom, couleur, article }) => (
             <Link key={article.id} href={`${basePath}/article/${article.slug}`} className="group block">
               {article.imageUneUrl && (
-                <div className={`relative rounded-[8px] overflow-hidden mb-3 bg-[#171d30] ${nom === 'Formats Verticaux' ? 'aspect-[9/16] max-h-64 mx-auto max-w-[220px]' : 'aspect-video'}`}>
+                <div className={`relative rounded-[8px] overflow-hidden mb-3 bg-[#404A63] ${nom === 'Formats Verticaux' ? 'aspect-[9/16] max-h-64 mx-auto max-w-[220px]' : 'aspect-video'}`}>
                   <Image src={article.imageUneUrl} alt="" fill sizes="(max-width: 1024px) 100vw, 380px" className="object-cover transition-transform duration-300 group-hover:scale-105" />
                   {(article.format === 'VIDEO_COURTE' || article.format === 'LIVE') && (
                     <div className="absolute inset-0 flex items-center justify-center bg-black/10 group-hover:bg-black/25 transition-colors">
@@ -57,7 +57,7 @@ export default function GrillePiliers({ colonnes, basePath = '', titre = 'Actual
               <span className="block font-mono text-[10.5px] font-bold uppercase tracking-widest mb-2" style={{ color: g.couleur || '#22D3EE' }}>{nom}</span>
               <ul>
                 {g.articles.map((a) => (
-                  <li key={a.id} className="border-t py-2.5 first:border-t-0" style={{ borderColor: '#232B45' }}>
+                  <li key={a.id} className="border-t py-2.5 first:border-t-0" style={{ borderColor: '#5B6480' }}>
                     <Link href={`${basePath}/article/${a.slug}`} className="text-[13px] leading-snug text-[#E7EBF7] hover:text-[#22D3EE] transition-colors">{a.titre}</Link>
                   </li>
                 ))}
