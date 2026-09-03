@@ -34,13 +34,13 @@ body {
 /* Ascenseur discret pour le carrousel horizontal (Carrousel.js). */
 .scrollbar-fine {
   scrollbar-width: thin;
-  scrollbar-color: #5B6480 transparent;
+  scrollbar-color: #6E7897 transparent;
 }
 .scrollbar-fine::-webkit-scrollbar {
   height: 6px;
 }
 .scrollbar-fine::-webkit-scrollbar-thumb {
-  background: #5B6480;
+  background: #6E7897;
   border-radius: 3px;
 }
 
@@ -63,22 +63,22 @@ body {
    /info-direct suffit : les mêmes composants partagés (Header, ArticleCard,
    FlashBar…) sont ainsi reskinnés sans dupliquer leur code, la spécificité
    CSS (2 classes vs 1) l'emporte naturellement sur les utilitaires Tailwind. */
-.theme-direct .bg-white { background-color: #39425A; }
-.theme-direct .bg-cream { background-color: #2E3546; }
+.theme-direct .bg-white { background-color: #4B5570; }
+.theme-direct .bg-cream { background-color: #404A5E; }
 .theme-direct .text-ink { color: #E7EBF7; }
-.theme-direct .text-muted { color: #8993B0; }
-.theme-direct .border-line { border-color: #5B6480; }
+.theme-direct .text-muted { color: #A9B2C9; }
+.theme-direct .border-line { border-color: #6E7897; }
 .theme-direct .text-coral { color: #22D3EE; }
 .theme-direct .bg-coral { background-color: #22D3EE; color: #0a0e1a; }
 .theme-direct .hover\:text-coral:hover { color: #22D3EE; }
-.theme-direct .bg-navy { background-color: #39425A; }
+.theme-direct .bg-navy { background-color: #4B5570; }
 .theme-direct .text-navy { color: #22D3EE; }
 .theme-direct .border-navy { border-color: #22D3EE; }
 .theme-direct .hover\:border-navy:hover { border-color: #22D3EE; }
 .theme-direct .text-gold { color: #FFC857; }
-.theme-direct .from-navy2 { --tw-gradient-from: #4A5570; }
-.theme-direct .to-navy { --tw-gradient-to: #2E3546; }
-.theme-direct .bg-gradient-to-r.from-white { --tw-gradient-from: #39425A; }
+.theme-direct .from-navy2 { --tw-gradient-from: #5A6784; }
+.theme-direct .to-navy { --tw-gradient-to: #404A5E; }
+.theme-direct .bg-gradient-to-r.from-white { --tw-gradient-from: #4B5570; }
 .theme-direct .to-\[\#FBF3E4\] { --tw-gradient-to: #1c1a12; }
 .theme-direct .border-\[\#F0DFB8\] { border-color: #3a331f; }
 

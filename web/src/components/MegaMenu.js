@@ -54,7 +54,7 @@ export default function MegaMenu({ piliers, basePath }) {
 
           {ouvert === pilier.cle && (
             <div
-              className="fixed left-0 right-0 top-[72px] bg-[#333B4E] border-t border-b border-[#5B6480] shadow-2xl z-40"
+              className="fixed left-0 right-0 top-[72px] bg-[#454F66] border-t border-b border-[#6E7897] shadow-2xl z-40"
               onMouseEnter={() => ouvrir(pilier.cle)}
               onMouseLeave={fermerDifferee}
             >
@@ -64,7 +64,7 @@ export default function MegaMenu({ piliers, basePath }) {
                 }`}
               >
                 <div>
-                  <span className="block font-mono text-[10.5px] uppercase tracking-widest text-[#8993B0] mb-3">Rubriques</span>
+                  <span className="block font-mono text-[10.5px] uppercase tracking-widest text-[#A9B2C9] mb-3">Rubriques</span>
                   <ul className="space-y-2">
                     {pilier.liensRubriques.map((r) => (
                       <li key={r.href}>
@@ -76,13 +76,13 @@ export default function MegaMenu({ piliers, basePath }) {
                           {r.label}
                         </Link>
                         {r.sousRubriques?.length > 0 && (
-                          <ul className="mt-1.5 ml-3 space-y-1 border-l border-[#5B6480] pl-3">
+                          <ul className="mt-1.5 ml-3 space-y-1 border-l border-[#6E7897] pl-3">
                             {r.sousRubriques.map((sr) => (
                               <li key={sr.href}>
                                 <Link
                                   href={`${basePath}${sr.href}`}
                                   onClick={() => setOuvert(null)}
-                                  className="inline-block text-[12.5px] text-[#8993B0] hover:text-[#22D3EE] hover:translate-x-1 transition-all"
+                                  className="inline-block text-[12.5px] text-[#A9B2C9] hover:text-[#22D3EE] hover:translate-x-1 transition-all"
                                 >
                                   {sr.label}
                                 </Link>
@@ -109,7 +109,7 @@ export default function MegaMenu({ piliers, basePath }) {
 
                 {pilier.aLaUne.length > 0 && (
                   <div>
-                    <span className="block font-mono text-[10.5px] uppercase tracking-widest text-[#8993B0] mb-3">En ce moment</span>
+                    <span className="block font-mono text-[10.5px] uppercase tracking-widest text-[#A9B2C9] mb-3">En ce moment</span>
                     <div className="grid grid-cols-2 gap-x-6 gap-y-5">
                       {pilier.aLaUne.map((a) => (
                         <Link
@@ -119,7 +119,7 @@ export default function MegaMenu({ piliers, basePath }) {
                           className="group flex gap-3"
                         >
                           {a.imageUneUrl && (
-                            <div className="relative w-[76px] h-[76px] shrink-0 rounded-[6px] overflow-hidden bg-[#404A63]">
+                            <div className="relative w-[76px] h-[76px] shrink-0 rounded-[6px] overflow-hidden bg-[#525E78]">
                               <Image src={a.imageUneUrl} alt="" fill sizes="76px" className="object-cover" />
                             </div>
                           )}
@@ -151,17 +151,17 @@ export default function MegaMenu({ piliers, basePath }) {
 // moment" < 3) — toujours du vrai contenu/lien du site, jamais un widget
 // factice (pas de formulaire newsletter/WhatsApp inexistant côté site).
 function BlocSecours({ secours, basePath, onNaviguer }) {
-  const conteneur = 'rounded-[10px] border border-[#5B6480] bg-[#39425A] p-4 flex flex-col h-full';
+  const conteneur = 'rounded-[10px] border border-[#6E7897] bg-[#4B5570] p-4 flex flex-col h-full';
 
   if (secours.type === 'kiosque' && secours.edition) {
     const { edition } = secours;
     return (
       <div className={conteneur}>
-        <span className="font-mono text-[10.5px] uppercase tracking-widest text-[#8993B0] mb-3">Kiosque numérique</span>
-        <div className="relative aspect-[3/4] rounded-[6px] overflow-hidden mb-3 bg-[#2E3546]">
+        <span className="font-mono text-[10.5px] uppercase tracking-widest text-[#A9B2C9] mb-3">Kiosque numérique</span>
+        <div className="relative aspect-[3/4] rounded-[6px] overflow-hidden mb-3 bg-[#404A5E]">
           <Image src={edition.couvertureUrl} alt={`Une n°${edition.numero}`} fill sizes="200px" className="object-cover" />
         </div>
-        <p className="text-[12px] text-[#8993B0] mb-3">N°{edition.numero} — édition du jour</p>
+        <p className="text-[12px] text-[#A9B2C9] mb-3">N°{edition.numero} — édition du jour</p>
         <Link
           href={`${basePath}/kiosque`}
           onClick={onNaviguer}
@@ -177,7 +177,7 @@ function BlocSecours({ secours, basePath, onNaviguer }) {
     const { article } = secours;
     return (
       <div className={conteneur}>
-        <span className="font-mono text-[10.5px] uppercase tracking-widest text-[#8993B0] mb-3">🎧 Dernier podcast</span>
+        <span className="font-mono text-[10.5px] uppercase tracking-widest text-[#A9B2C9] mb-3">🎧 Dernier podcast</span>
         <p className="text-[14px] font-serif leading-snug mb-3">{article.titre}</p>
         <Link
           href={`${basePath}/article/${article.slug}`}
@@ -189,7 +189,7 @@ function BlocSecours({ secours, basePath, onNaviguer }) {
         <Link
           href={`${basePath}/rubrique/audio-podcasts`}
           onClick={onNaviguer}
-          className="mt-2 text-center text-[12px] text-[#8993B0] hover:text-[#22D3EE] transition-colors"
+          className="mt-2 text-center text-[12px] text-[#A9B2C9] hover:text-[#22D3EE] transition-colors"
         >
           Tous les épisodes →
         </Link>
@@ -200,7 +200,7 @@ function BlocSecours({ secours, basePath, onNaviguer }) {
   // Fallback universel : abonnement (page réelle existante).
   return (
     <div className={conteneur}>
-      <span className="font-mono text-[10.5px] uppercase tracking-widest text-[#8993B0] mb-3">Notre Voie</span>
+      <span className="font-mono text-[10.5px] uppercase tracking-widest text-[#A9B2C9] mb-3">Notre Voie</span>
       <p className="text-[14px] font-serif leading-snug mb-3">Un accès illimité au site et à l&apos;application, ou à l&apos;article.</p>
       <Link
         href={`${basePath}/abonnement`}

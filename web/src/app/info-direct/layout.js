@@ -38,7 +38,7 @@ export default async function InfoDirectLayout({ children }) {
   const megaMenu = construireMegaMenu(rubriques, articlesParPilier, { edition: editions?.[0], dernierAudio });
 
   return (
-    <div className="theme-direct bg-[#2E3546] text-[#E7EBF7] min-h-screen">
+    <div className="theme-direct bg-[#404A5E] text-[#E7EBF7] min-h-screen">
       <Header basePath="/info-direct" megaMenu={megaMenu} />
       <main>{children}</main>
       <Footer basePath="/info-direct" />

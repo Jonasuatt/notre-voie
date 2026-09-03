@@ -22,7 +22,7 @@ import { timeAgo, formatDateRange, LABEL_FORMAT } from '@/lib/format';
 // Times (nytimes.com), demandée explicitement pour distinguer Info en
 // direct du Quotidien.
 function Separateur() {
-  return <hr className="max-w-[1180px] mx-auto my-10" style={{ borderColor: '#5B6480' }} />;
+  return <hr className="max-w-[1180px] mx-auto my-10" style={{ borderColor: '#6E7897' }} />;
 }
 
 const BASE_PATH = '/info-direct';
@@ -208,7 +208,7 @@ export default async function QuotidienAccueilPage() {
                         {String(i + 1).padStart(2, '0')}
                       </span>
                       <Link href={`${BASE_PATH}/article/${a.slug}`} className="hover:text-white leading-snug flex-1">{a.titre}</Link>
-                      <span className="font-mono text-[10px] text-[#8993B0] shrink-0 tabular-nums">{timeAgo(a.publieLe)}</span>
+                      <span className="font-mono text-[10px] text-[#A9B2C9] shrink-0 tabular-nums">{timeAgo(a.publieLe)}</span>
                     </li>
                   ))}
                 </ol>
@@ -216,7 +216,7 @@ export default async function QuotidienAccueilPage() {
 
               {/* Encart institutionnel — sous "5 choses à retenir", couleurs
                   officielles du logo Notre Voie. */}
-              <div className="mt-4 p-5 bg-[#39425A]/90 border-2 border-[#E6007E]/60 rounded-xl text-center flex flex-col items-center justify-center shadow-lg shadow-[#E6007E]/10">
+              <div className="mt-4 p-5 bg-[#4B5570]/90 border-2 border-[#E6007E]/60 rounded-xl text-center flex flex-col items-center justify-center shadow-lg shadow-[#E6007E]/10">
                 <h3 className="text-3xl font-black uppercase tracking-wider">
                   <span className="text-white">Notre </span>
                   <span className="text-[#E6007E]">Voie</span>

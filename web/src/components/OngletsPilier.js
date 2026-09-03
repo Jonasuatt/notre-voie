@@ -21,8 +21,8 @@ export default function OngletsPilier({ titre, onglets, basePath = '' }) {
 
   return (
     <div>
-      <div className="flex items-center justify-between flex-wrap gap-4 pb-3 mb-6 border-b" style={{ borderColor: '#5B6480' }}>
-        <h3 className="font-mono text-[11px] font-bold uppercase tracking-widest" style={{ color: '#8993B0' }}>{titre}</h3>
+      <div className="flex items-center justify-between flex-wrap gap-4 pb-3 mb-6 border-b" style={{ borderColor: '#6E7897' }}>
+        <h3 className="font-mono text-[11px] font-bold uppercase tracking-widest" style={{ color: '#A9B2C9' }}>{titre}</h3>
         <div className="flex items-center gap-1.5 min-w-0">
           <div ref={rangeeRef} className="flex gap-1.5 overflow-x-auto max-w-full scrollbar-fine">
             {onglets.map((o, i) => (
@@ -31,7 +31,7 @@ export default function OngletsPilier({ titre, onglets, basePath = '' }) {
                 type="button"
                 onClick={() => setActif(i)}
                 className={`shrink-0 text-[12.5px] font-bold px-3.5 py-1.5 rounded-full transition-colors ${
-                  i === actif ? 'bg-[#22D3EE] text-[#0a0e1a]' : 'text-[#8993B0] hover:text-[#E7EBF7]'
+                  i === actif ? 'bg-[#22D3EE] text-[#0a0e1a]' : 'text-[#A9B2C9] hover:text-[#E7EBF7]'
                 }`}
               >
                 {o.label}
@@ -45,7 +45,7 @@ export default function OngletsPilier({ titre, onglets, basePath = '' }) {
                 onClick={() => defiler(-1)}
                 aria-label="Onglets précédents"
                 className="w-6 h-6 rounded-full flex items-center justify-center text-[13px] hover:bg-white/5 transition-colors"
-                style={{ color: '#8993B0' }}
+                style={{ color: '#A9B2C9' }}
               >
                 ‹
               </button>
@@ -54,7 +54,7 @@ export default function OngletsPilier({ titre, onglets, basePath = '' }) {
                 onClick={() => defiler(1)}
                 aria-label="Onglets suivants"
                 className="w-6 h-6 rounded-full flex items-center justify-center text-[13px] hover:bg-white/5 transition-colors"
-                style={{ color: '#8993B0' }}
+                style={{ color: '#A9B2C9' }}
               >
                 ›
               </button>
@@ -67,7 +67,7 @@ export default function OngletsPilier({ titre, onglets, basePath = '' }) {
         {courant.articles.map((a) => (
           <Link key={a.id} href={`${basePath}/article/${a.slug}`} className="group block">
             {a.imageUneUrl && (
-              <div className="relative aspect-video rounded-[8px] overflow-hidden mb-2.5 bg-[#404A63]">
+              <div className="relative aspect-video rounded-[8px] overflow-hidden mb-2.5 bg-[#525E78]">
                 <Image src={a.imageUneUrl} alt="" fill sizes="260px" className="object-cover transition-transform duration-300 group-hover:scale-105" />
                 {(a.format === 'VIDEO_COURTE' || a.format === 'LIVE') && (
                   <div className="absolute inset-0 flex items-center justify-center bg-black/10 group-hover:bg-black/25 transition-colors">
@@ -80,7 +80,7 @@ export default function OngletsPilier({ titre, onglets, basePath = '' }) {
             )}
             <span className="font-mono text-[10px] uppercase tracking-wide" style={{ color: a.rubrique?.couleur || '#22D3EE' }}>{a.rubrique?.nom}</span>
             <h4 className="font-serif text-[15px] leading-snug mt-1 line-clamp-2 group-hover:text-[#22D3EE] transition-colors">{a.titre}</h4>
-            <span className="font-mono text-[10.5px] mt-1.5 block" style={{ color: '#8993B0' }}>{timeAgo(a.publieLe)}</span>
+            <span className="font-mono text-[10.5px] mt-1.5 block" style={{ color: '#A9B2C9' }}>{timeAgo(a.publieLe)}</span>
           </Link>
         ))}
       </div>
