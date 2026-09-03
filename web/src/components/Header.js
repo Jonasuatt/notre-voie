@@ -64,6 +64,18 @@ export default function Header({ basePath = '', megaMenu }) {
           </nav>
         )}
         <div className="flex items-center gap-3 shrink-0">
+          {/* LIVE TV — productions filmées en direct et leur archivage,
+              volontairement hors du pilier "Médias & Multimédia" (réservé
+              aux reportages ordinaires et enquêtes). Entrée distincte façon
+              welt.de. */}
+          {estInfoDirect && (
+            <Link
+              href={`${basePath}/rubrique/live-tv`}
+              className="hidden sm:flex items-center gap-1.5 font-mono text-[11px] font-bold uppercase tracking-widest text-coral border border-coral rounded-full px-3 py-[7px] hover:bg-coral hover:text-white transition-colors"
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-current dot-live" /> Live TV
+            </Link>
+          )}
           <Link href={`${basePath}/recherche`} aria-label="Rechercher" className="p-2 text-ink hover:text-coral transition-colors">
             <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
               <circle cx="11" cy="11" r="7" />

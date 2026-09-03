@@ -38,7 +38,8 @@ const RUBRIQUES_INFO_DIRECT = [
 // Rubriques de service — cf. cahier des charges §3.2
 const RUBRIQUES_SERVICE = [
   { nom: 'Photos légendées', angleEditorial: "Reportages et événements racontés en images, chaque photo légendée et créditée" },
-  { nom: 'Vidéos', angleEditorial: "Toutes les vidéos courtes et les directs regroupés dans un seul flux dédié" },
+  { nom: 'Vidéos', angleEditorial: "Reportages vidéo ordinaires et enquêtes filmées — le direct a sa propre rubrique (Live TV)" },
+  { nom: 'Live TV', angleEditorial: "Productions filmées en direct et leur archivage : plateaux, retransmissions, événements couverts en vidéo" },
   { nom: 'Audio / Podcasts', angleEditorial: "Articles écoutés, interviews, journal parlé quotidien" },
   { nom: 'Archives / Kiosque numérique', angleEditorial: "Éditions précédentes du journal consultables en PDF, articles archivés par date et par rubrique" },
   { nom: 'Nécrologie', angleEditorial: "Avis de décès, communiqués et messages de remerciement aux familles" },
