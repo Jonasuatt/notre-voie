@@ -64,6 +64,9 @@ body {
    FlashBar…) sont ainsi reskinnés sans dupliquer leur code, la spécificité
    CSS (2 classes vs 1) l'emporte naturellement sur les utilitaires Tailwind. */
 .theme-direct .bg-white { background-color: #4B5570; }
+/* Barre de navigation : noir comme le bandeau Vie chère (bg-ink), pas la
+   teinte des cartes. */
+.theme-direct header.bg-white { background-color: #14141F; }
 .theme-direct .bg-cream { background-color: #404A5E; }
 .theme-direct .text-ink { color: #E7EBF7; }
 .theme-direct .text-muted { color: #A9B2C9; }
