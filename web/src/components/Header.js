@@ -71,7 +71,7 @@ export default function Header({ basePath = '', megaMenu }) {
           {estInfoDirect && (
             <Link
               href={`${basePath}/rubrique/live-tv`}
-              className="hidden sm:flex items-center gap-1.5 font-mono text-[11px] font-bold uppercase tracking-widest text-coral border border-coral rounded-full px-3 py-[7px] hover:bg-coral hover:text-white transition-colors"
+              className="hidden sm:flex items-center gap-1.5 font-mono text-[11px] font-bold uppercase tracking-widest text-coral border border-current rounded-full px-3 py-[7px] hover:bg-coral hover:text-[#0a0e1a] transition-colors"
             >
               <span className="w-1.5 h-1.5 rounded-full bg-current dot-live" /> Live TV
             </Link>
