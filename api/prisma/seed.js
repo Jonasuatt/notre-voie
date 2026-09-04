@@ -126,6 +126,13 @@ async function seedRubriques() {
       create: { ...r, slug: slugify(r.nom), type: 'SERVICE', ordre: ordre++ },
     });
   }
+  // Rattrapage ciblé : « Vidéos » existait avant la création de Live TV et
+  // décrivait encore le direct. On ne réécrit que si le texte est resté
+  // l'ancien, pour ne jamais écraser une reformulation faite depuis le CMS.
+  await prisma.rubrique.updateMany({
+    where: { slug: 'videos', angleEditorial: 'Toutes les vidéos courtes et les directs regroupés dans un seul flux dédié' },
+    data: { angleEditorial: RUBRIQUES_SERVICE.find((r) => r.nom === 'Vidéos').angleEditorial },
+  });
   console.log(`✔ ${RUBRIQUES_EDITORIALES.length + RUBRIQUES_INFO_DIRECT.length + RUBRIQUES_SERVICE.length} rubriques créées/à jour.`);
 }
 
