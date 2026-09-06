@@ -21,7 +21,8 @@
       "package": "ci.notrevoienews.app",
       "permissions": [
         "android.permission.INTERNET"
-      ]
+      ],
+      "versionCode": 1
     },
     "web": {
       "bundler": "metro",
