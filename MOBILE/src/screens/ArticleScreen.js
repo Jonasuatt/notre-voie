@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, ActivityIndicator, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { articlesAPI, paiementsAPI } from '../api/api';
@@ -17,12 +17,17 @@ export default function ArticleScreen({ route }) {
   const [article, setArticle] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  // Isolé pour être rejoué après la saisie d'un code d'abonné : l'API
+  // renverra alors l'article entier.
+  const charger = useCallback(() => {
+    setLoading(true);
     articlesAPI.getBySlug(slug).then((r) => {
       setArticle(r.data.article);
       articlesAPI.enregistrerVue(r.data.article.id);
     }).finally(() => setLoading(false));
   }, [slug]);
+
+  useEffect(() => { charger(); }, [charger]);
 
   const payerArticle = async () => {
     if (!reader) {
@@ -30,7 +35,7 @@ export default function ArticleScreen({ route }) {
       return;
     }
     try {
-      await paiementsAPI.payerArticle({ articleId: article.id, moyenPaiement: 'ORANGE_MONEY', montant: 200 });
+      await paiementsAPI.payerArticle({ articleId: article.id, moyenPaiement: 'ORANGE_MONEY', montant: article.prixArticle || 100 });
       Alert.alert('Paiement initié', "Confirmez le paiement sur votre téléphone (mobile money) pour débloquer l'article.");
     } catch (err) {
       Alert.alert('Erreur', err.response?.data?.error || 'Paiement impossible.');
@@ -86,15 +91,17 @@ export default function ArticleScreen({ route }) {
         </View>
       )}
 
-      {verrouille ? (
-        <Paywall onPayerArticle={payerArticle} />
-      ) : (
-        !!article.contenuHtml && (
-          // Rendu simplifié : l'app n'embarque pas de moteur HTML complet,
-          // le texte brut suffit pour la lecture mobile (les balises basiques
-          // sont retirées côté affichage).
-          <Text style={styles.corps}>{article.contenuHtml.replace(/<[^>]+>/g, '\n').replace(/\n{2,}/g, '\n\n').trim()}</Text>
-        )
+      {/* Rendu simplifié : l'app n'embarque pas de moteur HTML complet, le
+          texte brut suffit pour la lecture mobile. Article verrouillé, l'API
+          n'a envoyé que le début : il se lit normalement, le relais est pris
+          juste en dessous par le bloc d'abonnement. */}
+      {!!article.contenuHtml && (
+        <Text style={styles.corps}>
+          {article.contenuHtml.replace(/<[^>]+>/g, '\n').replace(/\n{2,}/g, '\n\n').trim()}
+        </Text>
+      )}
+      {verrouille && (
+        <Paywall onPayerArticle={payerArticle} prixArticle={article.prixArticle} onCodeValide={charger} />
       )}
 
       {article.tags?.length > 0 && (

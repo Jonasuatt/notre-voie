@@ -15,6 +15,10 @@ const api = axios.create({
 api.interceptors.request.use(async (config) => {
   const token = await AsyncStorage.getItem('nv_reader_token');
   if (token) config.headers.Authorization = `Bearer ${token}`;
+  // Code de lecture de l'abonné : c'est l'API qui décide de débloquer, l'app
+  // ne fait que présenter la clé — même mécanique que sur le site.
+  const code = await AsyncStorage.getItem('nv_code_lecture');
+  if (code) config.headers['x-code-lecture'] = code;
   return config;
 });
 
@@ -35,12 +39,19 @@ export const articlesAPI = {
   enregistrerVue: (id) => api.post(`/articles/${id}/vue`, { source: 'app' }).catch(() => {}),
 };
 
+export const codesLectureAPI = {
+  verifier: (code) => api.post('/codes-lecture/verifier', { code }),
+};
+
 export const factCheckAPI = {
   list: () => api.get('/verite-ou-intox'),
 };
 
 export const editionsAPI = {
   list: (params) => api.get('/editions', { params }),
+  // Le PDF complet n'est jamais exposé dans la liste : il se débloque avec le
+  // code remis à l'abonné (cf. editions.controller.js).
+  deverrouiller: (id, code) => api.post(`/editions/${id}/deverrouiller`, { code }),
 };
 
 export const prixVieChereAPI = {

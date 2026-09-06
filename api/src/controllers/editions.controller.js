@@ -87,10 +87,18 @@ const deverrouiller = asyncHandler(async (req, res) => {
   const edition = await prisma.edition.findUnique({ where: { id: req.params.id } });
   if (!edition) return res.status(404).json({ error: 'Édition introuvable.' });
 
-  if (!edition.codeAcces) {
-    return res.status(403).json({ error: "Le PDF de ce numéro n'est pas disponible en téléchargement." });
-  }
-  if (!code || code.trim().toUpperCase() !== edition.codeAcces.trim().toUpperCase()) {
+  const saisi = (code || '').trim().toUpperCase();
+  if (!saisi) return res.status(403).json({ error: 'Code invalide.' });
+
+  // Deux clés ouvrent un numéro : celle propre à ce numéro, remise au coup
+  // par coup, et le code de lecture de l'abonné, qui vaut pour tout le
+  // kiosque tant qu'il court — sans quoi l'abonnement ouvrirait les articles
+  // mais pas les journaux.
+  const codeDuNumero = edition.codeAcces && saisi === edition.codeAcces.trim().toUpperCase();
+  const codeAbonne = await prisma.codeLecture.findUnique({ where: { code: saisi } });
+  const abonnementValide = codeAbonne && codeAbonne.actif && codeAbonne.expireLe >= new Date();
+
+  if (!codeDuNumero && !abonnementValide) {
     return res.status(403).json({ error: 'Code invalide.' });
   }
   res.json({ pdfUrl: edition.pdfUrl });
