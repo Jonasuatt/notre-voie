@@ -1,16 +1,18 @@
 import { useCallback, useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, Image, StyleSheet, Alert, Linking } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, Image, StyleSheet, Alert } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
 import { formatDateRange } from '../utils/format';
 import { listerTelechargements, supprimerNumero } from '../utils/telechargements';
+import LecteurJournal from '../components/LecteurJournal';
 
 // Numéros gardés sur le téléphone. La connexion étant irrégulière et souvent
 // facturée à la donnée, un abonné doit pouvoir charger son journal quand le
 // réseau est bon et le lire plus tard, sans rien consommer.
 export default function MesTelechargementsScreen() {
   const [numeros, setNumeros] = useState([]);
+  const [lecture, setLecture] = useState(null);
 
   useFocusEffect(
     useCallback(() => {
@@ -59,8 +61,8 @@ export default function MesTelechargementsScreen() {
             <View style={{ flex: 1 }}>
               <Text style={styles.numero}>N°{item.numero}</Text>
               <Text style={styles.date}>{formatDateRange(item.dateParution, item.dateFin)}</Text>
-              <TouchableOpacity onPress={() => Linking.openURL(item.uri)}>
-                <Text style={styles.lire}>Lire le journal →</Text>
+              <TouchableOpacity onPress={() => setLecture(item)}>
+                <Text style={styles.lire}>Lire le journal · {item.pages?.length || 0} pages →</Text>
               </TouchableOpacity>
             </View>
             <TouchableOpacity onPress={() => supprimer(item.numero)} hitSlop={10}>
@@ -74,11 +76,15 @@ export default function MesTelechargementsScreen() {
             <Text style={styles.videTitre}>Aucun numéro téléchargé</Text>
             <Text style={styles.videTexte}>
               Ouvrez un numéro dans le kiosque, débloquez-le avec votre code, puis touchez
-              « Télécharger pour lire hors connexion ».
+              « Garder pour lire hors connexion ».
             </Text>
           </View>
         }
       />
+
+      {lecture && (
+        <LecteurJournal edition={lecture} pages={lecture.pages} onFermer={() => setLecture(null)} />
+      )}
     </View>
   );
 }

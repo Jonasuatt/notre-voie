@@ -8,6 +8,7 @@ import { editionsAPI } from '../api/api';
 import { colors } from '../theme/colors';
 import { formatDateRange } from '../utils/format';
 import { telechargerNumero } from '../utils/telechargements';
+import LecteurJournal from './LecteurJournal';
 
 // Délai de lecture libre de la Une avant que l'accès au numéro complet ne
 // soit demandé. Le lecteur a le temps de parcourir les titres — c'est
@@ -20,14 +21,16 @@ export default function VisionneuseUne({ edition, onFermer, onSAbonner }) {
   const [demandeAcces, setDemandeAcces] = useState(false);
   const [code, setCode] = useState('');
   const [envoi, setEnvoi] = useState(false);
-  const [pdfUrl, setPdfUrl] = useState(null);
+  const [debloque, setDebloque] = useState(false);
+  const [lecture, setLecture] = useState(false);
+  const [progression, setProgression] = useState(null);
   const minuteur = useRef(null);
 
   useEffect(() => {
     if (!edition) return undefined;
     setReste(SECONDES_DE_LECTURE);
     setDemandeAcces(false);
-    setPdfUrl(null);
+    setDebloque(false);
     minuteur.current = setInterval(() => {
       setReste((s) => {
         if (s <= 1) {
@@ -44,8 +47,10 @@ export default function VisionneuseUne({ edition, onFermer, onSAbonner }) {
   const valider = async () => {
     setEnvoi(true);
     try {
-      const { data } = await editionsAPI.deverrouiller(edition.id, code.trim().toUpperCase());
-      setPdfUrl(data.pdfUrl);
+      // Le code est validé par l'API ; la lecture se fait ensuite sur les
+      // pages du numéro, que le lecteur intégré affiche.
+      await editionsAPI.deverrouiller(edition.id, code.trim().toUpperCase());
+      setDebloque(true);
       setDemandeAcces(false);
     } catch (err) {
       Alert.alert('Code refusé', err.response?.data?.error || 'Ce code ne correspond à aucun abonnement.');
@@ -57,14 +62,17 @@ export default function VisionneuseUne({ edition, onFermer, onSAbonner }) {
   const telecharger = async () => {
     setEnvoi(true);
     try {
-      await telechargerNumero(edition, pdfUrl);
+      await telechargerNumero(edition, {
+        onProgression: (faites, total) => setProgression(`${faites}/${total}`),
+      });
       Alert.alert(
         'Numéro enregistré',
         `Le n°${edition.numero} est lisible sans connexion depuis l'onglet « Hors connexion ».`,
       );
-    } catch {
-      Alert.alert('Téléchargement impossible', 'Vérifiez votre connexion et réessayez.');
+    } catch (err) {
+      Alert.alert('Téléchargement impossible', err.message || 'Vérifiez votre connexion et réessayez.');
     } finally {
+      setProgression(null);
       setEnvoi(false);
     }
   };
@@ -102,23 +110,30 @@ export default function VisionneuseUne({ edition, onFermer, onSAbonner }) {
           )}
         </ScrollView>
 
-        {!demandeAcces && !pdfUrl && (
+        {!demandeAcces && !debloque && (
           <View style={styles.compteur}>
             <Ionicons name="eye-outline" size={14} color="rgba(255,255,255,0.7)" />
             <Text style={styles.compteurTexte}>Lecture de la Une · {reste}s</Text>
           </View>
         )}
 
-        {pdfUrl && (
+        {debloque && (
           <View style={styles.piedOuvert}>
             <Text style={styles.ouvertTexte}>NUMÉRO DÉBLOQUÉ</Text>
-            <TouchableOpacity style={styles.btn} onPress={telecharger} disabled={envoi}>
+            <TouchableOpacity style={styles.btn} onPress={() => setLecture(true)}>
+              <Ionicons name="book-outline" size={16} color="#fff" />
+              <Text style={styles.btnTexte}>Lire le journal</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.btnSecondaire} onPress={telecharger} disabled={envoi}>
               {envoi ? (
-                <ActivityIndicator color="#fff" size="small" />
+                <>
+                  <ActivityIndicator color="#fff" size="small" />
+                  <Text style={styles.btnTexte}>{progression ? `Page ${progression}` : 'Enregistrement…'}</Text>
+                </>
               ) : (
                 <>
                   <Ionicons name="cloud-download-outline" size={16} color="#fff" />
-                  <Text style={styles.btnTexte}>Télécharger pour lire hors connexion</Text>
+                  <Text style={styles.btnTexte}>Garder pour lire hors connexion</Text>
                 </>
               )}
             </TouchableOpacity>
@@ -162,6 +177,10 @@ export default function VisionneuseUne({ edition, onFermer, onSAbonner }) {
           </View>
         </View>
       </Modal>
+
+      {lecture && (
+        <LecteurJournal edition={edition} pages={edition.pages} onFermer={() => setLecture(false)} />
+      )}
     </Modal>
   );
 }
@@ -178,6 +197,7 @@ const styles = StyleSheet.create({
   piedOuvert: { position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: 'rgba(7,39,66,0.95)', padding: 16, paddingBottom: 28 },
   ouvertTexte: { color: '#4FB3F0', fontSize: 10.5, fontWeight: '800', letterSpacing: 1, marginBottom: 10 },
   btn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: colors.navy2, borderRadius: 100, paddingVertical: 13 },
+  btnSecondaire: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, borderWidth: 1, borderColor: 'rgba(255,255,255,0.3)', borderRadius: 100, paddingVertical: 12, marginTop: 8 },
   btnPlein: { backgroundColor: colors.coral, borderRadius: 100, paddingVertical: 13, marginTop: 14, alignItems: 'center' },
   btnTexte: { color: '#fff', fontWeight: '700', fontSize: 13 },
   inactif: { opacity: 0.5 },
