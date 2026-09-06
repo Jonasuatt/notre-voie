@@ -41,6 +41,12 @@
       ],
       "expo-status-bar",
       "expo-font"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "bb944ab2-a16c-4187-90be-1865e78978fa"
+      }
+    },
+    "owner": "jonaso72"
   }
 }
