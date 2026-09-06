@@ -1393,6 +1393,31 @@ function urlPageArchive(pdfUrl, n) {
     .replace(/\.pdf$/, '.jpg');
 }
 
+// Les 10 numéros archivés avant le fonds complet portaient des dates
+// saisies à la main, en écart d'un jour avec l'ours imprimé, et leurs
+// fichiers vivaient sur l'ancien compte Cloudinary. On les aligne sur le
+// manifeste : dates réelles et fichiers du compte du journal. Leurs pages
+// ne sont pas touchées — leur rubriquage a été relevé page par page, il
+// vaut mieux que le gabarit appliqué aux archives.
+async function alignerEditionsHeritees() {
+  let alignees = 0;
+  for (const a of ARCHIVES_UNES) {
+    const edition = await prisma.edition.findUnique({ where: { numero: a.numero } });
+    if (!edition || edition.pdfUrl === a.pdfUrl) continue;
+    await prisma.edition.update({
+      where: { id: edition.id },
+      data: {
+        dateParution: new Date(a.dateParution),
+        dateFin: a.dateFin ? new Date(a.dateFin) : null,
+        pdfUrl: a.pdfUrl,
+        couvertureUrl: a.couvertureUrl,
+      },
+    });
+    alignees++;
+  }
+  if (alignees) console.log(`✔ ${alignees} numéro(s) hérité(s) réaligné(s) sur l'ours imprimé et le compte média du journal.`);
+}
+
 async function seedArchivesUnes() {
   let editions = 0;
   let redatees = 0;
@@ -1476,57 +1501,57 @@ async function seedEditions() {
 // toujours la même date absolue).
 async function fixArticleDates() {
   const dates = [
-    { slug: "pouvoir-ternit-image-republique-arrestation-pasteur-jeremie-koffi", date: "2026-08-13" },
-    { slug: "une-curieuse-operation-chirurgicale-du-pasteur", date: "2026-08-13" },
-    { slug: "korhogo-defi-pour-le-pdci-rda", date: "2026-08-13" },
-    { slug: "faille-cachee-scandale-39-milliards-fraude-dgi", date: "2026-08-13" },
-    { slug: "anp-interpelle-medias-usage-ethique-intelligence-artificielle", date: "2026-08-13" },
-    { slug: "fete-de-yorokloi-2026-ouragahio-femme-bhete-celebree", date: "2026-08-13" },
-    { slug: "commissaire-kounvolo-coulibaly-lance-campagne-fppn", date: "2026-08-13" },
-    { slug: "jeunes-presentent-priorites-gouvernement-journee-internationale-jeunesse", date: "2026-08-13" },
-    { slug: "cinq-morts-chavirement-pirogue-fleuve-cavally-toulepleu", date: "2026-08-13" },
-    { slug: "bouake-jeunesse-18-pays-sous-region-conclave", date: "2026-08-13" },
-    { slug: "election-fif-clubs-exigent-300-millions-subvention", date: "2026-08-13" },
-    { slug: "ousmane-diomande-nottingham-forest-osa-540-millions", date: "2026-08-13" },
-    { slug: "cote-ivoire-demene-sortir-guepier-blanchiment-capitaux", date: "2026-07-30" },
-    { slug: "accord-cote-ivoire-botswana-or-africain-richesse-durable", date: "2026-07-30" },
-    { slug: "incendie-orphelinat-mamie-therese-gouvernement-prise-en-charge", date: "2026-07-30" },
-    { slug: "fifa-bute-uefa-concacaf-vente-parts-coupe-du-monde", date: "2026-07-30" },
-    { slug: "bedie-le-sphinx-de-daoukro-il-y-a-trois-ans", date: "2026-08-02" },
-    { slug: "emerse-fae-vire-fif-je-suis-decu-oui", date: "2026-08-02" },
-    { slug: "13e-prix-national-excellence-80-laureats-primes", date: "2026-08-03" },
-    { slug: "marie-laure-ngoran-sacree-lauréate-prix-excellence-medias", date: "2026-08-03" },
-    { slug: "qui-etait-franco-baresi-mort-31-juillet-2026", date: "2026-08-03" },
-    { slug: "assemblee-nationale-deputes-95-pourcent-electeurs-non-choisis", date: "2026-08-04" },
-    { slug: "cherte-carburant-loyer-vivres-transport-pouvoir-achat-souffrance", date: "2026-08-04" },
-    { slug: "ecole-catholique-ecrase-moyennes-nationales-examens-2026", date: "2026-08-04" },
-    { slug: "bouna-deux-allogenes-condamnes-20-ans-tentative-meurtre", date: "2026-08-04" },
-    { slug: "herve-renard-retrouve-les-elephants", date: "2026-08-04" },
-    { slug: "affi-nguessan-souverainete-veritable-institutions-fortes", date: "2026-08-05" },
-    { slug: "cacao-ivoirien-or-brun-epreuve-records", date: "2026-08-05" },
-    { slug: "gaha-carine-reine-guemon-finale-awoulaba-2026", date: "2026-08-05" },
-    { slug: "dabou-planteur-retrouve-mort-plantation-cosrou", date: "2026-08-05" },
-    { slug: "discours-nation-ouattara-promesses-epreuve-faits", date: "2026-08-09" },
-    { slug: "exportation-or-monte-puissance-face-cacao", date: "2026-08-09" },
-    { slug: "president-gabonais-experience-ivoirienne-relogement", date: "2026-08-09" },
-    { slug: "alepe-kossandji-six-morts-violences-conflit-foncier", date: "2026-08-09" },
-    { slug: "hausse-carburant-gouvernement-impuissant-lache-ivoiriens", date: "2026-08-10" },
-    { slug: "grace-presidentielle-clemence-ouattara-portes-politique", date: "2026-08-10" },
-    { slug: "litige-foncier-modeste-procureur-suspend-decision-grand-bassam", date: "2026-08-10" },
-    { slug: "ouattara-yopougon-prisonniers-opinion-vie-chere-orpaillage", date: "2026-08-11" },
-    { slug: "bictogo-brigade-salubrite-yopougon", date: "2026-08-11" },
-    { slug: "daloa-38-millions-voles-caches-puits", date: "2026-08-11" },
-    { slug: "affi-nguessan-gouvernement-complice-orpaillage", date: "2026-08-12" },
-    { slug: "financement-medias-gouvernement-capter-recettes-publicitaires", date: "2026-08-12" },
-    { slug: "derives-mercantiles-certains-pretres", date: "2026-08-12" },
-    { slug: "yan-diomande-real-madrid-impossible-dire-non", date: "2026-08-12" },
-    { slug: "vrai-tresor-afrique-pas-sous-la-terre-eco-2027", date: "2026-07-30" },
-    { slug: "abondance-petroliere-ne-profite-pas-aux-ivoiriens", date: "2026-07-30" },
-    { slug: "bin-sin-bin-mourir-un-luxe-en-cote-ivoire", date: "2026-08-02" },
-    { slug: "finale-awoulaba-reines-afrique-sonia-nguessan-moronou", date: "2026-08-03" },
-    { slug: "amah-helene-enflamme-palais-culture-identite-agni", date: "2026-08-04" },
-    { slug: "bangolo-brule-essence-incendie-domicile", date: "2026-07-30" },
-    { slug: "retour-herve-renard-elephants-pari-progression", date: "2026-08-05" },
+    { slug: "pouvoir-ternit-image-republique-arrestation-pasteur-jeremie-koffi", date: "2026-08-14" },
+    { slug: "une-curieuse-operation-chirurgicale-du-pasteur", date: "2026-08-14" },
+    { slug: "korhogo-defi-pour-le-pdci-rda", date: "2026-08-14" },
+    { slug: "faille-cachee-scandale-39-milliards-fraude-dgi", date: "2026-08-14" },
+    { slug: "anp-interpelle-medias-usage-ethique-intelligence-artificielle", date: "2026-08-14" },
+    { slug: "fete-de-yorokloi-2026-ouragahio-femme-bhete-celebree", date: "2026-08-14" },
+    { slug: "commissaire-kounvolo-coulibaly-lance-campagne-fppn", date: "2026-08-14" },
+    { slug: "jeunes-presentent-priorites-gouvernement-journee-internationale-jeunesse", date: "2026-08-14" },
+    { slug: "cinq-morts-chavirement-pirogue-fleuve-cavally-toulepleu", date: "2026-08-14" },
+    { slug: "bouake-jeunesse-18-pays-sous-region-conclave", date: "2026-08-14" },
+    { slug: "election-fif-clubs-exigent-300-millions-subvention", date: "2026-08-14" },
+    { slug: "ousmane-diomande-nottingham-forest-osa-540-millions", date: "2026-08-14" },
+    { slug: "cote-ivoire-demene-sortir-guepier-blanchiment-capitaux", date: "2026-07-31" },
+    { slug: "accord-cote-ivoire-botswana-or-africain-richesse-durable", date: "2026-07-31" },
+    { slug: "incendie-orphelinat-mamie-therese-gouvernement-prise-en-charge", date: "2026-07-31" },
+    { slug: "fifa-bute-uefa-concacaf-vente-parts-coupe-du-monde", date: "2026-07-31" },
+    { slug: "bedie-le-sphinx-de-daoukro-il-y-a-trois-ans", date: "2026-08-03" },
+    { slug: "emerse-fae-vire-fif-je-suis-decu-oui", date: "2026-08-03" },
+    { slug: "13e-prix-national-excellence-80-laureats-primes", date: "2026-08-04" },
+    { slug: "marie-laure-ngoran-sacree-lauréate-prix-excellence-medias", date: "2026-08-04" },
+    { slug: "qui-etait-franco-baresi-mort-31-juillet-2026", date: "2026-08-04" },
+    { slug: "assemblee-nationale-deputes-95-pourcent-electeurs-non-choisis", date: "2026-08-05" },
+    { slug: "cherte-carburant-loyer-vivres-transport-pouvoir-achat-souffrance", date: "2026-08-05" },
+    { slug: "ecole-catholique-ecrase-moyennes-nationales-examens-2026", date: "2026-08-05" },
+    { slug: "bouna-deux-allogenes-condamnes-20-ans-tentative-meurtre", date: "2026-08-05" },
+    { slug: "herve-renard-retrouve-les-elephants", date: "2026-08-05" },
+    { slug: "affi-nguessan-souverainete-veritable-institutions-fortes", date: "2026-08-06" },
+    { slug: "cacao-ivoirien-or-brun-epreuve-records", date: "2026-08-06" },
+    { slug: "gaha-carine-reine-guemon-finale-awoulaba-2026", date: "2026-08-06" },
+    { slug: "dabou-planteur-retrouve-mort-plantation-cosrou", date: "2026-08-06" },
+    { slug: "discours-nation-ouattara-promesses-epreuve-faits", date: "2026-08-10" },
+    { slug: "exportation-or-monte-puissance-face-cacao", date: "2026-08-10" },
+    { slug: "president-gabonais-experience-ivoirienne-relogement", date: "2026-08-10" },
+    { slug: "alepe-kossandji-six-morts-violences-conflit-foncier", date: "2026-08-10" },
+    { slug: "hausse-carburant-gouvernement-impuissant-lache-ivoiriens", date: "2026-08-11" },
+    { slug: "grace-presidentielle-clemence-ouattara-portes-politique", date: "2026-08-11" },
+    { slug: "litige-foncier-modeste-procureur-suspend-decision-grand-bassam", date: "2026-08-11" },
+    { slug: "ouattara-yopougon-prisonniers-opinion-vie-chere-orpaillage", date: "2026-08-12" },
+    { slug: "bictogo-brigade-salubrite-yopougon", date: "2026-08-12" },
+    { slug: "daloa-38-millions-voles-caches-puits", date: "2026-08-12" },
+    { slug: "affi-nguessan-gouvernement-complice-orpaillage", date: "2026-08-13" },
+    { slug: "financement-medias-gouvernement-capter-recettes-publicitaires", date: "2026-08-13" },
+    { slug: "derives-mercantiles-certains-pretres", date: "2026-08-13" },
+    { slug: "yan-diomande-real-madrid-impossible-dire-non", date: "2026-08-13" },
+    { slug: "vrai-tresor-afrique-pas-sous-la-terre-eco-2027", date: "2026-07-31" },
+    { slug: "abondance-petroliere-ne-profite-pas-aux-ivoiriens", date: "2026-07-31" },
+    { slug: "bin-sin-bin-mourir-un-luxe-en-cote-ivoire", date: "2026-08-03" },
+    { slug: "finale-awoulaba-reines-afrique-sonia-nguessan-moronou", date: "2026-08-04" },
+    { slug: "amah-helene-enflamme-palais-culture-identite-agni", date: "2026-08-05" },
+    { slug: "bangolo-brule-essence-incendie-domicile", date: "2026-07-31" },
+    { slug: "retour-herve-renard-elephants-pari-progression", date: "2026-08-06" },
   ];
 
   let index = 0;
@@ -2406,6 +2431,7 @@ async function main() {
   if (dejaDesEditions === 0) await seedEditions();
   await seedEditionPages();
   await seedArchivesUnes();
+  await alignerEditionsHeritees();
   await seedCodeAccesDemo();
   await fixArticleDates();
   await seedInfoDirectFlashs();
