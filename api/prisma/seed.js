@@ -1395,6 +1395,7 @@ function urlPageArchive(pdfUrl, n) {
 
 async function seedArchivesUnes() {
   let editions = 0;
+  let redatees = 0;
   let pages = 0;
   for (const a of ARCHIVES_UNES) {
     let edition = await prisma.edition.findUnique({ where: { numero: a.numero } });
@@ -1409,6 +1410,20 @@ async function seedArchivesUnes() {
         },
       });
       editions++;
+    } else if (edition.pdfUrl === a.pdfUrl) {
+      // Numéro issu de ce manifeste : ses dates suivent la relecture de
+      // l'ours (une correction de lecture doit pouvoir se rejouer). Les
+      // numéros archivés avant ce lot ont un autre pdfUrl et ne sont donc
+      // jamais touchés ici.
+      const memeDebut = edition.dateParution.toISOString().slice(0, 10) === a.dateParution;
+      const memeFin = (edition.dateFin ? edition.dateFin.toISOString().slice(0, 10) : null) === (a.dateFin || null);
+      if (!memeDebut || !memeFin) {
+        await prisma.edition.update({
+          where: { id: edition.id },
+          data: { dateParution: new Date(a.dateParution), dateFin: a.dateFin ? new Date(a.dateFin) : null },
+        });
+        redatees++;
+      }
     }
     for (let n = 1; n <= PAGES_PAR_NUMERO; n++) {
       const existante = await prisma.editionPage.findUnique({
@@ -1426,7 +1441,7 @@ async function seedArchivesUnes() {
       pages++;
     }
   }
-  console.log(`✔ ${editions} numéro(s) d'archive ajouté(s) au kiosque, ${pages} page(s) indexée(s) (${ARCHIVES_UNES.length} au manifeste).`);
+  console.log(`✔ ${editions} numéro(s) d'archive ajouté(s) au kiosque, ${redatees} redaté(s), ${pages} page(s) indexée(s) (${ARCHIVES_UNES.length} au manifeste).`);
 }
 
 async function seedEditions() {

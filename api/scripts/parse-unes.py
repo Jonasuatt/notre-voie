@@ -44,6 +44,11 @@ def lire(chemin):
     num = int(num)
     d1 = f"{an}-{MOIS[deb]:02d}-{int(j1):02d}"
     d2 = f"{an}-{MOIS[fin]:02d}-{int(j2):02d}" if j2 else None
+    # L'ours ne millesime que la fin ("DU MERCREDI 31 DECEMBRE AU DIMANCHE
+    # 4 JANVIER 2026") : un numero a cheval sur le nouvel an commence donc
+    # l'annee precedente.
+    if d2 and d2 <= d1:
+        d1 = f"{int(an) - 1}-{MOIS[deb]:02d}-{int(j1):02d}"
     if num in MANUEL:
         d1, d2 = MANUEL[num]
     return {"numero": num, "dateParution": d1, "dateFin": d2,
