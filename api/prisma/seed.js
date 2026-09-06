@@ -1493,6 +1493,18 @@ function paragraphes(texte) {
   return blocs;
 }
 
+// Le journal compose une partie de ses corps en petite capitale : le PDF
+// restitue alors un texte tout en minuscules. On ne peut pas deviner les noms
+// propres, mais la majuscule de début de phrase, elle, est certaine — et
+// c'est elle qui rend le texte présentable.
+function capitaliserPhrases(texte) {
+  return texte
+    // Début du texte, ou début d'un paragraphe une fois le corps balisé.
+    .replace(/^(\s*)([a-zà-ÿ])/, (m, esp, c) => esp + c.toUpperCase())
+    .replace(/(<p>\s*)([a-zà-ÿ])/g, (m, avant, c) => avant + c.toUpperCase())
+    .replace(/([.!?]\s+|»\s+)([a-zà-ÿ])/g, (m, avant, c) => avant + c.toUpperCase());
+}
+
 function echapper(t) {
   return t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
@@ -1536,7 +1548,7 @@ async function seedArticlesArchives() {
     publieLe.setUTCMinutes(8 * 60 + (lignes.length % 30) * 20);
 
     const entete = a.signature ? `<p class="signature">${echapper(a.signature)}</p>` : '';
-    const corps = paragraphes(a.corps).map((b) => `<p>${echapper(b)}</p>`).join('');
+    const corps = paragraphes(capitaliserPhrases(a.corps)).map((b) => `<p>${echapper(b)}</p>`).join('');
 
     lignes.push({
       slug,
@@ -1595,6 +1607,28 @@ async function seedCodeLectureDemo() {
     update: {},
     create: { code: 'NV-DEMO26', libelle: 'Démonstration — accès complet 30 jours', expireLe },
   });
+}
+
+// Rattrapage de casse sur les archives déjà publiées : leur corps avait été
+// inséré tel que sorti du PDF. Marqué par un tag pour ne s'exécuter qu'une
+// fois et ne pas repasser sur un texte corrigé à la main depuis le CMS.
+async function fixCasseArchives() {
+  const aTraiter = await prisma.article.findMany({
+    where: { tags: { has: 'archives-papier' }, NOT: { tags: { has: 'casse-relue' } } },
+    select: { id: true, contenuHtml: true, tags: true },
+    take: 5000,
+  });
+  if (!aTraiter.length) return;
+  let corriges = 0;
+  for (const a of aTraiter) {
+    const corrige = a.contenuHtml ? capitaliserPhrases(a.contenuHtml) : a.contenuHtml;
+    await prisma.article.update({
+      where: { id: a.id },
+      data: { tags: [...a.tags, 'casse-relue'], ...(corrige !== a.contenuHtml ? { contenuHtml: corrige } : {}) },
+    });
+    if (corrige !== a.contenuHtml) corriges++;
+  }
+  console.log(`✔ Casse relue sur ${aTraiter.length} article(s) d'archive (${corriges} modifié(s)).`);
 }
 
 async function seedEditions() {
@@ -2565,6 +2599,7 @@ async function main() {
   await seedArticlesArchives().catch((e) => console.error('Archives non importées :', e.message));
   await seedPaywallArchives().catch((e) => console.error('Paywall archives :', e.message));
   await seedCodeLectureDemo().catch((e) => console.error('Code de lecture démo :', e.message));
+  await fixCasseArchives().catch((e) => console.error('Casse des archives :', e.message));
   await seedCodeAccesDemo();
   await fixArticleDates();
   await seedInfoDirectFlashs();
