@@ -99,6 +99,15 @@ export async function getCampagnesActives({ rubrique, format } = {}) {
   return data.campagnes;
 }
 
+// Kiosque avec son volume total — l'accueil affiche l'ampleur du fonds.
+export async function getKiosqueResume({ pageSize = 4 } = {}) {
+  const data = await apiFetch(`/api/editions?page=1&pageSize=${pageSize}`, {
+    revalidate: 3600,
+    fallback: { editions: fixtures.EDITIONS, total: fixtures.EDITIONS.length },
+  });
+  return { editions: data.editions || [], total: data.total || 0 };
+}
+
 export async function getEditions({ page = 1, pageSize = 12 } = {}) {
   const data = await apiFetch(`/api/editions?page=${page}&pageSize=${pageSize}`, {
     revalidate: 3600,
