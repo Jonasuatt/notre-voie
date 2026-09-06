@@ -131,13 +131,16 @@ export default async function ArticlePage({ params }) {
         </div>
       )}
 
-      {verrouille ? (
-        <Paywall article={article} basePath={BASE_PATH} />
-      ) : (
-        article.contenuHtml && (
-          <div className="prose-article mt-7 text-[16px] text-ink" dangerouslySetInnerHTML={{ __html: article.contenuHtml }} />
-        )
+      {article.contenuHtml && (
+        // Article verrouillé : l'API n'a envoyé que le début du texte. Le
+        // dégradé signale que la lecture s'interrompt là, sans faire croire
+        // à une fin d'article.
+        <div className={`prose-article mt-7 text-[16px] text-ink${verrouille ? ' relative max-h-[420px] overflow-hidden' : ''}`}>
+          <div dangerouslySetInnerHTML={{ __html: article.contenuHtml }} />
+          {verrouille && <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-b from-transparent to-cream pointer-events-none" />}
+        </div>
       )}
+      {verrouille && <Paywall article={article} basePath={BASE_PATH} />}
 
       {galerie.length > 0 && (
         <div className="mt-8 pt-6 border-t border-line">

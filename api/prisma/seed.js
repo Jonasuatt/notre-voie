@@ -1564,6 +1564,39 @@ async function seedArticlesArchives() {
   console.log(`✔ ${crees} article(s) d'archive publié(s) depuis les numéros papier.`);
 }
 
+// Modèle économique du fonds d'archives : les dix derniers numéros restent en
+// lecture libre, le fonds plus ancien passe au paywall souple (abonnement,
+// achat à l'article, ou code de lecture). N'est appliqué qu'une fois — si la
+// rédaction rouvre ensuite un article depuis le CMS, son choix tient.
+async function seedPaywallArchives() {
+  const dejaFait = await prisma.article.count({ where: { tags: { has: 'archives-papier' }, paywall: 'PAYANT' } });
+  if (dejaFait > 0) return;
+
+  const recents = (await prisma.edition.findMany({ orderBy: { dateParution: 'desc' }, take: 10, select: { numero: true } }))
+    .map((e) => `numero-${e.numero}`);
+  const anciens = await prisma.article.findMany({
+    where: { tags: { has: 'archives-papier' }, NOT: { tags: { hasSome: recents } } },
+    select: { id: true },
+  });
+  if (!anciens.length) return;
+  const maj = await prisma.article.updateMany({
+    where: { id: { in: anciens.map((a) => a.id) } },
+    data: { paywall: 'PAYANT' },
+  });
+  console.log(`✔ ${maj.count} article(s) d'archive passés au paywall (10 derniers numéros laissés libres).`);
+}
+
+// Code de lecture de démonstration, pour présenter le parcours abonné sans
+// attendre une vraie souscription. Expire au bout de 30 jours.
+async function seedCodeLectureDemo() {
+  const expireLe = new Date(Date.now() + 30 * 24 * 3600 * 1000);
+  await prisma.codeLecture.upsert({
+    where: { code: 'NV-DEMO26' },
+    update: {},
+    create: { code: 'NV-DEMO26', libelle: 'Démonstration — accès complet 30 jours', expireLe },
+  });
+}
+
 async function seedEditions() {
   const editions = [
     { numero: 7961, dateParution: "2026-07-30", pdfUrl: "https://res.cloudinary.com/ataat5bs/raw/upload/v1787194110/notre-voie/edition/nv5erwj7eoplvj4f7i5q.pdf", couvertureUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787194106/notre-voie/une/elo8nuazwzz1vboa9oma.jpg" },
@@ -2530,6 +2563,8 @@ async function main() {
   // Le fonds d'archives est un enrichissement : s'il échoue, l'API doit
   // démarrer quand même — un seed fautif ne peut pas mettre le site à terre.
   await seedArticlesArchives().catch((e) => console.error('Archives non importées :', e.message));
+  await seedPaywallArchives().catch((e) => console.error('Paywall archives :', e.message));
+  await seedCodeLectureDemo().catch((e) => console.error('Code de lecture démo :', e.message));
   await seedCodeAccesDemo();
   await fixArticleDates();
   await seedInfoDirectFlashs();

@@ -11,11 +11,44 @@ function uniqueSlug(titre) {
   return `${base}-${Date.now().toString(36)}`;
 }
 
-// Retire le corps de l'article si le lecteur n'a pas d'accès payant,
-// pour appliquer le paywall souple côté API (le client ne doit pas
-// avoir à faire confiance à un flag côté front).
-async function applyPaywall(article, reader) {
-  if (article.paywall === 'LIBRE' || !article) return article;
+// Paywall souple. Le lecteur qui n'a pas payé n'obtient pas une page vide :
+// il lit le début de l'article, puis se voit proposer l'abonnement, l'achat
+// à l'unité, ou la saisie du code reçu par mail. Le découpage se fait ici et
+// non côté client — sinon le corps complet transiterait quand même.
+const SIGNES_OFFERTS = 700;
+// Prix de l'article à l'unité, en FCFA. Valeur de départ à valider par la
+// régie : le numéro papier complet est à 300 FCFA.
+const PRIX_ARTICLE = Number(process.env.PRIX_ARTICLE_FCFA || 100);
+
+// Coupe le corps HTML sur une fin de paragraphe, jamais au milieu d'une
+// balise : on empile les <p> jusqu'à dépasser le quota de signes.
+function extraitHtml(html) {
+  if (!html) return null;
+  const paragraphes = html.match(/<p[^>]*>[\s\S]*?<\/p>/g);
+  if (!paragraphes) return html.slice(0, SIGNES_OFFERTS);
+  const gardes = [];
+  let signes = 0;
+  for (const p of paragraphes) {
+    gardes.push(p);
+    signes += p.replace(/<[^>]+>/g, '').length;
+    if (signes >= SIGNES_OFFERTS) break;
+  }
+  return gardes.join('');
+}
+
+async function codeLectureValide(code) {
+  if (!code) return null;
+  const trouve = await prisma.codeLecture.findUnique({ where: { code: String(code).trim().toUpperCase() } });
+  if (!trouve || !trouve.actif || trouve.expireLe < new Date()) return null;
+  // Compteur d'usage pour la régie ; ne doit pas faire échouer la lecture.
+  prisma.codeLecture
+    .update({ where: { id: trouve.id }, data: { utilisations: { increment: 1 }, derniereUtilisation: new Date() } })
+    .catch(() => {});
+  return trouve;
+}
+
+async function applyPaywall(article, reader, codeAcces) {
+  if (!article || article.paywall === 'LIBRE') return article;
 
   if (reader) {
     const abonnementActif = await prisma.abonnement.findFirst({
@@ -29,8 +62,14 @@ async function applyPaywall(article, reader) {
     if (paiementArticle) return article;
   }
 
-  // Accès non débloqué : on renvoie uniquement le teaser (chapo), jamais le corps complet.
-  return { ...article, contenuHtml: null, paywallLocked: true };
+  if (await codeLectureValide(codeAcces)) return article;
+
+  return {
+    ...article,
+    contenuHtml: extraitHtml(article.contenuHtml),
+    paywallLocked: true,
+    prixArticle: PRIX_ARTICLE,
+  };
 }
 
 // GET /api/articles — flux public (Une, rubriques, recherche)
@@ -95,7 +134,7 @@ const getBySlug = asyncHandler(async (req, res) => {
     return res.status(404).json({ error: 'Article introuvable.' });
   }
 
-  const withPaywall = await applyPaywall(article, req.reader);
+  const withPaywall = await applyPaywall(article, req.reader, req.get('x-code-lecture'));
   res.json({ article: withPaywall });
 });
 

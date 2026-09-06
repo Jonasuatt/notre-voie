@@ -7,9 +7,9 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || process.env.API_URL || 'http:
 // des fixtures de démonstration de même forme, pour ne jamais présenter
 // une page cassée. Voir docs/DECISIONS.md — à retirer une fois l'API en
 // production avec des données réelles.
-async function apiFetch(path, { revalidate = 60, fallback } = {}) {
+async function apiFetch(path, { revalidate = 60, fallback, entetes } = {}) {
   try {
-    const res = await fetch(`${API_URL}${path}`, { next: { revalidate } });
+    const res = await fetch(`${API_URL}${path}`, { next: { revalidate }, ...(entetes ? { headers: entetes } : {}) });
     if (!res.ok) throw new Error(`API ${path} → ${res.status}`);
     return await res.json();
   } catch (err) {
@@ -49,6 +49,18 @@ export async function getArticles({ rubrique, format, q, date, dateDebut, dateFi
   return data;
 }
 
+// Code de lecture de l'abonné, déposé en cookie par /acces après vérification.
+// Il est relu ici côté serveur et transmis à l'API : c'est elle qui décide de
+// débloquer, le site ne fait que porter la clé.
+async function codeLectureDuLecteur() {
+  try {
+    const { cookies } = await import('next/headers');
+    return cookies().get('nv_code_lecture')?.value || null;
+  } catch {
+    return null;
+  }
+}
+
 export async function getArticleBySlug(slug) {
   let fromFixtures = fixtures.ARTICLES.find((a) => a.slug === slug) || null;
   // En mode démo (sans lecteur connecté), on reproduit le comportement
@@ -57,8 +69,12 @@ export async function getArticleBySlug(slug) {
   if (fromFixtures && fromFixtures.paywall === 'PAYANT') {
     fromFixtures = { ...fromFixtures, contenuHtml: null, paywallLocked: true };
   }
+  const code = await codeLectureDuLecteur();
   const data = await apiFetch(`/api/articles/${slug}`, {
-    revalidate: 30,
+    // Pas de cache partagé quand un code est présenté : la réponse dépend
+    // alors du lecteur.
+    revalidate: code ? 0 : 30,
+    entetes: code ? { 'x-code-lecture': code } : undefined,
     fallback: { article: fromFixtures },
   });
   return data.article;

@@ -453,6 +453,26 @@ model Notification {
 // ABONNEMENTS & PAIEMENTS (lecteurs)
 // =====================================================================
 
+// Code de lecture communique par mail a un abonne. Il ouvre l'ensemble des
+// articles payants pendant sa duree de validite, sans compte a creer : c'est
+// le meme principe que le code deja utilise pour deverrouiller un PDF du
+// kiosque (cf. Edition.codeAcces), etendu a la lecture du site.
+model CodeLecture {
+  id       String   @id @default(uuid())
+  code     String   @unique
+  libelle  String? // ex : "Abonnement mensuel — septembre 2026"
+  expireLe DateTime
+  actif    Boolean  @default(true)
+
+  // Traçabilite d'usage, utile a la regie : combien de lecteurs s'en servent.
+  utilisations Int      @default(0)
+  derniereUtilisation DateTime?
+
+  createdAt DateTime @default(now())
+
+  @@map("codes_lecture")
+}
+
 model Abonnement {
   id       String @id @default(uuid())
   reader   Reader @relation(fields: [readerId], references: [id])

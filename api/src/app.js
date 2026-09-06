@@ -51,6 +51,7 @@ app.use('/api/editions', require('./routes/editions.routes'));
 app.use('/api/prix-vie-chere', require('./routes/prixVieChere.routes'));
 app.use('/api/notifications', require('./routes/notifications.routes'));
 app.use('/api/abonnements', require('./routes/abonnements.routes'));
+app.use('/api/codes-lecture', require('./routes/codesLecture.routes'));
 app.use('/api/paiements', require('./routes/paiements.routes'));
 app.use('/api/campagnes', require('./routes/campagnes.routes'));
 app.use('/api/verite-ou-intox', require('./routes/factCheck.routes'));

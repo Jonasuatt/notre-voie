@@ -62,6 +62,7 @@ body {
    pour rester détachée du contenu. */
 .theme-direct header.bg-white { background-color: #072742; }
 .theme-direct .bg-cream { background-color: #0B3358; }
+.theme-direct .to-cream { --tw-gradient-to: #0B3358; }
 .theme-direct .text-ink { color: #EAF3FB; }
 .theme-direct .text-muted { color: #A9C6DD; }
 .theme-direct .border-line { border-color: #2E6D9E; }
