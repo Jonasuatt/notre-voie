@@ -8,6 +8,8 @@ import { colors } from '../theme/colors';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import VisionneuseUne from '../components/VisionneuseUne';
+import EtatVide from '../components/EtatVide';
+import BarreEdition from '../components/BarreEdition';
 import { formatDateRange } from '../utils/format';
 
 // Accueil du Quotidien — l'édition du jour telle qu'elle paraît : la Une en
@@ -22,16 +24,22 @@ export default function AccueilScreen() {
   const [chargement, setChargement] = useState(true);
   const [rafraichit, setRafraichit] = useState(false);
   const [visionneuse, setVisionneuse] = useState(null);
+  const [erreur, setErreur] = useState(false);
 
   const charger = useCallback(async () => {
-    const [e, a, p] = await Promise.all([
+    // allSettled et non all : le bandeau des prix ou le fil peuvent manquer
+    // sans qu'on prive le lecteur de l'édition du jour.
+    const [e, a, p] = await Promise.allSettled([
       editionsAPI.list({ pageSize: 1 }),
       articlesAPI.list({ pageSize: 12, portail: 'QUOTIDIEN' }),
       prixVieChereAPI.ticker(),
     ]);
-    setEdition(e.data.editions?.[0] || null);
-    setArticles(a.data.articles || []);
-    setPrix(p.data.prix || []);
+    const edi = e.status === 'fulfilled' ? e.value.data.editions?.[0] || null : null;
+    const art = a.status === 'fulfilled' ? a.value.data.articles || [] : [];
+    setEdition(edi);
+    setArticles(art);
+    setPrix(p.status === 'fulfilled' ? p.value.data.prix || [] : []);
+    setErreur(!edi && !art.length);
   }, []);
 
   useEffect(() => { charger().finally(() => setChargement(false)); }, [charger]);
@@ -42,7 +50,18 @@ export default function AccueilScreen() {
     setRafraichit(false);
   };
 
-  if (chargement) return <View style={styles.centre}><Text style={styles.attente}>Chargement…</Text></View>;
+  if (chargement || erreur) {
+    return (
+      <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: colors.cream }}>
+        <BarreEdition navigation={navigation} edition="LE QUOTIDIEN" accent={colors.navy2} />
+        <EtatVide
+          chargement={chargement}
+          erreur={erreur}
+          onReessayer={() => { setChargement(true); setErreur(false); charger().finally(() => setChargement(false)); }}
+        />
+      </SafeAreaView>
+    );
+  }
 
   const pages = edition?.pages || [];
   const une = pages.find((p) => p.numeroPage === 1) || null;
@@ -58,6 +77,7 @@ export default function AccueilScreen() {
       refreshControl={<RefreshControl refreshing={rafraichit} onRefresh={rafraichir} tintColor={colors.navy} />}
       contentContainerStyle={{ paddingBottom: 28 }}
     >
+      <BarreEdition navigation={navigation} edition="LE QUOTIDIEN" accent={colors.navy2} />
       <TickerVieChere prix={prix} />
 
       {edition && (

@@ -4,6 +4,7 @@ import { editionsAPI } from '../api/api';
 import { colors } from '../theme/colors';
 import { formatDate } from '../utils/format';
 import VisionneuseUne from '../components/VisionneuseUne';
+import EtatVide from '../components/EtatVide';
 
 const PAR_PAGE = 24;
 
@@ -16,6 +17,7 @@ export default function KiosqueScreen({ navigation }) {
   const [total, setTotal] = useState(0);
   const [chargement, setChargement] = useState(true);
   const [ouverte, setOuverte] = useState(null);
+  const [erreur, setErreur] = useState(false);
 
   const charger = useCallback((numeroPage) => {
     setChargement(true);
@@ -24,7 +26,9 @@ export default function KiosqueScreen({ navigation }) {
       .then((r) => {
         setEditions((precedentes) => (numeroPage === 1 ? r.data.editions : [...precedentes, ...r.data.editions]));
         setTotal(r.data.total || 0);
+        setErreur(false);
       })
+      .catch(() => setErreur(true))
       .finally(() => setChargement(false));
   }, []);
 
@@ -68,7 +72,14 @@ export default function KiosqueScreen({ navigation }) {
           </TouchableOpacity>
         )}
         ListFooterComponent={chargement ? <ActivityIndicator color={colors.navy} style={{ marginVertical: 18 }} /> : null}
-        ListEmptyComponent={!chargement && <Text style={styles.empty}>Aucune édition en ligne pour le moment.</Text>}
+        ListEmptyComponent={
+          <EtatVide
+            chargement={chargement}
+            erreur={erreur}
+            onReessayer={() => charger(1)}
+            message="Aucune édition en ligne pour le moment."
+          />
+        }
       />
 
       <VisionneuseUne

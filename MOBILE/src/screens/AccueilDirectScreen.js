@@ -8,6 +8,7 @@ import TickerVieChere from '../components/TickerVieChere';
 import ArticleCard from '../components/ArticleCard';
 import FormatBadge from '../components/FormatBadge';
 import { colors } from '../theme/colors';
+import BarreEdition from '../components/BarreEdition';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { timeAgo } from '../utils/format';
@@ -63,6 +64,7 @@ export default function AccueilDirectScreen() {
       )}
       ListHeaderComponent={
         <>
+          <BarreEdition navigation={navigation} edition="INFO EN DIRECT" accent="#4FB3F0" />
           <FlashBar articles={flashEtLive} />
           <TickerVieChere prix={prix} />
 

@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { rubriquesAPI } from '../api/api';
 import { colors } from '../theme/colors';
 import { usePortail } from '../context/PortailContext';
+import EtatVide from '../components/EtatVide';
 
 // Liste des rubriques : le lecteur choisit d'abord un thème, puis lit les
 // articles qui s'y rattachent (écran RubriqueArticles). Les onglets
@@ -12,16 +13,23 @@ import { usePortail } from '../context/PortailContext';
 export default function RubriquesScreen({ navigation }) {
   const [rubriques, setRubriques] = useState([]);
   const [chargement, setChargement] = useState(true);
+  const [erreur, setErreur] = useState(false);
   const { portail } = usePortail();
 
-  useEffect(() => {
+  const charger = useCallback(() => {
+    setChargement(true);
     rubriquesAPI
       .getAll('EDITORIALE')
-      .then((r) => setRubriques(r.data.rubriques.filter((x) => !x.parentId)))
+      .then((r) => { setRubriques(r.data.rubriques.filter((x) => !x.parentId)); setErreur(false); })
+      .catch(() => setErreur(true))
       .finally(() => setChargement(false));
   }, []);
 
-  if (chargement) return <ActivityIndicator color={colors.navy} style={{ marginTop: 40 }} />;
+  useEffect(() => { charger(); }, [charger]);
+
+  if (chargement || erreur) {
+    return <EtatVide chargement={chargement} erreur={erreur} onReessayer={charger} />;
+  }
 
   return (
     <View style={styles.page}>

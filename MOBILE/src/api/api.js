@@ -6,10 +6,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 // (build EAS / preview) sans recompiler le code.
 const API_URL = process.env.EXPO_PUBLIC_API_URL || 'https://api-production-d7919.up.railway.app/api';
 
+// 30 s : l'API s'endort après une période sans trafic et sa première réponse
+// demande une douzaine de secondes. Avec 10 s, tout écran ouvert au réveil
+// restait vide.
 const api = axios.create({
   baseURL: API_URL,
   headers: { 'Content-Type': 'application/json' },
-  timeout: 10000,
+  timeout: 30000,
 });
 
 api.interceptors.request.use(async (config) => {
