@@ -6,12 +6,9 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#072742"
-    },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "ci.notrevoienews.app"
@@ -22,13 +19,27 @@
         "backgroundColor": "#072742"
       },
       "package": "ci.notrevoienews.app",
-      "permissions": ["android.permission.INTERNET"]
+      "permissions": [
+        "android.permission.INTERNET"
+      ]
     },
     "web": {
       "bundler": "metro",
       "output": "single",
       "favicon": "./assets/favicon.png"
     },
-    "plugins": ["expo-notifications"]
+    "plugins": [
+      "expo-notifications",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#072742"
+        }
+      ],
+      "expo-status-bar",
+      "expo-font"
+    ]
   }
 }
