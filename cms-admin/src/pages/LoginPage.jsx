@@ -29,10 +29,7 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-ink px-4">
       <div className="w-full max-w-sm">
         <div className="flex justify-center mb-8">
-          <div className="inline-flex items-center rounded-full overflow-hidden font-serif font-extrabold text-[18px]">
-            <span className="bg-navy text-white px-4 py-2">Notre</span>
-            <span className="bg-white text-coral font-black px-4 py-2">Voie</span>
-          </div>
+          <img src="/logo.png" alt="Notre Voie" className="h-11 w-auto rounded-[6px] bg-white" />
         </div>
 
         <form onSubmit={handleSubmit} className="card p-7">

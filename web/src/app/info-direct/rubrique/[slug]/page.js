@@ -41,7 +41,7 @@ export default async function RubriquePage({ params, searchParams }) {
           <label className="block text-[10.5px] font-mono uppercase tracking-wide text-muted mb-1">Jour de parution</label>
           <input type="date" name="date" defaultValue={date} className="border border-line rounded-md px-3 py-1.5 text-[13px] bg-transparent" />
         </div>
-        <button type="submit" className="text-[12.5px] font-bold px-4 py-1.5 rounded-full" style={{ background: '#22D3EE', color: '#0a0e1a' }}>Filtrer</button>
+        <button type="submit" className="text-[12.5px] font-bold px-4 py-1.5 rounded-full" style={{ background: '#4FB3F0', color: '#062134' }}>Filtrer</button>
         {date && (
           <a href={`${BASE_PATH}/rubrique/${params.slug}`} className="text-[12.5px] font-semibold text-muted hover:text-ink px-1 py-1.5">
             Réinitialiser

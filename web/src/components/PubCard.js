@@ -43,7 +43,7 @@ export default function PubCard({ campagne }) {
         <h4 className="font-serif text-[16.5px] leading-snug mt-2 group-hover:text-coral transition-colors">
           {campagne.titre}
         </h4>
-        <span className="inline-block mt-3 text-[12px] font-bold bg-[#F0F0EE] text-[#0a0e1a] px-3.5 py-1.5 rounded-full group-hover:bg-coral group-hover:text-white transition-colors">
+        <span className="inline-block mt-3 text-[12px] font-bold bg-[#F0F0EE] text-[#062134] px-3.5 py-1.5 rounded-full group-hover:bg-coral group-hover:text-white transition-colors">
           {campagne.texteCTA || 'En savoir plus'} →
         </span>
       </div>

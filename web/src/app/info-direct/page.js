@@ -22,7 +22,7 @@ import { timeAgo, formatDateRange, LABEL_FORMAT } from '@/lib/format';
 // Times (nytimes.com), demandée explicitement pour distinguer Info en
 // direct du Quotidien.
 function Separateur() {
-  return <hr className="max-w-[1180px] mx-auto my-10" style={{ borderColor: '#6E7897' }} />;
+  return <hr className="max-w-[1180px] mx-auto my-10" style={{ borderColor: '#2E6D9E' }} />;
 }
 
 const BASE_PATH = '/info-direct';
@@ -154,14 +154,14 @@ export default async function QuotidienAccueilPage() {
               </div>
               <div className="pt-4">
                 <div className="flex items-center gap-2.5">
-                  <span className="font-mono text-[10.5px] font-bold uppercase tracking-widest bg-[#22D3EE] text-[#0a0e1a] px-2.5 py-1 rounded-full">
+                  <span className="font-mono text-[10.5px] font-bold uppercase tracking-widest bg-[#4FB3F0] text-[#062134] px-2.5 py-1 rounded-full">
                     {LABEL_FORMAT[une.format] || une.format}
                   </span>
                   <span className="font-mono text-[11px] uppercase tracking-wide" style={{ color: une.rubrique?.couleur }}>
                     {une.rubrique?.nom}
                   </span>
                 </div>
-                <h1 className="font-serif text-[28px] sm:text-[32px] leading-tight mt-3 group-hover:text-[#22D3EE] transition-colors">
+                <h1 className="font-serif text-[28px] sm:text-[32px] leading-tight mt-3 group-hover:text-[#4FB3F0] transition-colors">
                   {une.titre}
                 </h1>
                 {une.chapo && <p className="text-muted text-[14.5px] mt-2.5 leading-relaxed max-w-2xl line-clamp-2">{une.chapo}</p>}
@@ -200,15 +200,15 @@ export default async function QuotidienAccueilPage() {
             <div>
               <div className="bg-navy rounded-[10px] p-5 text-white">
                 <h3 className="font-serif text-[16px] mb-1">5 choses à retenir aujourd&apos;hui</h3>
-                <ol className="pl-0 text-[12.5px] text-[#D8DCEA]">
+                <ol className="pl-0 text-[12.5px] text-[#CFE3F3]">
                   {resumeDuJour.map((a, i) => (
                     <li key={a.id} className="flex gap-2.5 py-2.5 border-t border-white/10 first:border-t-0">
-                      <span className="font-mono text-[#22D3EE] font-bold shrink-0 flex items-center gap-1.5">
+                      <span className="font-mono text-[#4FB3F0] font-bold shrink-0 flex items-center gap-1.5">
                         {a.format === 'LIVE' && <span className="w-1.5 h-1.5 rounded-full bg-coral dot-live" />}
                         {String(i + 1).padStart(2, '0')}
                       </span>
                       <Link href={`${BASE_PATH}/article/${a.slug}`} className="hover:text-white leading-snug flex-1">{a.titre}</Link>
-                      <span className="font-mono text-[10px] text-[#A9B2C9] shrink-0 tabular-nums">{timeAgo(a.publieLe)}</span>
+                      <span className="font-mono text-[10px] text-[#A9C6DD] shrink-0 tabular-nums">{timeAgo(a.publieLe)}</span>
                     </li>
                   ))}
                 </ol>
@@ -216,21 +216,21 @@ export default async function QuotidienAccueilPage() {
 
               {/* Encart institutionnel — sous "5 choses à retenir", couleurs
                   officielles du logo Notre Voie. */}
-              <div className="mt-4 p-5 bg-[#4B5570]/90 border-2 border-[#E6007E]/60 rounded-xl text-center flex flex-col items-center justify-center shadow-lg shadow-[#E6007E]/10">
+              <div className="mt-4 p-5 bg-[#12456F]/90 border-2 border-[#E90895]/60 rounded-xl text-center flex flex-col items-center justify-center shadow-lg shadow-[#E90895]/10">
                 <h3 className="text-3xl font-black uppercase tracking-wider">
                   <span className="text-white">Notre </span>
-                  <span className="text-[#E6007E]">Voie</span>
+                  <span className="text-[#E90895]">Voie</span>
                 </h3>
-                <span className="text-xs font-bold uppercase tracking-wider text-[#0a0e1a] bg-[#009EE3] px-3 py-0.5 rounded-full mt-1.5 shadow-sm">
+                <span className="text-xs font-bold uppercase tracking-wider text-[#062134] bg-[#009EE3] px-3 py-0.5 rounded-full mt-1.5 shadow-sm">
                   Notre métier, informer
                 </span>
-                <span className="w-12 h-0.5 bg-[#E6007E]/40 my-3" />
+                <span className="w-12 h-0.5 bg-[#E90895]/40 my-3" />
                 <p className="text-xs text-[#CBD3EC] leading-relaxed max-w-xs">
                   En vente tous les jours dans vos kiosques ou par abonnement.
                 </p>
                 <Link
                   href={`${BASE_PATH}/abonnement`}
-                  className="mt-3 px-5 py-2 text-xs font-bold text-white bg-[#E6007E] hover:bg-[#c9006e] rounded-lg transition-all shadow-md"
+                  className="mt-3 px-5 py-2 text-xs font-bold text-white bg-[#E90895] hover:bg-[#c9006e] rounded-lg transition-all shadow-md"
                 >
                   S&apos;abonner au journal
                 </Link>

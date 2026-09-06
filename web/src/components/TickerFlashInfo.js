@@ -9,7 +9,7 @@ export default function TickerFlashInfo({ articles, basePath = '' }) {
   const boucle = [...articles, ...articles];
 
   return (
-    <div className="border-b border-[#6E7897] bg-[#454F66] overflow-hidden">
+    <div className="border-b border-[#2E6D9E] bg-[#0E3C63] overflow-hidden">
       <div className="max-w-[1180px] mx-auto flex items-stretch">
         <span className="flex-none flex items-center gap-1.5 font-mono text-[10.5px] font-bold uppercase tracking-widest text-white bg-coral px-4 py-2 z-10">
           <span className="w-1.5 h-1.5 rounded-full bg-white dot-live" /> Flash Info
@@ -20,10 +20,10 @@ export default function TickerFlashInfo({ articles, basePath = '' }) {
               <Link
                 key={`${a.id}-${i}`}
                 href={`${basePath}/article/${a.slug}`}
-                className="flex items-center gap-2.5 text-[12.5px] whitespace-nowrap hover:text-[#22D3EE] transition-colors"
-                style={{ color: '#D8DCEA' }}
+                className="flex items-center gap-2.5 text-[12.5px] whitespace-nowrap hover:text-[#4FB3F0] transition-colors"
+                style={{ color: '#CFE3F3' }}
               >
-                <span className="w-1 h-1 rounded-full bg-[#22D3EE] shrink-0" />
+                <span className="w-1 h-1 rounded-full bg-[#4FB3F0] shrink-0" />
                 {a.titre}
               </Link>
             ))}

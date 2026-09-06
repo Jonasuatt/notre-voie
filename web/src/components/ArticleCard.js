@@ -20,7 +20,7 @@ export default function ArticleCard({ article, basePath = '' }) {
         {(article.format === 'VIDEO_COURTE' || article.format === 'LIVE') && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/10 group-hover:bg-black/25 transition-colors">
             <span className="w-10 h-10 rounded-full bg-white/85 flex items-center justify-center">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="#0a0e1a"><path d="M8 5v14l11-7z" /></svg>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="#062134"><path d="M8 5v14l11-7z" /></svg>
             </span>
           </div>
         )}

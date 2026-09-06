@@ -14,10 +14,10 @@ export default function Diaporama({ photos, basePath = '', titre = 'Album photo'
 
   return (
     <div className="mb-10">
-      <h3 className="font-mono text-[11px] font-bold uppercase tracking-widest pb-3 mb-5 border-b" style={{ borderColor: '#6E7897', color: '#A9B2C9' }}>
+      <h3 className="font-mono text-[11px] font-bold uppercase tracking-widest pb-3 mb-5 border-b" style={{ borderColor: '#2E6D9E', color: '#A9C6DD' }}>
         {titre}
       </h3>
-      <div className="relative aspect-video rounded-xl overflow-hidden bg-[#525E78] border" style={{ borderColor: '#6E7897' }}>
+      <div className="relative aspect-video rounded-xl overflow-hidden bg-[#17527F] border" style={{ borderColor: '#2E6D9E' }}>
         {slides.map((p, i) => (
           <figure
             key={p.id}
@@ -36,7 +36,7 @@ export default function Diaporama({ photos, basePath = '', titre = 'Album photo'
       </div>
       <Link
         href={`${basePath}/rubrique/photos-legendees`}
-        className="inline-block mt-3 font-mono text-[11px] uppercase tracking-widest text-[#22D3EE] hover:underline"
+        className="inline-block mt-3 font-mono text-[11px] uppercase tracking-widest text-[#4FB3F0] hover:underline"
       >
         Voir toutes les photos →
       </Link>

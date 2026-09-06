@@ -35,7 +35,7 @@ export default function ColonneActualites({ colonnes, basePath = '', titre = 'Ac
 
   return (
     <div>
-      <h3 className="font-mono text-[11px] font-bold uppercase tracking-widest pb-3 mb-6 border-b" style={{ borderColor: '#6E7897', color: '#A9B2C9' }}>
+      <h3 className="font-mono text-[11px] font-bold uppercase tracking-widest pb-3 mb-6 border-b" style={{ borderColor: '#2E6D9E', color: '#A9C6DD' }}>
         {titre}
       </h3>
       <div className={`grid ${classesGrille(colonnes.length)} gap-x-8 gap-y-10`}>
@@ -44,7 +44,7 @@ export default function ColonneActualites({ colonnes, basePath = '', titre = 'Ac
           const vertical = nom === 'Formats Verticaux';
           const contenu = (
             <>
-              <span className="flex items-center gap-1.5 font-mono text-[10.5px] font-bold uppercase tracking-widest mb-3" style={{ color: g.couleur || '#22D3EE' }}>
+              <span className="flex items-center gap-1.5 font-mono text-[10.5px] font-bold uppercase tracking-widest mb-3" style={{ color: g.couleur || '#4FB3F0' }}>
                 {ICONE_COLONNE[nom] && <span aria-hidden>{ICONE_COLONNE[nom]}</span>}
                 {nom}
               </span>
@@ -52,12 +52,12 @@ export default function ColonneActualites({ colonnes, basePath = '', titre = 'Ac
               {tete && (
                 <Link href={`${basePath}/article/${tete.slug}`} className="group block mb-4">
                   {tete.imageUneUrl && (
-                    <div className={`relative rounded-[6px] overflow-hidden mb-2.5 bg-[#525E78] ${vertical ? 'aspect-[9/16] max-h-64 mx-auto max-w-[180px]' : 'aspect-video'}`}>
+                    <div className={`relative rounded-[6px] overflow-hidden mb-2.5 bg-[#17527F] ${vertical ? 'aspect-[9/16] max-h-64 mx-auto max-w-[180px]' : 'aspect-video'}`}>
                       <Image src={tete.imageUneUrl} alt="" fill sizes="220px" className="object-cover transition-transform duration-300 group-hover:scale-105" />
                       {(tete.format === 'VIDEO_COURTE' || tete.format === 'LIVE') && (
                         <div className="absolute inset-0 flex items-center justify-center bg-black/10 group-hover:bg-black/25 transition-colors">
                           <span className="w-9 h-9 rounded-full bg-white/85 flex items-center justify-center">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="#0a0e1a"><path d="M8 5v14l11-7z" /></svg>
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="#062134"><path d="M8 5v14l11-7z" /></svg>
                           </span>
                         </div>
                       )}
@@ -68,16 +68,16 @@ export default function ColonneActualites({ colonnes, basePath = '', titre = 'Ac
                       )}
                     </div>
                   )}
-                  <h4 className="font-serif text-[15px] leading-snug group-hover:text-[#22D3EE] transition-colors">{tete.titre}</h4>
-                  {tete.chapo && <p className="text-[12px] mt-1.5 leading-snug" style={{ color: '#B8C0D9' }}>{tete.chapo}</p>}
+                  <h4 className="font-serif text-[15px] leading-snug group-hover:text-[#4FB3F0] transition-colors">{tete.titre}</h4>
+                  {tete.chapo && <p className="text-[12px] mt-1.5 leading-snug" style={{ color: '#B4CFE4' }}>{tete.chapo}</p>}
                 </Link>
               )}
 
               {reste.length > 0 && (
                 <ul>
                   {reste.map((a) => (
-                    <li key={a.id} className="border-t py-2.5 first:border-t-0" style={{ borderColor: '#6E7897' }}>
-                      <Link href={`${basePath}/article/${a.slug}`} className="text-[13px] leading-snug text-[#E7EBF7] hover:text-[#22D3EE] transition-colors">
+                    <li key={a.id} className="border-t py-2.5 first:border-t-0" style={{ borderColor: '#2E6D9E' }}>
+                      <Link href={`${basePath}/article/${a.slug}`} className="text-[13px] leading-snug text-[#EAF3FB] hover:text-[#4FB3F0] transition-colors">
                         {a.titre}
                       </Link>
                     </li>
@@ -89,14 +89,14 @@ export default function ColonneActualites({ colonnes, basePath = '', titre = 'Ac
 
           if (styleCartes) {
             return (
-              <div key={nom} className="flex flex-col justify-between h-full bg-[#4B5570]/60 p-5 rounded-xl border" style={{ borderColor: '#6E7897' }}>
+              <div key={nom} className="flex flex-col justify-between h-full bg-[#12456F]/60 p-5 rounded-xl border" style={{ borderColor: '#2E6D9E' }}>
                 <div>{contenu}</div>
               </div>
             );
           }
 
           return (
-            <div key={nom} className={i > 0 ? 'sm:pl-8 sm:border-l' : ''} style={i > 0 ? { borderColor: '#6E7897' } : undefined}>
+            <div key={nom} className={i > 0 ? 'sm:pl-8 sm:border-l' : ''} style={i > 0 ? { borderColor: '#2E6D9E' } : undefined}>
               {contenu}
             </div>
           );

@@ -1,17 +1,15 @@
 import Link from 'next/link';
+import Image from 'next/image';
 
-// Pastille bicolore reprise de la maquette produit — utilisée dans le
-// header et le footer. Le PNG officiel (logo.png) reste disponible pour
-// la Une / les partages sociaux via <Image src="/logo.png" .../>.
-// Classes dédiées `logo-pill-*` (plutôt que bg-navy/bg-white) : le thème
-// sombre d'Info en direct réécrit bg-navy et bg-white vers la même teinte
-// (cf. globals.css), ce qui rendait le logo invisible sur le header sombre.
+// Logo officiel du journal (public/logo.png, 1080×418). Remplace l'ancienne
+// pastille bicolore reconstituée en CSS : une seule source d'identité pour
+// le header, le footer, la Une et les partages sociaux. Ratio 2.583:1, la
+// hauteur pilote la largeur.
 export default function LogoPill({ small = false, href = '/' }) {
-  const size = small ? 'h-[26px] text-[11px] px-[9px]' : 'h-9 text-[15px] px-[13px]';
+  const h = small ? 26 : 38;
   return (
-    <Link href={href} className="inline-flex items-center rounded-full overflow-hidden shadow-sm font-serif font-extrabold">
-      <span className={`logo-pill-a text-white flex items-center ${size}`}>Notre</span>
-      <span className={`logo-pill-b font-black flex items-center ${size}`}>Voie</span>
+    <Link href={href} className="inline-flex items-center shrink-0 bg-white rounded-[6px] overflow-hidden" aria-label="Notre Voie — accueil">
+      <Image src="/logo.png" alt="Notre Voie" width={Math.round(h * 2.583)} height={h} priority className="h-auto w-auto" style={{ height: h }} />
     </Link>
   );
 }

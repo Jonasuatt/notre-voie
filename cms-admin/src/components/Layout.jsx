@@ -20,10 +20,7 @@ export default function Layout() {
     <div className="min-h-screen flex">
       <aside className="w-64 bg-ink text-white flex flex-col shrink-0">
         <div className="px-5 py-5 border-b border-white/10">
-          <div className="inline-flex items-center rounded-full overflow-hidden font-serif font-extrabold text-[14px]">
-            <span className="bg-navy text-white px-3 py-1.5">Notre</span>
-            <span className="bg-white text-coral font-black px-3 py-1.5">Voie</span>
-          </div>
+          <img src="/logo.png" alt="Notre Voie" className="h-8 w-auto rounded-[5px] bg-white" />
           <p className="text-[10px] font-mono uppercase tracking-widest text-white/40 mt-2">CMS 1 — Administration</p>
         </div>
 

@@ -51,7 +51,7 @@ export default function Header({ basePath = '', megaMenu }) {
         </div>
         {megaMenu?.length > 0 ? (
           <div className="hidden lg:flex items-center gap-6 text-[13.5px] font-semibold">
-            <Link href={basePath || '/'} className="hover:text-[#22D3EE] transition-colors">Accueil</Link>
+            <Link href={basePath || '/'} className="hover:text-[#4FB3F0] transition-colors">Accueil</Link>
             <MegaMenu piliers={megaMenu} basePath={basePath} />
           </div>
         ) : (
@@ -71,7 +71,7 @@ export default function Header({ basePath = '', megaMenu }) {
           {estInfoDirect && (
             <Link
               href={`${basePath}/rubrique/live-tv`}
-              className="hidden sm:flex items-center gap-1.5 font-mono text-[11px] font-bold uppercase tracking-widest text-coral border border-current rounded-full px-3 py-[7px] hover:bg-coral hover:text-[#0a0e1a] transition-colors"
+              className="hidden sm:flex items-center gap-1.5 font-mono text-[11px] font-bold uppercase tracking-widest text-coral border border-current rounded-full px-3 py-[7px] hover:bg-coral hover:text-[#062134] transition-colors"
             >
               <span className="w-1.5 h-1.5 rounded-full bg-current dot-live" /> Live TV
             </Link>

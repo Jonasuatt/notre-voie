@@ -34,13 +34,13 @@ body {
 /* Ascenseur discret pour le carrousel horizontal (Carrousel.js). */
 .scrollbar-fine {
   scrollbar-width: thin;
-  scrollbar-color: #6E7897 transparent;
+  scrollbar-color: #2E6D9E transparent;
 }
 .scrollbar-fine::-webkit-scrollbar {
   height: 6px;
 }
 .scrollbar-fine::-webkit-scrollbar-thumb {
-  background: #6E7897;
+  background: #2E6D9E;
   border-radius: 3px;
 }
 
@@ -49,39 +49,33 @@ body {
   line-height: 1.75;
 }
 
-/* Pastille de logo — couleurs fixes, volontairement en dehors de la
-   réécriture .theme-direct ci-dessous (qui neutralise bg-navy/bg-white)
-   pour que le logo garde son contraste bicolore sur fond sombre. */
-.logo-pill-a { background-color: #0B6FA8; }
-.logo-pill-b { background-color: #FFFFFF; color: #E6008C; }
-.theme-direct .logo-pill-a { background-color: #22D3EE; color: #0a0e1a; }
-.theme-direct .logo-pill-b { background-color: #FFFFFF; color: #0a0e1a; }
-
-/* Thème « Info en direct » — identité visuelle distincte du Quotidien
-   (fond sombre, accent cyan façon direct TV, au lieu du blanc/crème et du
-   corail « presse papier »). Un seul wrapper `.theme-direct` en tête de
-   /info-direct suffit : les mêmes composants partagés (Header, ArticleCard,
+/* Thème « Info en direct » — identité visuelle distincte du Quotidien,
+   déclinée sur les deux couleurs officielles du logo : le bleu #1A89D8
+   (assombri pour les fonds, éclairci en #4FB3F0 pour les liens et accents,
+   seul moyen de tenir le contraste sur fond sombre) et le magenta #E90895,
+   réservé aux aplats (badges, Flash Info) où il porte du blanc.
+   Un seul wrapper `.theme-direct` en tête de /info-direct suffit : les mêmes composants partagés (Header, ArticleCard,
    FlashBar…) sont ainsi reskinnés sans dupliquer leur code, la spécificité
    CSS (2 classes vs 1) l'emporte naturellement sur les utilitaires Tailwind. */
-.theme-direct .bg-white { background-color: #4B5570; }
-/* Barre de navigation : noir comme le bandeau Vie chère (bg-ink), pas la
-   teinte des cartes. */
-.theme-direct header.bg-white { background-color: #14141F; }
-.theme-direct .bg-cream { background-color: #404A5E; }
-.theme-direct .text-ink { color: #E7EBF7; }
-.theme-direct .text-muted { color: #A9B2C9; }
-.theme-direct .border-line { border-color: #6E7897; }
-.theme-direct .text-coral { color: #22D3EE; }
-.theme-direct .bg-coral { background-color: #22D3EE; color: #0a0e1a; }
-.theme-direct .hover\:text-coral:hover { color: #22D3EE; }
-.theme-direct .bg-navy { background-color: #4B5570; }
-.theme-direct .text-navy { color: #22D3EE; }
-.theme-direct .border-navy { border-color: #22D3EE; }
-.theme-direct .hover\:border-navy:hover { border-color: #22D3EE; }
+.theme-direct .bg-white { background-color: #12456F; }
+/* Barre de navigation : bleu nuit du journal, plus sombre que les cartes
+   pour rester détachée du contenu. */
+.theme-direct header.bg-white { background-color: #072742; }
+.theme-direct .bg-cream { background-color: #0B3358; }
+.theme-direct .text-ink { color: #EAF3FB; }
+.theme-direct .text-muted { color: #A9C6DD; }
+.theme-direct .border-line { border-color: #2E6D9E; }
+.theme-direct .text-coral { color: #4FB3F0; }
+.theme-direct .bg-coral { background-color: #E90895; color: #FFFFFF; }
+.theme-direct .hover\:text-coral:hover { color: #4FB3F0; }
+.theme-direct .bg-navy { background-color: #12456F; }
+.theme-direct .text-navy { color: #4FB3F0; }
+.theme-direct .border-navy { border-color: #4FB3F0; }
+.theme-direct .hover\:border-navy:hover { border-color: #4FB3F0; }
 .theme-direct .text-gold { color: #FFC857; }
-.theme-direct .from-navy2 { --tw-gradient-from: #5A6784; }
-.theme-direct .to-navy { --tw-gradient-to: #404A5E; }
-.theme-direct .bg-gradient-to-r.from-white { --tw-gradient-from: #4B5570; }
+.theme-direct .from-navy2 { --tw-gradient-from: #1A5B8C; }
+.theme-direct .to-navy { --tw-gradient-to: #0B3358; }
+.theme-direct .bg-gradient-to-r.from-white { --tw-gradient-from: #12456F; }
 .theme-direct .to-\[\#FBF3E4\] { --tw-gradient-to: #1c1a12; }
 .theme-direct .border-\[\#F0DFB8\] { border-color: #3a331f; }
 

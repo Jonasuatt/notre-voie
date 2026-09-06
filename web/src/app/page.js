@@ -24,16 +24,16 @@ export default function PortailPage() {
       <div className="grid sm:grid-cols-2 gap-6 mt-12 w-full max-w-3xl">
         <Link
           href="/info-direct"
-          className="group bg-[#0f1526] border border-[#22D3EE]/25 rounded-2xl p-8 text-left hover:-translate-y-1 transition-transform shadow-xl"
+          className="group bg-[#0f1526] border border-[#4FB3F0]/25 rounded-2xl p-8 text-left hover:-translate-y-1 transition-transform shadow-xl"
         >
-          <span className="inline-flex items-center gap-1.5 font-mono text-[10.5px] uppercase tracking-widest text-[#22D3EE] font-bold">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#22D3EE] dot-live" /> L&apos;actualité au fil de l&apos;eau
+          <span className="inline-flex items-center gap-1.5 font-mono text-[10.5px] uppercase tracking-widest text-[#4FB3F0] font-bold">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#4FB3F0] dot-live" /> L&apos;actualité au fil de l&apos;eau
           </span>
-          <h2 className="font-serif text-[26px] text-white mt-2 group-hover:text-[#22D3EE] transition-colors">Info en direct</h2>
+          <h2 className="font-serif text-[26px] text-white mt-2 group-hover:text-[#4FB3F0] transition-colors">Info en direct</h2>
           <p className="text-white/50 text-[14px] mt-3 leading-relaxed">
             L&apos;édition animée au quotidien par la rédaction web, pour suivre l&apos;actualité en temps réel.
           </p>
-          <span className="inline-block mt-5 text-[13px] font-bold text-[#22D3EE]">Entrer →</span>
+          <span className="inline-block mt-5 text-[13px] font-bold text-[#4FB3F0]">Entrer →</span>
         </Link>
 
         <Link
