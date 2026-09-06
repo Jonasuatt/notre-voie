@@ -49,6 +49,17 @@ body {
   line-height: 1.75;
 }
 
+/* Signature relevée sur le papier (articles d'archive) — distinguée du corps
+   sans être attribuée en base : c'est un compte technique qui les porte. */
+.prose-article p.signature {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.72em;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.65;
+  margin-bottom: 1.6em;
+}
+
 /* Thème « Info en direct » — identité visuelle distincte du Quotidien,
    déclinée sur les deux couleurs officielles du logo : le bleu #1A89D8
    (assombri pour les fonds, éclairci en #4FB3F0 pour les liens et accents,
