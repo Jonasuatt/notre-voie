@@ -27,7 +27,7 @@ function arg(nom, defaut) {
 
 async function main() {
   if (!isConfigured) throw new Error('CLOUDINARY_* absents de api/.env');
-  const dossier = arg('--dossier', 'C:\Users\User\Documents\Claude\Notre Voie Document\Unes Notre Voie');
+  const dossier = arg('--dossier', 'C:/Users/User/Documents/Claude/Notre Voie Document/Unes Notre Voie');
   const limite = Number(arg('--limite', Infinity));
 
   const unes = JSON.parse(fs.readFileSync(ENTREE, 'utf8'));
@@ -36,8 +36,11 @@ async function main() {
 
   let n = 0;
   for (const une of unes) {
-    if (dejaFait.has(une.numero) || n >= limite) continue;
-    const fichier = path.join(dossier, une.fichier);
+    if (n >= limite) break;
+    if (dejaFait.has(une.numero)) continue;
+    // Le SDK Cloudinary avale les antislashs d'un chemin Windows : on lui
+    // passe le chemin en slashs, que fs accepte tout aussi bien.
+    const fichier = path.join(dossier, une.fichier).split(path.sep).join('/');
     try {
       const res = await cloudinary.uploader.upload(fichier, {
         resource_type: 'image',
@@ -60,7 +63,7 @@ async function main() {
       n++;
       console.log(`✔ ${une.numero} (${une.dateParution}) — ${n} ce lot, ${faites.length}/${unes.length} au total`);
     } catch (err) {
-      console.error(`✖ ${une.numero} : ${err.message}`);
+      console.error(`✖ ${une.numero} : ${err?.error?.message || err.message || JSON.stringify(err)}`);
     }
   }
   console.log(`Terminé : ${faites.length}/${unes.length} numéros hébergés.`);

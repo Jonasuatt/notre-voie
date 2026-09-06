@@ -1368,6 +1368,67 @@ async function seedCodeAccesDemo() {
   console.log('✔ Code d\'accès NV7970-DEMO défini pour le n°7970.');
 }
 
+// Fonds d'archives « Unes Notre Voie » — 245 numéros (7730 → 7984) déposés
+// sur Cloudinary par scripts/importer-unes.js, dont le manifeste donne pour
+// chaque numéro son PDF et sa couverture. Les dates de parution ne sont pas
+// devinées : elles ont été lues dans l'ours imprimé sur chaque Une
+// (scripts/parse-unes.py), week-ends à cheval sur deux mois compris.
+// Idempotent : un numéro déjà en base est laissé tel quel, ce qui préserve
+// les 10 numéros archivés avant ce lot.
+const ARCHIVES_UNES = require('../scripts/unes-uploadees.json');
+
+// Même gabarit de pagination que editions.controller.js applique à tout
+// numéro importé depuis le CMS — la maquette du journal est stable sur les
+// numéros vérifiés. Page 1 = Une, donc sans rubrique propre.
+const GABARIT_PAGES_ARCHIVES = {
+  2: ['politique'], 3: ['politique'], 4: ['economie'], 5: ['culture'],
+  6: ['societe'], 7: ['regions'], 8: ['sport'],
+};
+const PAGES_PAR_NUMERO = 8;
+
+// Page N rendue à la volée par Cloudinary depuis le PDF (transformation pg_N).
+function urlPageArchive(pdfUrl, n) {
+  return pdfUrl
+    .replace('/upload/', `/upload/c_limit,w_1400,q_auto/pg_${n}/`)
+    .replace(/\.pdf$/, '.jpg');
+}
+
+async function seedArchivesUnes() {
+  let editions = 0;
+  let pages = 0;
+  for (const a of ARCHIVES_UNES) {
+    let edition = await prisma.edition.findUnique({ where: { numero: a.numero } });
+    if (!edition) {
+      edition = await prisma.edition.create({
+        data: {
+          numero: a.numero,
+          dateParution: new Date(a.dateParution),
+          dateFin: a.dateFin ? new Date(a.dateFin) : null,
+          pdfUrl: a.pdfUrl,
+          couvertureUrl: a.couvertureUrl,
+        },
+      });
+      editions++;
+    }
+    for (let n = 1; n <= PAGES_PAR_NUMERO; n++) {
+      const existante = await prisma.editionPage.findUnique({
+        where: { editionId_numeroPage: { editionId: edition.id, numeroPage: n } },
+      });
+      if (existante) continue;
+      await prisma.editionPage.create({
+        data: {
+          editionId: edition.id,
+          numeroPage: n,
+          rubriques: GABARIT_PAGES_ARCHIVES[n] || [],
+          imageUrl: urlPageArchive(a.pdfUrl, n),
+        },
+      });
+      pages++;
+    }
+  }
+  console.log(`✔ ${editions} numéro(s) d'archive ajouté(s) au kiosque, ${pages} page(s) indexée(s) (${ARCHIVES_UNES.length} au manifeste).`);
+}
+
 async function seedEditions() {
   const editions = [
     { numero: 7961, dateParution: "2026-07-30", pdfUrl: "https://res.cloudinary.com/ataat5bs/raw/upload/v1787194110/notre-voie/edition/nv5erwj7eoplvj4f7i5q.pdf", couvertureUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787194106/notre-voie/une/elo8nuazwzz1vboa9oma.jpg" },
@@ -2329,6 +2390,7 @@ async function main() {
   const dejaDesEditions = await prisma.edition.count();
   if (dejaDesEditions === 0) await seedEditions();
   await seedEditionPages();
+  await seedArchivesUnes();
   await seedCodeAccesDemo();
   await fixArticleDates();
   await seedInfoDirectFlashs();
