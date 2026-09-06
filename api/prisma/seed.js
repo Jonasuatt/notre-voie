@@ -2527,7 +2527,9 @@ async function main() {
   await seedEditionPages();
   await seedArchivesUnes();
   await alignerEditionsHeritees();
-  await seedArticlesArchives();
+  // Le fonds d'archives est un enrichissement : s'il échoue, l'API doit
+  // démarrer quand même — un seed fautif ne peut pas mettre le site à terre.
+  await seedArticlesArchives().catch((e) => console.error('Archives non importées :', e.message));
   await seedCodeAccesDemo();
   await fixArticleDates();
   await seedInfoDirectFlashs();
