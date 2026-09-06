@@ -1469,6 +1469,101 @@ async function seedArchivesUnes() {
   console.log(`✔ ${editions} numéro(s) d'archive ajouté(s) au kiosque, ${redatees} redaté(s), ${pages} page(s) indexée(s) (${ARCHIVES_UNES.length} au manifeste).`);
 }
 
+// Articles des 245 numeros archives — extraits des PDF par
+// scripts/extraire-articles.py (titres, surtitres, corps, signatures lus dans
+// la composition du journal). Rien n'est reecrit : le texte publie ici est
+// celui qui a paru sur le papier.
+//
+// Porteur : un compte technique « Redaction — Archives ». La signature reelle
+// relevee sur le papier est affichee dans l'article, mais aucun journaliste
+// n'est credite en base sur la foi d'une lecture automatique.
+const EMAIL_ARCHIVES = 'archives@notrevoienews.com';
+
+function paragraphes(texte) {
+  // Le PDF ne restitue pas les alineas : on decoupe sur les fins de phrase,
+  // autour de 700 signes, pour rendre le corps lisible a l'ecran.
+  const phrases = texte.split(/(?<=[.!?»])\s+/);
+  const blocs = [];
+  let courant = '';
+  for (const phrase of phrases) {
+    courant += (courant ? ' ' : '') + phrase;
+    if (courant.length >= 700) { blocs.push(courant); courant = ''; }
+  }
+  if (courant) blocs.push(courant);
+  return blocs;
+}
+
+function echapper(t) {
+  return t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+async function seedArticlesArchives() {
+  const chemin = require('path').join(__dirname, '..', 'scripts', 'articles-unes.json.gz');
+  if (!require('fs').existsSync(chemin)) return;
+
+  const archives = JSON.parse(require('zlib').gunzipSync(require('fs').readFileSync(chemin)).toString('utf8'));
+  const attendus = archives.length;
+  const dejaLa = await prisma.article.count({ where: { tags: { has: 'archives-papier' } } });
+  if (dejaLa >= attendus) {
+    console.log(`✔ ${dejaLa} article(s) d'archive déjà en base.`);
+    return;
+  }
+
+  const auteur = await prisma.staff.upsert({
+    where: { email: EMAIL_ARCHIVES },
+    update: {},
+    create: {
+      email: EMAIL_ARCHIVES, nom: 'Archives', prenom: 'Rédaction', role: 'REDACTEUR',
+      service: 'Archives', motDePasseHash: await bcrypt.hash(genPassword(24), 10), isActive: false,
+    },
+  });
+  const rubriques = Object.fromEntries(
+    (await prisma.rubrique.findMany({ select: { id: true, slug: true } })).map((r) => [r.slug, r.id])
+  );
+  const connus = new Set((await prisma.article.findMany({ select: { slug: true } })).map((a) => a.slug));
+
+  const lignes = [];
+  for (const a of archives) {
+    const rubriqueId = rubriques[a.rubrique];
+    if (!rubriqueId) continue;
+    const slug = `${slugify(a.titre).slice(0, 90)}-nv${a.numero}`;
+    if (connus.has(slug)) continue;
+    connus.add(slug);
+
+    // 8h + 20 min par article, comme les numéros déjà en base : un ordre de
+    // lecture réaliste plutôt qu'un empilement à minuit pile.
+    const publieLe = new Date(`${a.date}T00:00:00.000Z`);
+    publieLe.setUTCMinutes(8 * 60 + (lignes.length % 30) * 20);
+
+    const entete = a.signature ? `<p class="signature">${echapper(a.signature)}</p>` : '';
+    const corps = paragraphes(a.corps).map((b) => `<p>${echapper(b)}</p>`).join('');
+
+    lignes.push({
+      slug,
+      titre: a.titre,
+      chapo: a.chapo || a.surtitre || null,
+      contenuHtml: entete + corps,
+      tags: ['archives-papier', `numero-${a.numero}`, ...(a.surtitre ? [a.surtitre.toLowerCase()] : [])],
+      format: 'EDITION',
+      statut: 'PUBLIE',
+      portails: ['QUOTIDIEN'],
+      rubriqueId,
+      auteurId: auteur.id,
+      valideParId: auteur.id,
+      publieLe,
+      createdAt: publieLe,
+      updatedAt: publieLe,
+    });
+  }
+
+  let crees = 0;
+  for (let i = 0; i < lignes.length; i += 500) {
+    const lot = await prisma.article.createMany({ data: lignes.slice(i, i + 500), skipDuplicates: true });
+    crees += lot.count;
+  }
+  console.log(`✔ ${crees} article(s) d'archive publié(s) depuis les numéros papier.`);
+}
+
 async function seedEditions() {
   const editions = [
     { numero: 7961, dateParution: "2026-07-30", pdfUrl: "https://res.cloudinary.com/ataat5bs/raw/upload/v1787194110/notre-voie/edition/nv5erwj7eoplvj4f7i5q.pdf", couvertureUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787194106/notre-voie/une/elo8nuazwzz1vboa9oma.jpg" },
@@ -2432,6 +2527,7 @@ async function main() {
   await seedEditionPages();
   await seedArchivesUnes();
   await alignerEditionsHeritees();
+  await seedArticlesArchives();
   await seedCodeAccesDemo();
   await fixArticleDates();
   await seedInfoDirectFlashs();
