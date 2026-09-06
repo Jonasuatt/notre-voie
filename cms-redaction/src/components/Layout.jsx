@@ -5,7 +5,7 @@ import { PORTAILS } from '../utils/portails';
 import { ROLE_LABELS, ROLE_COLORS } from '../utils/constants';
 import {
   HomeIcon, NewspaperIcon, BanknotesIcon, BookOpenIcon, PhotoIcon, ArchiveBoxIcon,
-  ArrowRightOnRectangleIcon, PlusCircleIcon,
+  ArrowRightOnRectangleIcon, PlusCircleIcon, LifebuoyIcon,
 } from '@heroicons/react/24/outline';
 
 const NAV = [
@@ -15,6 +15,7 @@ const NAV = [
   { to: '/mediatheque', label: 'Photothèque', icon: PhotoIcon },
   { to: '/prix-vie-chere', label: 'Vie chère (ticker)', icon: BanknotesIcon },
   { to: '/editions', label: 'Kiosque / Éditions', icon: BookOpenIcon },
+  { to: '/guide', label: "Guide d'utilisation", icon: LifebuoyIcon },
 ];
 
 export default function Layout() {

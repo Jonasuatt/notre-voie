@@ -3,6 +3,7 @@ import toast from 'react-hot-toast';
 import { editionsAPI, mediaAPI } from '../services/api';
 import { format as formatDate } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import Aide from '../components/Aide';
 
 const EMPTY = { numero: '', dateParution: '', dateFin: '', pdfUrl: '', couvertureUrl: '', prix: '300', codeAcces: '' };
 
@@ -96,7 +97,7 @@ export default function EditionsPage() {
 
   return (
     <div className="p-8 max-w-4xl">
-      <h1 className="text-2xl font-bold">Kiosque numérique</h1>
+      <div className="flex items-center gap-2"><h1 className="text-2xl font-bold">Kiosque numérique</h1><Aide>Les numéros du journal en PDF. À l'import, chaque page est archivée en image et la couverture devient la Une du kiosque. Le code d'accès conditionne le téléchargement du PDF par les abonnés.</Aide></div>
       <p className="text-gray-500 text-sm mt-1">Mettez en ligne le PDF de l&apos;édition papier du jour.</p>
 
       <form onSubmit={submit} className="card p-5 mt-6 grid sm:grid-cols-2 gap-4">

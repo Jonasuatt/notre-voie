@@ -9,6 +9,7 @@ import CampagnesPage from './pages/CampagnesPage';
 import CampagneDetailPage from './pages/CampagneDetailPage';
 import AnnonceursPage from './pages/AnnonceursPage';
 import ComptesPage from './pages/ComptesPage';
+import GuidePage from './pages/GuidePage';
 
 export default function App() {
   return (
@@ -28,6 +29,7 @@ export default function App() {
           <Route path="campagnes" element={<CampagnesPage />} />
           <Route path="campagnes/:id" element={<CampagneDetailPage />} />
           <Route path="annonceurs" element={<AnnonceursPage />} />
+          <Route path="guide" element={<GuidePage />} />
           <Route path="comptes" element={<RequireRole roles={['ADMIN']}><ComptesPage /></RequireRole>} />
         </Route>
 

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { annonceursAPI } from '../services/api';
+import Aide from '../components/Aide';
 
 const EMPTY = { nom: '', contact: '', email: '', telephone: '' };
 
@@ -34,7 +35,7 @@ export default function AnnonceursPage() {
 
   return (
     <div className="p-8 max-w-4xl">
-      <h1 className="text-2xl font-bold">Annonceurs</h1>
+      <div className="flex items-center gap-2"><h1 className="text-2xl font-bold">Annonceurs</h1><Aide>Le répertoire des clients de la régie. Un annonceur doit exister ici avant qu'on puisse lui rattacher une campagne.</Aide></div>
       <p className="text-gray-500 text-sm mt-1">Portefeuille d&apos;annonceurs de la régie publicitaire.</p>
 
       <form onSubmit={submit} className="card p-5 mt-6 grid sm:grid-cols-4 gap-3 items-end">

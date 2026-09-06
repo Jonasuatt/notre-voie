@@ -6,6 +6,7 @@ import { StatutBadge, FormatBadge, PaywallBadge } from '../components/Badges';
 import { STATUT_LABELS, FORMAT_LABELS } from '../utils/constants';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import Aide from '../components/Aide';
 
 export default function ArticlesListPage() {
   const { portailActif } = useAuth();
@@ -45,7 +46,7 @@ export default function ArticlesListPage() {
   return (
     <div className="p-8">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">{estInfoDirect ? 'Le fil' : 'Articles'}</h1>
+        <div className="flex items-center gap-2"><h1 className="text-2xl font-bold">{estInfoDirect ? 'Le fil' : 'Articles'}</h1><Aide>Tous les textes de l'espace actif, quel que soit leur statut. Filtrez par statut pour retrouver ce qui attend une validation. Ouvrir un article permet de le corriger, de le faire avancer dans le circuit ou de le publier.</Aide></div>
         <Link to="/articles/nouveau" className="btn-primary">+ Nouvel article</Link>
       </div>
 

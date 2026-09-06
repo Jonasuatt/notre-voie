@@ -75,13 +75,20 @@ export default async function PortailPage() {
         {uneDuJour.articles?.length > 0 && (
           <Section titre="À la une du Quotidien" lien="/quotidien" libelleLien="Tout le journal">
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {/* Un article venu du papier n'a pas toujours de visuel : sans
+                  image on ne laisse pas un cadre vide, la carte devient un
+                  bloc de texte bordé. */}
               {uneDuJour.articles.map((a) => (
-                <Link key={a.id} href={`/quotidien/article/${a.slug}`} className="group block">
-                  <div className="relative aspect-video rounded-[8px] overflow-hidden bg-[#12456F] mb-2.5">
-                    {a.imageUneUrl && (
+                <Link
+                  key={a.id}
+                  href={`/quotidien/article/${a.slug}`}
+                  className={`group block${a.imageUneUrl ? '' : ' bg-[#0B3358] border border-[#2E6D9E] rounded-xl p-5 hover:border-[#4FB3F0] transition-colors'}`}
+                >
+                  {a.imageUneUrl && (
+                    <div className="relative aspect-video rounded-[8px] overflow-hidden bg-[#12456F] mb-2.5">
                       <Image src={a.imageUneUrl} alt="" fill sizes="260px" className="object-cover transition-transform duration-300 group-hover:scale-105" />
-                    )}
-                  </div>
+                    </div>
+                  )}
                   <span className="font-mono text-[10px] uppercase tracking-wide text-[#4FB3F0]">{a.rubrique?.nom}</span>
                   <h3 className="font-serif text-[15px] leading-snug mt-1 line-clamp-3 group-hover:text-[#4FB3F0] transition-colors">{a.titre}</h3>
                   <span className="font-mono text-[10.5px] text-[#A9C6DD] mt-1.5 block">{timeAgo(a.publieLe)}</span>

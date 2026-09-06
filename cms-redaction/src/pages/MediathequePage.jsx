@@ -5,6 +5,7 @@ import { MEDIA_TYPE_LABELS } from '../utils/constants';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { TrashIcon, MusicalNoteIcon, DocumentIcon } from '@heroicons/react/24/outline';
+import Aide from '../components/Aide';
 
 // Photothèque / médiathèque : archive de tous les médias déjà importés,
 // rattachés à un article ou "en stock" — cf. cahier des charges §1.1
@@ -39,7 +40,7 @@ export default function MediathequePage() {
 
   return (
     <div className="p-8">
-      <h1 className="text-2xl font-bold">Photothèque</h1>
+      <div className="flex items-center gap-2"><h1 className="text-2xl font-bold">Photothèque</h1><Aide>Les visuels et sons de la rédaction. Une image peut être déposée sans article : elle reste disponible pour un autre sujet. Légende et crédit sont attendus pour chaque photo.</Aide></div>
       <p className="text-gray-500 text-sm mt-1">Archive des photos, vidéos et audios importés — rattachés à un article ou en stock, prêts à être réutilisés.</p>
 
       <div className="flex flex-wrap gap-3 mt-5">

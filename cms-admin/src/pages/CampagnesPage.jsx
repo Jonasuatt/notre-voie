@@ -4,6 +4,7 @@ import toast from 'react-hot-toast';
 import { campagnesAPI, annonceursAPI, rubriquesAPI } from '../services/api';
 import { StatutCampagneBadge } from '../components/Badges';
 import { FORMAT_PUB_LABELS, formatFCFA } from '../utils/constants';
+import Aide from '../components/Aide';
 
 const EMPTY = {
   nom: '', formatPub: 'NATIVE_CARTE', annonceurId: '', rubriqueIds: [], regionsCiblees: '',
@@ -63,7 +64,7 @@ export default function CampagnesPage() {
     <div className="p-8 max-w-5xl">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Campagnes publicitaires</h1>
+          <div className="flex items-center gap-2"><h1 className="text-2xl font-bold">Campagnes publicitaires</h1><Aide>Les emplacements publicitaires vendus : période, format et rubriques ciblées. Une campagne cesse d'être diffusée d'elle-même à sa date de fin.</Aide></div>
           <p className="text-gray-500 text-sm mt-1">Ciblage par rubrique, région et format — cf. cahier des charges §5.</p>
         </div>
         <button onClick={() => setShowForm((v) => !v)} className="btn-primary">

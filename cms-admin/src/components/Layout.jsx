@@ -2,7 +2,7 @@ import { Outlet, NavLink } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { ROLE_LABELS, ROLE_COLORS } from '../utils/constants';
 import {
-  HomeIcon, MegaphoneIcon, BuildingStorefrontIcon, UsersIcon,
+  HomeIcon, MegaphoneIcon, BuildingStorefrontIcon, UsersIcon, LifebuoyIcon,
   ArrowRightOnRectangleIcon,
 } from '@heroicons/react/24/outline';
 
@@ -11,6 +11,7 @@ const NAV = [
   { to: '/campagnes', label: 'Campagnes', icon: MegaphoneIcon, roles: ['ADMIN', 'REGIE'] },
   { to: '/annonceurs', label: 'Annonceurs', icon: BuildingStorefrontIcon, roles: ['ADMIN', 'REGIE'] },
   { to: '/comptes', label: 'Comptes', icon: UsersIcon, roles: ['ADMIN'] },
+  { to: '/guide', label: "Guide d'utilisation", icon: LifebuoyIcon, roles: ['ADMIN', 'REGIE'] },
 ];
 
 export default function Layout() {

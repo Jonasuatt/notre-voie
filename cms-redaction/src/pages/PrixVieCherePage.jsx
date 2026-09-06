@@ -3,6 +3,7 @@ import toast from 'react-hot-toast';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { prixVieChereAPI } from '../services/api';
+import Aide from '../components/Aide';
 
 const EMPTY = { produit: '', unite: '', prix: '', variationPct: '' };
 
@@ -45,7 +46,7 @@ export default function PrixVieCherePage() {
 
   return (
     <div className="p-8 max-w-4xl">
-      <h1 className="text-2xl font-bold">Ticker Vie chère</h1>
+      <div className="flex items-center gap-2"><h1 className="text-2xl font-bold">Ticker Vie chère</h1><Aide>Les prix du bandeau défilant sur le site. Le dernier relevé saisi fait référence, et la flèche de hausse ou de baisse se calcule par rapport au précédent.</Aide></div>
       <p className="text-gray-500 text-sm mt-1">Prix de première nécessité affichés en bandeau sur l&apos;accueil du site.</p>
 
       <form onSubmit={submit} className="card p-5 mt-6 grid sm:grid-cols-5 gap-3 items-end">

@@ -3,6 +3,7 @@ import toast from 'react-hot-toast';
 import { staffAPI } from '../services/api';
 import { RoleBadge } from '../components/Badges';
 import { ROLE_LABELS } from '../utils/constants';
+import Aide from '../components/Aide';
 
 const EMPTY = { nom: '', prenom: '', email: '', motDePasse: '', role: 'REDACTEUR', service: '', telephone: '' };
 
@@ -60,7 +61,7 @@ export default function ComptesPage() {
     <div className="p-8 max-w-5xl">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Comptes</h1>
+          <div className="flex items-center gap-2"><h1 className="text-2xl font-bold">Comptes</h1><Aide>Les accès du personnel aux deux CMS. Le rôle décide de ce que chacun peut faire : un rédacteur soumet, un chef de service valide, le rédacteur en chef publie.</Aide></div>
           <p className="text-gray-500 text-sm mt-1">Gestion des accès CMS 1 (Administration/Régie) et CMS 2 (Rédaction).</p>
         </div>
         <button onClick={() => setShowForm((v) => !v)} className="btn-primary">
