@@ -30,7 +30,11 @@ GABARIT = {2: 'politique', 3: 'politique', 4: 'economie', 5: 'culture',
 def sansaccent(s):
     return ''.join(c for c in unicodedata.normalize('NFD', s) if unicodedata.category(c) != 'Mn')
 
+# Le PDF glisse des octets de controle (dont 0x00) que Postgres refuse.
+CTRL = re.compile('[%s]' % ''.join(chr(c) for c in list(range(0, 9)) + [11, 12] + list(range(14, 32)) + [127]))
+
 def recoller(t):
+    t = CTRL.sub('', t)
     t = re.sub(r'(\w)-\s+(\w)', r'\1\2', t)
     t = t.replace('ﬁ', 'fi').replace('ﬂ', 'fl').replace('ﬀ', 'ff')
     return re.sub(r'\s+', ' ', t).strip()
