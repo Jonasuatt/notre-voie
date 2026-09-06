@@ -24,3 +24,16 @@ export function formatFCFA(montant) {
   if (montant === null || montant === undefined) return '';
   return `${Number(montant).toLocaleString('fr-FR')} FCFA`;
 }
+
+// Période de parution : un numéro de week-end couvre plusieurs jours, il faut
+// alors afficher les deux bornes (« 4 - 6 sept. 2026 »).
+export function formatDateRange(debut, fin) {
+  if (!fin) return formatDate(debut);
+  const d = new Date(debut);
+  const f = new Date(fin);
+  const memeMois = d.getMonth() === f.getMonth() && d.getFullYear() === f.getFullYear();
+  const jour = (x) => x.getDate();
+  return memeMois
+    ? `${jour(d)} - ${formatDate(fin)}`
+    : `${formatDate(debut)} - ${formatDate(fin)}`;
+}

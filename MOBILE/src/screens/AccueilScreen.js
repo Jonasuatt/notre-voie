@@ -1,122 +1,155 @@
 import { useCallback, useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, RefreshControl, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, Image, TouchableOpacity, StyleSheet, RefreshControl, useWindowDimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { articlesAPI, rubriquesAPI, prixVieChereAPI, factCheckAPI } from '../api/api';
-import FlashBar from '../components/FlashBar';
+import { articlesAPI, prixVieChereAPI, editionsAPI } from '../api/api';
 import TickerVieChere from '../components/TickerVieChere';
 import ArticleCard from '../components/ArticleCard';
-import FormatBadge from '../components/FormatBadge';
 import { colors } from '../theme/colors';
-import { timeAgo } from '../utils/format';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { StatusBar } from 'expo-status-bar';
+import VisionneuseUne from '../components/VisionneuseUne';
+import { formatDateRange } from '../utils/format';
 
+// Accueil du Quotidien — l'édition du jour telle qu'elle paraît : la Une en
+// grand, puis les pages intérieures, comme sur le site. Chaque page ouvre la
+// visionneuse du kiosque.
 export default function AccueilScreen() {
   const navigation = useNavigation();
+  const { width } = useWindowDimensions();
+  const [edition, setEdition] = useState(null);
   const [articles, setArticles] = useState([]);
   const [prix, setPrix] = useState([]);
-  const [factChecks, setFactChecks] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
+  const [chargement, setChargement] = useState(true);
+  const [rafraichit, setRafraichit] = useState(false);
+  const [visionneuse, setVisionneuse] = useState(null);
 
-  const load = useCallback(async () => {
-    const [a, p, f] = await Promise.all([
-      articlesAPI.list({ pageSize: 20 }),
+  const charger = useCallback(async () => {
+    const [e, a, p] = await Promise.all([
+      editionsAPI.list({ pageSize: 1 }),
+      articlesAPI.list({ pageSize: 12, portail: 'QUOTIDIEN' }),
       prixVieChereAPI.ticker(),
-      factCheckAPI.list(),
     ]);
-    setArticles(a.data.articles);
-    setPrix(p.data.prix);
-    setFactChecks(f.data.factChecks);
+    setEdition(e.data.editions?.[0] || null);
+    setArticles(a.data.articles || []);
+    setPrix(p.data.prix || []);
   }, []);
 
-  useEffect(() => { load().finally(() => setLoading(false)); }, [load]);
+  useEffect(() => { charger().finally(() => setChargement(false)); }, [charger]);
 
-  const onRefresh = async () => {
-    setRefreshing(true);
-    await load();
-    setRefreshing(false);
+  const rafraichir = async () => {
+    setRafraichit(true);
+    await charger();
+    setRafraichit(false);
   };
 
-  if (loading) return <View style={styles.center}><Text style={styles.loading}>Chargement…</Text></View>;
+  if (chargement) return <View style={styles.centre}><Text style={styles.attente}>Chargement…</Text></View>;
 
-  const flashEtLive = articles.filter((a) => a.format === 'FLASH' || a.format === 'LIVE').slice(0, 8);
-  const une = articles[0];
-  const resume = articles.slice(1, 6);
-  const fc = factChecks[0];
+  const pages = edition?.pages || [];
+  const une = pages.find((p) => p.numeroPage === 1) || null;
+  const interieures = pages.filter((p) => p.numeroPage > 1);
+  const largeurUne = width - 32;
+  const resume = articles.slice(0, 5);
 
   return (
-    <FlatList
+    <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: colors.ink }}>
+      <StatusBar style="light" />
+      <ScrollView
       style={styles.page}
-      data={articles.slice(0, 12)}
-      keyExtractor={(a) => a.id}
-      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.navy} />}
-      renderItem={({ item }) => (
-        <View style={{ paddingHorizontal: 16 }}>
-          <ArticleCard article={item} />
+      refreshControl={<RefreshControl refreshing={rafraichit} onRefresh={rafraichir} tintColor={colors.navy} />}
+      contentContainerStyle={{ paddingBottom: 28 }}
+    >
+      <TickerVieChere prix={prix} />
+
+      {edition && (
+        <View style={styles.bloc}>
+          <Text style={styles.eyebrow}>L&apos;ÉDITION DU JOUR</Text>
+          <Text style={styles.numero}>
+            N°{edition.numero} · {formatDateRange(edition.dateParution, edition.dateFin)}
+          </Text>
+
+          {une?.imageUrl && (
+            <TouchableOpacity
+              activeOpacity={0.9}
+              onPress={() => setVisionneuse(edition)}
+            >
+              <Image
+                source={{ uri: une.imageUrl }}
+                style={[styles.une, { width: largeurUne, height: largeurUne * 1.35 }]}
+                resizeMode="cover"
+              />
+            </TouchableOpacity>
+          )}
+
+          {interieures.length > 0 && (
+            <>
+              <Text style={styles.sousTitre}>Les pages du numéro</Text>
+              <View style={styles.grillePages}>
+                {interieures.map((p) => (
+                  <TouchableOpacity
+                    key={p.id}
+                    style={styles.pageCarte}
+                    activeOpacity={0.85}
+                    onPress={() => setVisionneuse(edition)}
+                  >
+                    <Image source={{ uri: p.imageUrl }} style={styles.pageImage} resizeMode="cover" />
+                    <Text style={styles.pageNum}>Page {p.numeroPage}</Text>
+                    {p.rubriques?.length > 0 && (
+                      <Text style={styles.pageRub} numberOfLines={1}>{p.rubriques.join(' · ')}</Text>
+                    )}
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </>
+          )}
         </View>
       )}
-      ListHeaderComponent={
+
+      {resume.length > 0 && (
+        <View style={styles.resume}>
+          <Text style={styles.resumeTitre}>5 choses à retenir aujourd&apos;hui</Text>
+          {resume.map((a, i) => (
+            <TouchableOpacity key={a.id} onPress={() => navigation.navigate('Article', { slug: a.slug })}>
+              <Text style={styles.resumeItem}>{i + 1}. {a.titre}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      )}
+
+      {articles.length > 0 && (
         <>
-          <FlashBar articles={flashEtLive} />
-          <TickerVieChere prix={prix} />
-
-          {une && (
-            <TouchableOpacity style={styles.hero} activeOpacity={0.9} onPress={() => navigation.navigate('Article', { slug: une.slug })}>
-              <LinearGradient colors={[colors.navy2, colors.navy]} style={styles.heroImage}>
-                <FormatBadge format={une.format} />
-              </LinearGradient>
-              <Text style={[styles.heroRubrique, { color: une.rubrique?.couleur || colors.navy }]}>{une.rubrique?.nom}</Text>
-              <Text style={styles.heroTitre}>{une.titre}</Text>
-              {!!une.chapo && <Text style={styles.heroChapo}>{une.chapo}</Text>}
-              <Text style={styles.heroMeta}>{timeAgo(une.publieLe)} {une.auteur ? `· ${une.auteur.prenom} ${une.auteur.nom}` : ''}</Text>
-            </TouchableOpacity>
-          )}
-
-          {resume.length > 0 && (
-            <View style={styles.resumeCard}>
-              <Text style={styles.resumeTitle}>5 choses à retenir aujourd'hui</Text>
-              {resume.map((a, i) => (
-                <TouchableOpacity key={a.id} onPress={() => navigation.navigate('Article', { slug: a.slug })}>
-                  <Text style={styles.resumeItem}>{i + 1}. {a.titre}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          )}
-
-          {fc && (
-            <TouchableOpacity style={styles.factCheck} onPress={() => navigation.navigate('Article', { slug: fc.article.slug })}>
-              <View style={styles.factCheckIcon}><Text style={{ color: '#fff', fontWeight: '800' }}>✓</Text></View>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.factCheckLabel}>VÉRITÉ OU INTOX — {fc.verdict}</Text>
-                <Text style={styles.factCheckTitre} numberOfLines={2}>{fc.article.titre}</Text>
-              </View>
-            </TouchableOpacity>
-          )}
-
-          <Text style={styles.sectionTitle}>À la Une</Text>
+          <Text style={styles.section}>Les articles du jour</Text>
+          <View style={{ paddingHorizontal: 16 }}>
+            {articles.map((a) => <ArticleCard key={a.id} article={a} />)}
+          </View>
         </>
-      }
-      contentContainerStyle={{ paddingBottom: 24 }}
-    />
+      )}
+
+      <VisionneuseUne
+        edition={visionneuse}
+        onFermer={() => setVisionneuse(null)}
+        onSAbonner={() => navigation.navigate('Abonnement')}
+      />
+    </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   page: { flex: 1, backgroundColor: colors.cream },
-  center: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.cream },
-  loading: { color: colors.muted, fontSize: 13 },
-  hero: { margin: 16, marginBottom: 8 },
-  heroImage: { height: 180, borderRadius: 12 },
-  heroRubrique: { fontSize: 11, fontWeight: '700', textTransform: 'uppercase', marginTop: 10 },
-  heroTitre: { fontSize: 21, fontWeight: '800', color: colors.ink, marginTop: 6, lineHeight: 27 },
-  heroChapo: { fontSize: 13.5, color: colors.muted, marginTop: 8, lineHeight: 19 },
-  heroMeta: { fontSize: 10.5, color: colors.muted, marginTop: 10 },
-  resumeCard: { backgroundColor: colors.navy, marginHorizontal: 16, marginTop: 16, borderRadius: 12, padding: 16 },
-  resumeTitle: { color: '#fff', fontWeight: '700', fontSize: 15, marginBottom: 10 },
+  centre: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.cream },
+  attente: { color: colors.muted, fontSize: 13 },
+  bloc: { paddingHorizontal: 16, paddingTop: 16 },
+  eyebrow: { fontSize: 9.5, fontWeight: '800', letterSpacing: 1.1, color: colors.coral },
+  numero: { fontSize: 15, fontWeight: '700', color: colors.ink, marginTop: 4, marginBottom: 12 },
+  une: { borderRadius: 12, backgroundColor: colors.navy },
+  sousTitre: { fontSize: 12, fontWeight: '700', color: colors.muted, marginTop: 20, marginBottom: 10, letterSpacing: 0.4 },
+  grillePages: { flexDirection: 'row', flexWrap: 'wrap', marginHorizontal: -5 },
+  pageCarte: { width: '33.33%', paddingHorizontal: 5, marginBottom: 14 },
+  pageImage: { width: '100%', aspectRatio: 3 / 4, borderRadius: 8, backgroundColor: colors.navy },
+  pageNum: { fontSize: 10.5, fontWeight: '700', color: colors.ink, marginTop: 5 },
+  pageRub: { fontSize: 9, color: colors.muted, textTransform: 'capitalize' },
+  resume: { backgroundColor: colors.navy, marginHorizontal: 16, marginTop: 18, borderRadius: 12, padding: 16 },
+  resumeTitre: { color: '#fff', fontWeight: '700', fontSize: 15, marginBottom: 10 },
   resumeItem: { color: '#D8DCEA', fontSize: 12.5, lineHeight: 22 },
-  factCheck: { flexDirection: 'row', gap: 12, alignItems: 'center', backgroundColor: '#FBF3E4', marginHorizontal: 16, marginTop: 16, borderRadius: 12, padding: 16, borderWidth: 1, borderColor: '#F0DFB8' },
-  factCheckIcon: { width: 36, height: 36, borderRadius: 18, backgroundColor: colors.gold, alignItems: 'center', justifyContent: 'center' },
-  factCheckLabel: { fontSize: 9.5, fontWeight: '800', color: colors.gold, letterSpacing: 0.4 },
-  factCheckTitre: { fontSize: 13.5, fontWeight: '700', color: colors.ink, marginTop: 3 },
-  sectionTitle: { fontSize: 16, fontWeight: '800', color: colors.ink, marginHorizontal: 16, marginTop: 22, marginBottom: 10 },
+  section: { fontSize: 16, fontWeight: '800', color: colors.ink, marginHorizontal: 16, marginTop: 22, marginBottom: 10 },
 });

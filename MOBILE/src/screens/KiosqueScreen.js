@@ -1,25 +1,21 @@
 import { useCallback, useEffect, useState } from 'react';
-import {
-  View, Text, FlatList, TouchableOpacity, Image, Linking, StyleSheet,
-  ActivityIndicator, Modal, TextInput, Alert,
-} from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, Image, StyleSheet, ActivityIndicator } from 'react-native';
 import { editionsAPI } from '../api/api';
 import { colors } from '../theme/colors';
 import { formatDate } from '../utils/format';
+import VisionneuseUne from '../components/VisionneuseUne';
 
 const PAR_PAGE = 24;
 
 // Kiosque : les parutions du journal, la plus récente en tête. Le fonds
 // compte plusieurs centaines de numéros, d'où le chargement par pages au fil
 // du défilement plutôt qu'un lot figé.
-export default function KiosqueScreen() {
+export default function KiosqueScreen({ navigation }) {
   const [editions, setEditions] = useState([]);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [chargement, setChargement] = useState(true);
-  const [aDeverrouiller, setADeverrouiller] = useState(null);
-  const [code, setCode] = useState('');
-  const [envoi, setEnvoi] = useState(false);
+  const [ouverte, setOuverte] = useState(null);
 
   const charger = useCallback((numeroPage) => {
     setChargement(true);
@@ -41,22 +37,6 @@ export default function KiosqueScreen() {
     charger(suivante);
   };
 
-  // Le PDF complet est réservé aux abonnés : c'est le code qui l'ouvre, et
-  // l'API ne renvoie l'adresse du fichier qu'une fois le code accepté.
-  const ouvrirPdf = async () => {
-    setEnvoi(true);
-    try {
-      const { data } = await editionsAPI.deverrouiller(aDeverrouiller.id, code.trim().toUpperCase());
-      setADeverrouiller(null);
-      setCode('');
-      if (data.pdfUrl) Linking.openURL(data.pdfUrl);
-    } catch (err) {
-      Alert.alert('Code refusé', err.response?.data?.error || "Ce code ne correspond à aucun abonnement.");
-    } finally {
-      setEnvoi(false);
-    }
-  };
-
   return (
     <View style={styles.page}>
       <View style={styles.header}>
@@ -75,7 +55,7 @@ export default function KiosqueScreen() {
         onEndReached={suite}
         onEndReachedThreshold={0.6}
         renderItem={({ item }) => (
-          <TouchableOpacity style={styles.card} onPress={() => setADeverrouiller(item)}>
+          <TouchableOpacity style={styles.card} onPress={() => setOuverte(item)}>
             <View style={styles.cover}>
               {item.couvertureUrl ? (
                 <Image source={{ uri: item.couvertureUrl }} style={styles.image} resizeMode="cover" />
@@ -91,35 +71,12 @@ export default function KiosqueScreen() {
         ListEmptyComponent={!chargement && <Text style={styles.empty}>Aucune édition en ligne pour le moment.</Text>}
       />
 
-      <Modal visible={!!aDeverrouiller} transparent animationType="fade" onRequestClose={() => setADeverrouiller(null)}>
-        <View style={styles.fond}>
-          <View style={styles.boite}>
-            <Text style={styles.boiteTitre}>Numéro {aDeverrouiller?.numero}</Text>
-            <Text style={styles.boiteTexte}>
-              Le journal complet en PDF est réservé aux abonnés. Saisissez le code reçu par mail.
-            </Text>
-            <TextInput
-              value={code}
-              onChangeText={(t) => setCode(t.toUpperCase())}
-              placeholder="NV-XXXXXX"
-              placeholderTextColor={colors.muted}
-              autoCapitalize="characters"
-              autoCorrect={false}
-              style={styles.input}
-            />
-            <TouchableOpacity
-              style={[styles.btn, (!code || envoi) && styles.btnInactif]}
-              onPress={ouvrirPdf}
-              disabled={!code || envoi}
-            >
-              {envoi ? <ActivityIndicator color="#fff" size="small" /> : <Text style={styles.btnText}>Ouvrir le PDF</Text>}
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => { setADeverrouiller(null); setCode(''); }}>
-              <Text style={styles.annuler}>Annuler</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
+      <VisionneuseUne
+        edition={ouverte}
+        onFermer={() => setOuverte(null)}
+        onSAbonner={() => navigation.navigate('Abonnement')}
+      />
+
     </View>
   );
 }
@@ -137,13 +94,4 @@ const styles = StyleSheet.create({
   numero: { fontSize: 10.5, fontWeight: '700', color: colors.ink, marginTop: 6 },
   date: { fontSize: 9, color: colors.muted },
   empty: { textAlign: 'center', color: colors.muted, fontSize: 13, marginTop: 40 },
-  fond: { flex: 1, backgroundColor: 'rgba(7,39,66,0.75)', alignItems: 'center', justifyContent: 'center', padding: 28 },
-  boite: { backgroundColor: colors.paper, borderRadius: 16, padding: 22, width: '100%' },
-  boiteTitre: { fontSize: 17, fontWeight: '800', color: colors.ink },
-  boiteTexte: { fontSize: 13, color: colors.muted, marginTop: 8, lineHeight: 19 },
-  input: { borderWidth: 1, borderColor: colors.line, borderRadius: 100, paddingHorizontal: 16, paddingVertical: 11, fontSize: 13.5, color: colors.ink, letterSpacing: 1, marginTop: 16 },
-  btn: { backgroundColor: colors.coral, borderRadius: 100, paddingVertical: 13, marginTop: 12, alignItems: 'center' },
-  btnInactif: { opacity: 0.5 },
-  btnText: { color: '#fff', fontWeight: '700', fontSize: 13.5 },
-  annuler: { textAlign: 'center', color: colors.muted, fontSize: 12.5, marginTop: 14 },
 });
