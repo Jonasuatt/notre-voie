@@ -10,7 +10,9 @@ export default function PortailScreen({ navigation }) {
   return (
     <SafeAreaView style={styles.page}>
       <View style={styles.centre}>
-        <Image source={require('../../assets/icon.png')} style={styles.logo} resizeMode="contain" />
+        {/* Logo complet du journal — avec sa signature et son adresse —
+            plutôt que l'icône carrée de l'app, qui les perd. */}
+        <Image source={require('../../assets/logo-portail.png')} style={styles.logo} resizeMode="contain" />
         <Text style={styles.surtitre}>CHOISISSEZ VOTRE ÉDITION</Text>
         <Text style={styles.titre}>Aussi rapide que les réseaux sociaux, aussi fiable qu&apos;un journal</Text>
 
@@ -50,7 +52,7 @@ export default function PortailScreen({ navigation }) {
 const styles = StyleSheet.create({
   page: { flex: 1, backgroundColor: colors.ink },
   centre: { flex: 1, justifyContent: 'center', paddingHorizontal: 22 },
-  logo: { width: 132, height: 92, alignSelf: 'center', marginBottom: 22 },
+  logo: { width: 244, height: 94, alignSelf: 'center', marginBottom: 22 },
   surtitre: { fontSize: 10, fontWeight: '700', letterSpacing: 1.6, color: 'rgba(255,255,255,0.42)', textAlign: 'center' },
   titre: { fontSize: 21, fontWeight: '700', color: '#fff', textAlign: 'center', marginTop: 8, lineHeight: 28 },
   carte: { borderRadius: 18, padding: 20, marginTop: 18 },
