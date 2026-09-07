@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { getArticleBySlug } from '@/lib/api';
 import FormatBadge from '@/components/FormatBadge';
 import Paywall from '@/components/Paywall';
+import MentionSponsor from '@/components/MentionSponsor';
 import { formatDate, timeAgo } from '@/lib/format';
 
 const BASE_PATH = '/info-direct';
@@ -50,6 +51,12 @@ export default async function ArticlePage({ params }) {
           </Link>
         ))}
       </div>
+
+      {article.sponsorNom && (
+        <div className="mt-4">
+          <MentionSponsor article={article} />
+        </div>
+      )}
 
       <h1 className="font-serif text-[28px] sm:text-[32px] leading-tight mt-3">{article.titre}</h1>
       {article.chapo && <p className="text-muted text-[16px] mt-3 leading-relaxed">{article.chapo}</p>}

@@ -271,6 +271,13 @@ model Article {
   validePar   Staff?  @relation("ArticleValidateur", fields: [valideParId], references: [id])
   valideParId String?
 
+  // Contenu payé par un tiers. La mention est obligatoire : un lecteur doit
+  // savoir qu'il lit un contenu commercial, et un journal qui l'omet engage
+  // sa responsabilité autant que sa crédibilité. Renseigner `sponsorNom`
+  // suffit à déclencher l'affichage côté site et application.
+  sponsorNom     String?
+  sponsorMention String? @default("Contenu sponsorisé")
+
   imageUneUrl    String? // visuel principal (carte d'article + Une)
   dureeEcouteSec Int? // durée de la version audio, si générée
 

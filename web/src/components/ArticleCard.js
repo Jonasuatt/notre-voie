@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import FormatBadge from './FormatBadge';
+import MentionSponsor from './MentionSponsor';
 import { timeAgo } from '@/lib/format';
 
 export default function ArticleCard({ article, basePath = '' }) {
@@ -14,6 +15,7 @@ export default function ArticleCard({ article, basePath = '' }) {
           />
         )}
         <FormatBadge format={article.format} />
+        <MentionSponsor article={article} compact />
         {article.paywall === 'PAYANT' && (
           <span className="absolute top-2.5 right-2.5 bg-ink/70 text-white text-[9px] font-mono px-1.5 py-1 rounded">Abonnés</span>
         )}
