@@ -122,6 +122,20 @@ enum FormatPub {
   NATIVE_CARTE // Format publicitaire natif inspiré des cartes d'article
   BANNIERE
   TICKER_SPONSOR // Sponsoring du ticker Vie chère ou d'une rubrique
+  ARTICLE_SPONSORISE // Article de la rédaction dont la diffusion est sponsorisée
+  PUBLI_REPORTAGE // Contenu fourni par l'annonceur, signalé comme tel
+  RUBRIQUE_SPONSORISEE // Présence permanente sur une rubrique entière
+}
+
+enum SupportPub {
+  PRESSE // Journal papier — calibres en millimètres
+  NUMERIQUE // Site et application
+  ENCARTAGE // Insertion d'un document dans le tirage
+}
+
+enum TypeOption {
+  MAJORATION
+  REMISE
 }
 
 enum StatutCampagne {
@@ -519,6 +533,49 @@ model Transaction {
 // =====================================================================
 // RÉGIE PUBLICITAIRE (CMS 1)
 // =====================================================================
+
+// Grille tarifaire de la régie — reprise du tarif officiel du journal.
+// Les calibres (C10 à C68) sont ceux du papier : leur nom, leurs dimensions
+// en millimètres et leur prix hors taxes sont ceux que la régie facture déjà.
+// Les emplacements numériques s'y ajoutent avec la même mécanique, pour que
+// la régie vende les deux supports depuis un seul barème.
+model TarifPublicitaire {
+  id        String        @id @default(uuid())
+  code      String        @unique // C60, C32, NUM-NATIF…
+  libelle   String? // "Pleine page", "½ page"…
+  support   SupportPub    @default(PRESSE)
+  largeurMm Int?
+  hauteurMm Int?
+  tarifHT   Int // FCFA hors taxes
+  // Un publi-reportage n'est pas facturé au même prix qu'une annonce de même
+  // calibre : le tarif dédié est porté ici plutôt que dans une seconde grille.
+  tarifPubliReportageHT Int?
+  ordre     Int           @default(0)
+  actif     Boolean       @default(true)
+
+  createdAt DateTime @default(now())
+
+  @@map("tarifs_publicitaires")
+}
+
+// Majorations et remises applicables à un montant hors taxes. Modélisées
+// plutôt que codées en dur : la régie doit pouvoir ajuster un taux sans
+// qu'on retouche l'application.
+model OptionTarifaire {
+  id       String     @id @default(uuid())
+  code     String     @unique
+  libelle  String
+  type     TypeOption @default(MAJORATION)
+  // Pourcentage appliqué au montant HT (ex. 50 pour +50 %), ou montant fixe
+  // en FCFA selon `estForfait`.
+  valeur     Int
+  estForfait Boolean  @default(false)
+  note       String?
+  ordre      Int      @default(0)
+  actif      Boolean  @default(true)
+
+  @@map("options_tarifaires")
+}
 
 model Annonceur {
   id        String   @id @default(uuid())

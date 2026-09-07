@@ -1631,6 +1631,110 @@ async function fixCasseArchives() {
   console.log(`✔ Casse relue sur ${aTraiter.length} article(s) d'archive (${corriges} modifié(s)).`);
 }
 
+// Tarif publicitaire officiel du journal (document « Nos tarifs publicitaires »,
+// régie — AKHO A. Claude). Les calibres, dimensions et prix hors taxes sont
+// repris tels quels : c'est ce que la régie facture, pas une reconstitution.
+const TARIFS_PRESSE = [
+  { code: 'C60', libelle: 'Pleine page', l: 276, h: 345, ht: 480000, publi: 400000 },
+  { code: 'C61', libelle: null, l: 276, h: 260, ht: 360000 },
+  { code: 'C62', libelle: '½ page', l: 276, h: 172, ht: 300000, publi: 250000 },
+  { code: 'C63', libelle: null, l: 276, h: 130, ht: 200000 },
+  { code: 'C64', libelle: null, l: 276, h: 86, ht: 150000 },
+  { code: 'C68', libelle: null, l: 276, h: 43, ht: 100000 },
+  { code: 'C51', libelle: null, l: 230, h: 260, ht: 300000 },
+  { code: 'C52', libelle: null, l: 230, h: 172, ht: 200000 },
+  { code: 'C54', libelle: null, l: 230, h: 86, ht: 100000 },
+  { code: 'C40', libelle: null, l: 184, h: 345, ht: 320000 },
+  { code: 'C41', libelle: null, l: 184, h: 260, ht: 300000, publi: 250000 },
+  { code: 'C43', libelle: null, l: 184, h: 130, ht: 150000 },
+  { code: 'C44', libelle: null, l: 184, h: 86, ht: 80000 },
+  { code: 'C30', libelle: null, l: 138, h: 345, ht: 300000 },
+  { code: 'C31', libelle: null, l: 138, h: 260, ht: 200000 },
+  { code: 'C32', libelle: '¼ page', l: 138, h: 172, ht: 150000, publi: 200000 },
+  { code: 'C33', libelle: null, l: 138, h: 130, ht: 90000 },
+  { code: 'C34', libelle: '1/8 page', l: 138, h: 86, ht: 60000 },
+  { code: 'C38', libelle: null, l: 138, h: 43, ht: 30000 },
+  { code: 'C20', libelle: null, l: 92, h: 345, ht: 200000 },
+  { code: 'C21', libelle: null, l: 92, h: 260, ht: 150000 },
+  { code: 'C22', libelle: null, l: 92, h: 172, ht: 100000 },
+  { code: 'C23', libelle: null, l: 92, h: 130, ht: 60000 },
+  { code: 'C24', libelle: null, l: 92, h: 86, ht: 40000 },
+  { code: 'C28', libelle: null, l: 92, h: 43, ht: 20000 },
+  { code: 'C10', libelle: null, l: 46, h: 345, ht: 100000 },
+  { code: 'C11', libelle: null, l: 46, h: 260, ht: 60000 },
+  { code: 'C12', libelle: null, l: 46, h: 172, ht: 40000 },
+];
+
+// Emplacements de première de couverture — facturés au forfait, hors grille
+// des calibres courants.
+const TARIFS_UNE = [
+  { code: 'UNE-OREILLE', libelle: 'Une — oreille / manchette (calibre C24)', l: 92, h: 86, ht: 150000 },
+  { code: 'UNE-BANDEAU-NB', libelle: 'Une — bandeau noir et blanc (calibre C68)', l: 276, h: 43, ht: 200000 },
+  { code: 'UNE-BANDEAU-QUADRI', libelle: 'Une — bandeau quadrichromie (calibre C68)', l: 276, h: 43, ht: 300000 },
+];
+
+const OPTIONS_TARIFAIRES = [
+  { code: 'QUADRI', libelle: 'Quadrichromie', type: 'MAJORATION', valeur: 50, note: 'Appliquée au montant hors taxes.' },
+  { code: 'COULEUR', libelle: 'Supplément couleur', type: 'MAJORATION', valeur: 30, note: 'Appliqué au montant hors taxes.' },
+  { code: 'FRAIS-TECHNIQUES', libelle: 'Frais techniques', type: 'MAJORATION', valeur: 20, note: 'Composition ou retouche de la création fournie.' },
+  { code: 'EMPLACEMENT', libelle: 'Emplacement de rigueur', type: 'MAJORATION', valeur: 30, note: "Page et position imposées par l'annonceur." },
+  {
+    code: 'REMISE-CULTURE',
+    libelle: 'Spectacles, cinéma, culture et sport',
+    type: 'REMISE',
+    valeur: 50,
+    note: 'Manifestations culturelles et sportives, restaurants et night-clubs non sponsorisés par des marques.',
+  },
+];
+
+// Encartage : un droit fixe selon le tirage, auquel s'ajoute un prix à la
+// feuille. Modélisé en options forfaitaires pour rester lisible au devis.
+const OPTIONS_ENCARTAGE = [
+  { code: 'ENCART-DROIT-5000', libelle: "Encartage — droit d'asile jusqu'à 5 000 exemplaires", type: 'MAJORATION', valeur: 400000, forfait: true, note: 'Plus 20 F la feuille simple, 25 F la feuille double.' },
+  { code: 'ENCART-DROIT-PLUS', libelle: "Encartage — droit d'asile au-delà de 5 000 exemplaires", type: 'MAJORATION', valeur: 700000, forfait: true, note: 'Plus 20 F la feuille simple, 25 F la feuille double.' },
+];
+
+async function seedTarifsPublicitaires() {
+  let n = 0;
+  const poser = async (t, support, ordre) => {
+    await prisma.tarifPublicitaire.upsert({
+      where: { code: t.code },
+      update: {},
+      create: {
+        code: t.code,
+        libelle: t.libelle || null,
+        support,
+        largeurMm: t.l || null,
+        hauteurMm: t.h || null,
+        tarifHT: t.ht,
+        tarifPubliReportageHT: t.publi || null,
+        ordre,
+      },
+    });
+    n++;
+  };
+  for (const [i, t] of TARIFS_PRESSE.entries()) await poser(t, 'PRESSE', i);
+  for (const [i, t] of TARIFS_UNE.entries()) await poser(t, 'PRESSE', 100 + i);
+
+  let o = 0;
+  for (const opt of [...OPTIONS_TARIFAIRES, ...OPTIONS_ENCARTAGE]) {
+    await prisma.optionTarifaire.upsert({
+      where: { code: opt.code },
+      update: {},
+      create: {
+        code: opt.code,
+        libelle: opt.libelle,
+        type: opt.type,
+        valeur: opt.valeur,
+        estForfait: Boolean(opt.forfait),
+        note: opt.note || null,
+        ordre: o++,
+      },
+    });
+  }
+  console.log(`✔ Grille régie : ${n} calibre(s) et ${o} option(s) tarifaire(s).`);
+}
+
 async function seedEditions() {
   const editions = [
     { numero: 7961, dateParution: "2026-07-30", pdfUrl: "https://res.cloudinary.com/ataat5bs/raw/upload/v1787194110/notre-voie/edition/nv5erwj7eoplvj4f7i5q.pdf", couvertureUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787194106/notre-voie/une/elo8nuazwzz1vboa9oma.jpg" },
@@ -2599,6 +2703,7 @@ async function main() {
   await seedArticlesArchives().catch((e) => console.error('Archives non importées :', e.message));
   await seedPaywallArchives().catch((e) => console.error('Paywall archives :', e.message));
   await seedCodeLectureDemo().catch((e) => console.error('Code de lecture démo :', e.message));
+  await seedTarifsPublicitaires().catch((e) => console.error('Grille régie :', e.message));
   await fixCasseArchives().catch((e) => console.error('Casse des archives :', e.message));
   await seedCodeAccesDemo();
   await fixArticleDates();
