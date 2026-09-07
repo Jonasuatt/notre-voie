@@ -1740,12 +1740,13 @@ async function seedTarifsPublicitaires() {
 // milliers d'articles, plus du tout ensuite. L'expression doit rester
 // identique à CHAMP_TEXTE dans cerveau.controller.js : si elles divergent,
 // la recherche continue de répondre juste, mais sans profiter de l'index.
+// Les tags en sont absents des deux côtés — array_to_string n'étant pas
+// immutable, PostgreSQL refuse de l'indexer.
 async function seedIndexRecherche() {
   await prisma.$executeRawUnsafe(`
     CREATE INDEX IF NOT EXISTS articles_recherche_idx ON articles USING GIN ((
       setweight(to_tsvector('french', coalesce(titre, '')), 'A') ||
       setweight(to_tsvector('french', coalesce(chapo, '')), 'B') ||
-      setweight(to_tsvector('french', coalesce(array_to_string(tags, ' '), '')), 'B') ||
       setweight(to_tsvector('french', regexp_replace(coalesce("contenuHtml", ''), '<[^>]+>', ' ', 'g')), 'C')
     ))
   `);

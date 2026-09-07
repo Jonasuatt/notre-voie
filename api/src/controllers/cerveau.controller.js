@@ -14,10 +14,13 @@ const asyncHandler = require('../utils/asyncHandler');
 //
 // Le texte cherché est nettoyé de ses balises à la volée : le corps est stocké
 // en HTML, et sans cela une recherche sur « p » remonterait tout le fonds.
+// Les tags sont absents de cette expression à dessein : array_to_string n'est
+// pas immutable, et PostgreSQL refuse alors d'indexer l'expression. Ils sont
+// de toute façon presque toujours des mots déjà présents dans le texte, et
+// le rapprochement d'articles, lui, continue de s'appuyer dessus.
 const CHAMP_TEXTE = `
   setweight(to_tsvector('french', coalesce(a.titre, '')), 'A') ||
   setweight(to_tsvector('french', coalesce(a.chapo, '')), 'B') ||
-  setweight(to_tsvector('french', coalesce(array_to_string(a.tags, ' '), '')), 'B') ||
   setweight(to_tsvector('french', regexp_replace(coalesce(a."contenuHtml", ''), '<[^>]+>', ' ', 'g')), 'C')
 `;
 
