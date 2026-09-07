@@ -114,6 +114,14 @@ Raccorder Orange Money — le plus mature des trois — demande un contrat march
 
 Annonceurs, campagnes ciblées par rubrique, région et format, statistiques de diffusion et facturation sont modélisés et pilotables depuis le CMS Administration.
 
+**La grille tarifaire officielle est en base** : les 28 calibres du tarif papier (C10 à C68) avec leurs dimensions et leurs prix hors taxes, les emplacements de première de couverture, les tarifs publi-reportage et l'encartage. Majorations et remises — quadrichromie +50 %, couleur +30 %, frais techniques +20 %, emplacement de rigueur +30 %, remise culture et sport −50 % — sont modélisées : la régie ajuste un taux sans intervention technique.
+
+Un **simulateur de devis** calcule le montant depuis le CMS : calibre, nombre de parutions, publi-reportage, options. Le calcul est fait par l'API, jamais par le navigateur — c'est un prix annoncé à un annonceur.
+
+Trois formats de diffusion sponsorisée sont prévus dans le modèle : **article sponsorisé**, **publi-reportage** et **rubrique sponsorisée**.
+
+⚠ **Règle déontologique à tenir** : tout contenu payé par un annonceur doit être identifié comme tel pour le lecteur, visiblement et sans ambiguïté. L'affichage de cette mention sur le site et l'application reste à faire. C'est ce qui sépare un journal d'un support publicitaire, et un manquement se paierait en crédibilité — le capital que la plateforme est censée valoriser.
+
 ### 6.5 Prix
 
 | Élément | Valeur actuelle | Statut |
@@ -170,7 +178,33 @@ Emploi, immobilier, véhicules, services. Même logique de dépôt en libre-serv
 Un compte unique pour une administration, une entreprise ou une école, ouvrant l'accès à N lecteurs. Les institutions paient volontiers un abonnement groupé là où les particuliers hésitent, et le recouvrement est plus simple : une facture au lieu de mille micro-paiements.
 **Suppose** : la gestion multi-comptes, la facturation.
 
-### 9.4 💡 Espace annonceur en libre-service — *effort moyen à lourd*
+### 9.4 💡 Offres accessibles aux petits annonceurs — *effort léger, marché nouveau*
+
+Le plus petit calibre du tarif papier est à 20 000 FCFA. Un coiffeur, un mécanicien, une couturière, un vendeur de pièces détachées ne peuvent pas y entrer — alors qu'ils sont des milliers et qu'aucun quotidien ne les sert.
+
+Trois formules à étudier :
+
+- **L'annonce à la ligne**, de 1 000 à 5 000 FCFA, dans une page dédiée. Le prix d'un plat de maquis, pas d'une campagne.
+- **La formule artisan**, un petit encart numérique récurrent à prix mensuel fixe — de l'ordre de 15 000 FCFA — sans négociation ni devis. La simplicité vaut ici autant que le prix : un artisan n'a pas de service marketing.
+- **Le tarif de première annonce**, une remise de découverte pour un annonceur qui n'a jamais acheté d'espace. Le premier achat est l'obstacle ; les suivants viennent seuls.
+
+Le volume compense le prix unitaire, et ces annonceurs deviennent une base de revenus indépendante des grands comptes — donc moins sensible aux aléas politiques qui pèsent sur la publicité institutionnelle.
+
+**Suppose** : le paiement raccordé, un dépôt en libre-service, une modération.
+
+### 9.5 💡 Offre coopératives et groupements — *effort moyen, ancrage territorial*
+
+Les coopératives structurent l'économie rurale ivoirienne — café-cacao, anacarde, hévéa, vivriers. Elles ont des moyens collectifs qu'aucun de leurs membres n'a seul, une actualité réelle (campagnes d'achat, prix garantis, assemblées générales, certifications) et un besoin de visibilité auprès des pouvoirs publics.
+
+- **L'espace mutualisé** : la coopérative achète un emplacement, ses membres s'y partagent quelques lignes chacun.
+- **Le publi-reportage coopératif**, au tarif C32 ou C41, sur une campagne ou une réalisation.
+- **L'abonnement groupé** pour les responsables, qui rejoint l'abonnement institutionnel (§9.3).
+
+L'intérêt dépasse le chiffre d'affaires : ces annonceurs amènent une matière éditoriale que le journal cherche déjà — les Régions, la Vie chère, l'agriculture — à condition de tenir la frontière entre ce qui est acheté et ce qui est écrit par la rédaction.
+
+**Suppose** : un démarchage de terrain, une grille dédiée, et la mention de contenu sponsorisé mentionnée au §6.4.
+
+### 9.6 💡 Espace annonceur en libre-service — *effort moyen à lourd*
 Aujourd'hui la régie saisit les campagnes. Un espace où l'annonceur dépose lui-même sa création, choisit son ciblage et suit ses statistiques réduit la charge de la régie et rend le tableau de bord temps réel — déjà identifié comme argument commercial différenciant — directement démontrable.
 **Suppose** : le paiement raccordé, une validation avant diffusion.
 
