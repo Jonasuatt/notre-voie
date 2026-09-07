@@ -4,6 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { articlesAPI, paiementsAPI } from '../api/api';
 import { useAuth } from '../context/AuthContext';
 import FormatBadge from '../components/FormatBadge';
+import MentionSponsor from '../components/MentionSponsor';
 import Paywall from '../components/Paywall';
 import { colors } from '../theme/colors';
 import { formatDate, timeAgo } from '../utils/format';
@@ -55,6 +56,7 @@ export default function ArticleScreen({ route }) {
         <Text style={[styles.rubrique, { color: article.rubrique?.couleur || colors.navy }]}>{article.rubrique?.nom}</Text>
       </View>
 
+      <MentionSponsor article={article} />
       <Text style={styles.titre}>{article.titre}</Text>
       {!!article.chapo && <Text style={styles.chapo}>{article.chapo}</Text>}
 

@@ -2,6 +2,7 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import FormatBadge from './FormatBadge';
+import MentionSponsor from './MentionSponsor';
 import { colors } from '../theme/colors';
 import { timeAgo } from '../utils/format';
 
@@ -26,6 +27,7 @@ export default function ArticleCard({ article }) {
         <Text style={[styles.rubrique, { color: article.rubrique?.couleur || colors.navy }]}>
           {article.rubrique?.nom}
         </Text>
+        <MentionSponsor article={article} compact />
         <Text style={styles.titre} numberOfLines={2}>{article.titre}</Text>
         {!!article.chapo && <Text style={styles.chapo} numberOfLines={2}>{article.chapo}</Text>}
         <Text style={styles.meta}>{timeAgo(article.publieLe)}</Text>
