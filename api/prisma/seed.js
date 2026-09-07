@@ -1735,6 +1735,22 @@ async function seedTarifsPublicitaires() {
   console.log(`✔ Grille régie : ${n} calibre(s) et ${o} option(s) tarifaire(s).`);
 }
 
+// Index de recherche du Cerveau numérique. Sans lui, chaque recherche
+// recalcule le vecteur lexical de tout le fonds — supportable sur quelques
+// milliers d'articles, plus du tout ensuite. L'expression doit rester
+// identique à CHAMP_TEXTE dans cerveau.controller.js : si elles divergent,
+// la recherche continue de répondre juste, mais sans profiter de l'index.
+async function seedIndexRecherche() {
+  await prisma.$executeRawUnsafe(`
+    CREATE INDEX IF NOT EXISTS articles_recherche_idx ON articles USING GIN ((
+      setweight(to_tsvector('french', coalesce(titre, '')), 'A') ||
+      setweight(to_tsvector('french', coalesce(chapo, '')), 'B') ||
+      setweight(to_tsvector('french', coalesce(array_to_string(tags, ' '), '')), 'B') ||
+      setweight(to_tsvector('french', regexp_replace(coalesce("contenuHtml", ''), '<[^>]+>', ' ', 'g')), 'C')
+    ))
+  `);
+}
+
 async function seedEditions() {
   const editions = [
     { numero: 7961, dateParution: "2026-07-30", pdfUrl: "https://res.cloudinary.com/ataat5bs/raw/upload/v1787194110/notre-voie/edition/nv5erwj7eoplvj4f7i5q.pdf", couvertureUrl: "https://res.cloudinary.com/ataat5bs/image/upload/v1787194106/notre-voie/une/elo8nuazwzz1vboa9oma.jpg" },
@@ -2704,6 +2720,7 @@ async function main() {
   await seedPaywallArchives().catch((e) => console.error('Paywall archives :', e.message));
   await seedCodeLectureDemo().catch((e) => console.error('Code de lecture démo :', e.message));
   await seedTarifsPublicitaires().catch((e) => console.error('Grille régie :', e.message));
+  await seedIndexRecherche().catch((e) => console.error('Index de recherche :', e.message));
   await fixCasseArchives().catch((e) => console.error('Casse des archives :', e.message));
   await seedCodeAccesDemo();
   await fixArticleDates();
