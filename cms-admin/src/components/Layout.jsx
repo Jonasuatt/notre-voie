@@ -3,13 +3,15 @@ import { useAuth } from '../contexts/AuthContext';
 import { ROLE_LABELS, ROLE_COLORS } from '../utils/constants';
 import {
   HomeIcon, MegaphoneIcon, BuildingStorefrontIcon, UsersIcon, LifebuoyIcon,
-  ArrowRightOnRectangleIcon,
+  ArrowRightOnRectangleIcon, CurrencyDollarIcon, SparklesIcon,
 } from '@heroicons/react/24/outline';
 
 const NAV = [
   { to: '/', label: 'Tableau de bord', icon: HomeIcon, exact: true, roles: ['ADMIN', 'REGIE'] },
   { to: '/campagnes', label: 'Campagnes', icon: MegaphoneIcon, roles: ['ADMIN', 'REGIE'] },
   { to: '/annonceurs', label: 'Annonceurs', icon: BuildingStorefrontIcon, roles: ['ADMIN', 'REGIE'] },
+  { to: '/tarifs', label: 'Tarifs', icon: CurrencyDollarIcon, roles: ['ADMIN', 'REGIE'] },
+  { to: '/cerveau', label: 'Cerveau numérique', icon: SparklesIcon, roles: ['ADMIN', 'REGIE'] },
   { to: '/comptes', label: 'Comptes', icon: UsersIcon, roles: ['ADMIN'] },
   { to: '/guide', label: "Guide d'utilisation", icon: LifebuoyIcon, roles: ['ADMIN', 'REGIE'] },
 ];

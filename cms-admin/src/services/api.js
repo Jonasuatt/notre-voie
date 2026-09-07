@@ -56,4 +56,17 @@ export const campagnesAPI = {
     api.patch(`/campagnes/${campagneId}/factures/${factureId}`, { statut }),
 };
 
+export const tarifsAPI = {
+  getAll: () => api.get('/tarifs'),
+  devis: (data) => api.post('/tarifs/devis', data),
+  enregistrer: (data) => api.post('/tarifs', data),
+  majOption: (id, data) => api.patch(`/tarifs/options/${id}`, data),
+};
+
+export const cerveauAPI = {
+  apercu: () => api.get('/cerveau/apercu'),
+  recherche: (params) => api.get('/cerveau/recherche', { params }),
+  similaires: (id) => api.get(`/cerveau/similaires/${id}`),
+};
+
 export default api;

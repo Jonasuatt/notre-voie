@@ -10,6 +10,7 @@ import PrixVieCherePage from './pages/PrixVieCherePage';
 import EditionsPage from './pages/EditionsPage';
 import MediathequePage from './pages/MediathequePage';
 import GuidePage from './pages/GuidePage';
+import CerveauPage from './pages/CerveauPage';
 
 export default function App() {
   return (
@@ -32,6 +33,7 @@ export default function App() {
           <Route path="prix-vie-chere" element={<PrixVieCherePage />} />
           <Route path="editions" element={<EditionsPage />} />
           <Route path="mediatheque" element={<MediathequePage />} />
+          <Route path="cerveau" element={<CerveauPage />} />
           <Route path="guide" element={<GuidePage />} />
         </Route>
 

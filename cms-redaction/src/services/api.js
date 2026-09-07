@@ -116,4 +116,10 @@ export const notificationsAPI = {
   envoyer: (id) => api.post(`/notifications/${id}/envoyer`),
 };
 
+export const cerveauAPI = {
+  apercu: () => api.get('/cerveau/apercu'),
+  recherche: (params) => api.get('/cerveau/recherche', { params }),
+  similaires: (id) => api.get(`/cerveau/similaires/${id}`),
+};
+
 export default api;
