@@ -255,7 +255,96 @@ Aujourd'hui l'import du PDF est un travail d'atelier. Un écran du CMS où la ma
 
 # Partie IV — Décisions et suites
 
-## 13. Ce qui reste à faire sur l'existant
+## 13. Ce que représente la plateforme
+
+> **Ces chiffres sont des estimations, pas un devis.** Les coûts d'hébergement sont les tarifs publics affichés au 7 septembre 2026 et doivent être revérifiés avant tout engagement. Les charges humaines sont des ordres de grandeur du marché ivoirien, à confronter à des offres réelles. La conversion retenue est 1 USD ≈ 600 FCFA (taux flottant) et 1 EUR = 655,957 FCFA (parité fixe).
+
+### 13.1 Ce qui a été construit — mesures
+
+| Élément | Volume |
+|---|---|
+| Code applicatif | ~13 600 lignes réparties sur 5 applications |
+| Amorçage et données de référence | ~2 900 lignes |
+| Modèle de données | 19 tables, 17 énumérations |
+| API | 16 familles de routes |
+| Contenu en base | 245 numéros, 1 960 pages, 4 119 articles, 49 rubriques |
+| Documentation | 4 documents de référence |
+
+### 13.2 Valeur de remplacement
+
+Combien coûterait la **même** plateforme confiée à un prestataire, par les méthodes habituelles ? C'est la question utile : elle dit ce que la maison possède aujourd'hui.
+
+| Lot | Charge estimée |
+|---|---|
+| Cadrage, maquettes, modèle de données | 15 – 20 jours |
+| API et base de données | 30 – 40 jours |
+| Site public (deux éditions, kiosque, paywall) | 30 – 40 jours |
+| CMS Rédaction et CMS Administration | 40 – 50 jours |
+| Application mobile | 30 – 40 jours |
+| Intégration, recette, mise en production, formation | 20 – 25 jours |
+| **Total** | **165 – 215 jours-homme** |
+
+Aux tarifs pratiqués en Côte d'Ivoire :
+
+| Intervenant | Tarif journalier | Coût de la plateforme |
+|---|---|---|
+| Développeur indépendant expérimenté | 50 000 – 100 000 FCFA | **8 – 21 millions FCFA** |
+| Agence ou SSII locale | 150 000 – 300 000 FCFA | **25 – 65 millions FCFA** |
+
+L'écart entre les deux lignes est celui du risque porté : une agence facture aussi la garantie de livrer, la continuité si quelqu'un part, et l'engagement contractuel.
+
+### 13.3 Durée
+
+**Ce qui s'est réellement passé** : premier commit le 18 août 2026, état actuel le 7 septembre — **21 jours calendaires, 11 journées de travail effectives, 106 versions livrées**.
+
+Ce rythme tient à la méthode employée et ne doit pas servir de référence pour estimer une suite confiée à un tiers. Par les voies classiques, le même périmètre demanderait **8 à 11 mois** à un développeur seul, ou **4 à 6 mois** à une équipe de deux ou trois — c'est d'ailleurs l'ordre de grandeur qu'annonçait le cadrage initial d'août.
+
+**Ce qui reste avant une exploitation commerciale complète** :
+
+| Chantier | Charge | Nature |
+|---|---|---|
+| Raccordement mobile money | 5 – 10 jours après contrat | Le délai réel est celui de la démarche marchande, pas du code |
+| Sauvegardes automatiques | 1 – 2 jours | **À faire en premier** |
+| Envoi automatique des codes par mail | 2 – 3 jours | |
+| Publication Play Store | 2 – 3 jours | Hors délai de validation Google (2 à 7 jours) |
+| Application iOS | 20 – 30 jours | Si retenue |
+
+### 13.4 Budget de fonctionnement annuel
+
+**Socle technique — indispensable**
+
+| Poste | Coût annuel | Remarque |
+|---|---|---|
+| Hébergement (Railway, offre payante) | 150 000 – 350 000 FCFA | Supprime la mise en veille de l'API |
+| Médias (Cloudinary) | 0 – 650 000 FCFA | Gratuit tant que le trafic reste modeste ; l'offre supérieure devient nécessaire si le kiosque est très consulté |
+| Nom de domaine | 10 000 – 35 000 FCFA | Selon extension (.com ou .ci) |
+| Envoi d'e-mails | 0 – 150 000 FCFA | Gratuit jusqu'à quelques milliers d'envois par mois |
+| Compte développeur Google | 15 000 FCFA | **Une seule fois**, pas annuel |
+| Compte développeur Apple | 60 000 FCFA | Seulement si iOS |
+| **Sous-total** | **~175 000 à 1 250 000 FCFA** | |
+
+**Maintenance humaine — le poste déterminant**
+
+C'est ici que se joue le budget réel. Une plateforme éditoriale ne s'arrête pas de vivre : correctifs, montées de version, évolutions demandées par la rédaction, surveillance.
+
+| Niveau de service | Charge mensuelle | Coût annuel |
+|---|---|---|
+| Minimal — correctifs et surveillance | 2 jours | 1,2 – 2,4 millions FCFA |
+| Courant — correctifs et petites évolutions | 4 – 5 jours | 2,4 – 6 millions FCFA |
+| Soutenu — développement continu | 8 – 10 jours | 5 – 12 millions FCFA |
+
+**Coûts liés aux revenus** : les opérateurs de mobile money prélèvent une commission par transaction, de l'ordre de 1,5 à 3 %. Elle ne se budgète pas à l'avance : elle se déduit du chiffre d'affaires encaissé.
+
+### 13.5 Lecture d'ensemble
+
+- **Ce que la maison possède** vaut, à faire refaire, entre 8 et 65 millions FCFA selon l'intervenant retenu.
+- **Le socle technique** coûte moins de 1,3 million FCFA par an — c'est modeste au regard de ce qu'il porte.
+- **Le vrai budget est humain.** Sans quelqu'un pour maintenir la plateforme, elle se dégradera : les dépendances vieillissent, les systèmes mobiles évoluent, les besoins de la rédaction changent. Un budget de maintenance minimal est la condition pour que l'investissement déjà consenti ne se perde pas.
+- **La priorité absolue reste les sauvegardes** : un ou deux jours de travail protègent tout le reste.
+
+---
+
+## 14. Ce qui reste à faire sur l'existant
 
 | Chantier | Nature | Priorité |
 |---|---|---|
@@ -267,7 +356,7 @@ Aujourd'hui l'import du PDF est un travail d'atelier. Un écran du CMS où la ma
 | Relecture du fonds d'archives | Éditorial, au fil de l'eau | Basse |
 | Migration du domaine notrevoienews.com | Administratif | À arbitrer |
 
-## 14. Décisions attendues de la direction
+## 15. Décisions attendues de la direction
 
 1. **Grille tarifaire** — prix de l'article à l'unité, de l'abonnement mensuel et annuel.
 2. **Frontière du paywall** — quelle part du fonds reste en lecture libre.
@@ -276,8 +365,9 @@ Aujourd'hui l'import du PDF est un travail d'atelier. Un écran du CMS où la ma
 5. **Domaine** — conserver notrevoienews.com, et sous quelle forme.
 6. **Politique d'archives** — le fonds extrait doit-il être relu avant d'être pleinement exposé.
 7. **Priorités parmi les propositions** de la partie III — lesquelles retenir, dans quel ordre.
+8. **Budget de maintenance** — quel niveau de service retenir (cf. §13.4). C'est la décision qui conditionne la durée de vie de la plateforme.
 
-## 15. Documents liés
+## 16. Documents liés
 
 - [`fiche-technique.md`](fiche-technique.md) — architecture, technologies, hébergement, sécurité, exploitation
 - [`infrastructure.md`](infrastructure.md) — hébergement Railway, déploiement, incidents
