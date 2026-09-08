@@ -1713,5 +1713,19 @@
   "dateFin": null,
   "pdfUrl": "https://res.cloudinary.com/zxjwlw7r/image/upload/v1788690453/notre-voie/edition/nv-7731.pdf",
   "couvertureUrl": "https://res.cloudinary.com/zxjwlw7r/image/upload/c_limit,q_auto,w_800/pg_1/v1/notre-voie/edition/nv-7731.jpg?_a=BAMAPqiu0"
+ },
+ {
+  "numero": 7985,
+  "dateParution": "2026-09-07",
+  "dateFin": null,
+  "pdfUrl": "https://res.cloudinary.com/zxjwlw7r/image/upload/v1788872642/notre-voie/edition/nv-7985.pdf",
+  "couvertureUrl": "https://res.cloudinary.com/zxjwlw7r/image/upload/c_limit,q_auto,w_800/pg_1/v1/notre-voie/edition/nv-7985.jpg?_a=BAMAPqiu0"
+ },
+ {
+  "numero": 7986,
+  "dateParution": "2026-09-08",
+  "dateFin": null,
+  "pdfUrl": "https://res.cloudinary.com/zxjwlw7r/image/upload/v1788872643/notre-voie/edition/nv-7986.pdf",
+  "couvertureUrl": "https://res.cloudinary.com/zxjwlw7r/image/upload/c_limit,q_auto,w_800/pg_1/v1/notre-voie/edition/nv-7986.jpg?_a=BAMAPqiu0"
  }
 ]

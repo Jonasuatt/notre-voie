@@ -167,9 +167,22 @@ def articles_de_page(page, numero_page):
     return gardes
 
 def main():
+    import sys
     unes = {u['numero']: u for u in json.load(open(os.path.join(os.path.dirname(__file__), 'unes.json'), encoding='utf-8'))}
-    sortie, sans_rubrique = [], 0
-    for numero in sorted(unes):
+
+    # Reprend le manifeste existant : un nouveau numero deverse dans le meme
+    # fichier plutot que d'ecraser le fonds deja extrait. --tout force une
+    # reextraction complete (ex. apres un correctif de l'algorithme).
+    existant = []
+    if '--tout' not in sys.argv and os.path.exists(SORTIE):
+        existant = json.load(gzip.open(SORTIE, 'rt', encoding='utf-8'))
+    deja_faits = {a['numero'] for a in existant}
+    a_traiter = sorted(n for n in unes if n not in deja_faits)
+    if not a_traiter:
+        print('Rien de nouveau a extraire.'); return
+
+    sortie, sans_rubrique = list(existant), 0
+    for numero in a_traiter:
         chemin = os.path.join(DOSSIER, unes[numero]['fichier'])
         try:
             doc = fitz.open(chemin)
@@ -184,11 +197,10 @@ def main():
                 a['date'] = unes[numero]['dateParution']
                 sortie.append(a)
         doc.close()
-        if numero % 20 == 0:
-            print(f'  {numero} — {len(sortie)} articles')
+        print(f'  {numero} — {len(sortie)} articles au total')
     with gzip.open(SORTIE, 'wt', encoding='utf-8') as f:
         json.dump(sortie, f, ensure_ascii=False)
-    print(f'{len(sortie)} articles extraits ({sans_rubrique} ecartes faute de rubrique) -> {SORTIE}')
+    print(f'{len(sortie)} articles au total ({len(sortie) - len(existant)} nouveau(x), {sans_rubrique} ecarte(s) faute de rubrique) -> {SORTIE}')
 
 if __name__ == '__main__':
     main()
